@@ -18,7 +18,9 @@ Edit `config.json` to adjust the paths to required applications, including the c
 
 ## Using conversion scripts
 
-Scripts must be run from the current directory. The result will be an `index.html` file in the specified output folder, which may also include `conversion_warnings.csv` containing a record of possible problems encountered during conversion. Additionally, there will be any images that are part of the paper.
+Scripts can be run via the *paper-convert-www* frontend or from the command line.
+
+If run from the command line, scripts must be run from the current directory. The result will be an `index.html` file in the specified output folder, which may also include `conversion_warnings.csv` containing a record of possible problems encountered during conversion. Additionally, there will be any images that are part of the paper.
 
 Run `python main_docx.py -h` to see info on DOCX => HTML conversion. The DOCX converter also produces a `tmp.docx` file for some types of image conversion. `tmp.docx` may be safely deleted.
 
