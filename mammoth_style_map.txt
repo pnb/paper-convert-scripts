@@ -1,0 +1,12 @@
+p[style-name='Paper-Title'] => div.Paper-Title
+p[style-name='Author'] => div.Author:fresh
+p[style-name='Affiliations'] => div.Affiliations:fresh
+p[style-name='E-Mail'] => div.E-Mail:fresh
+p[style-name='Abstract Heading'] => h1.AbstractHeading.not-numbered
+p[style-name='Keywords Heading'] => h1.KeywordsHeading.not-numbered
+p[style-name='Keywords'] => div.Keywords
+p[style-name='Table Header'] =>
+p[style-name='Table Text'] =>
+p[style-name='CopyrightBlock'] => div.CopyrightBlock
+p[style-name='caption'] => caption:fresh
+p[style-name='Code'] => pre > code:separator('\n')

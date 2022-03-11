@@ -1,0 +1,15 @@
+Make:image("svg$", "dvisvgm -n -p ${page} --exact -c 1.4,1.4 -s ${source} > ${output}")
+Make:htlatex()
+Make:bibtex()
+Make:htlatex()
+Make:htlatex()
+
+Make:htlatex()
+Make:bibtex()
+Make:htlatex()
+Make:htlatex()
+
+Make:htlatex()
+Make:bibtex()
+Make:htlatex()
+Make:htlatex()
