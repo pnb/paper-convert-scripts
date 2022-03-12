@@ -372,7 +372,8 @@ class TeXHandler:
             'aebxti-': ['strong', 'em'],
         }
         for prefix, name in class_elem_map.items():
-            for elem in self.soup.find_all('span', attrs={'class': lambda x: x.startswith(prefix)}):
+            for elem in self.soup.find_all('span',
+                                           attrs={'class': lambda x: x and x.startswith(prefix)}):
                 if isinstance(name, str):
                     elem.name = name
                 else:

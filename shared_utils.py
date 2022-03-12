@@ -83,20 +83,20 @@ def check_styles(soup: bs4.BeautifulSoup) -> None:
     Args:
         soup (bs4.BeautifulSoup): Processed paper
     """
-    if not soup.find('div', attrs={'class': lambda x: 'Paper-Title' in x}):
+    if not soup.find('div', attrs={'class': lambda x: x and 'Paper-Title' in x}):
         warn('style_paper_title')
-    if not soup.find('h1', attrs={'class': lambda x: 'AbstractHeading' in x}):
+    if not soup.find('h1', attrs={'class': lambda x: x and 'AbstractHeading' in x}):
         warn('style_abstract_heading')
-    if not soup.find('h1', attrs={'class': lambda x: 'KeywordsHeading' in x}):
+    if not soup.find('h1', attrs={'class': lambda x: x and 'KeywordsHeading' in x}):
         warn('style_keywords_heading')
-    if not soup.find('div', attrs={'class': lambda x: 'Keywords' in x}):
+    if not soup.find('div', attrs={'class': lambda x: x and 'Keywords' in x}):
         warn('style_keywords')
-    num_authors = len(soup.find_all('div', attrs={'class': lambda x: 'Author' in x}))
-    num_affiliations = len(soup.find_all('div', attrs={'class': lambda x: 'Affiliations' in x}))
-    num_emails = len(soup.find_all('div', attrs={'class': lambda x: 'E-Mail' in x}))
+    num_authors = len(soup.find_all('div', attrs={'class': lambda x: x and 'Author' in x}))
+    num_affil = len(soup.find_all('div', attrs={'class': lambda x: x and 'Affiliations' in x}))
+    num_emails = len(soup.find_all('div', attrs={'class': lambda x: x and 'E-Mail' in x}))
     if not num_authors:
         warn('style_author')
-    if not num_affiliations:
+    if not num_affil:
         warn('style_affiliations')
     if not num_emails:
         warn('style_email')
