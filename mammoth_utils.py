@@ -221,6 +221,11 @@ class MammothParser:
                 # Move <figcaption> inside a new <figure> containing the <img>(s)
                 new_fig = self.soup.new_tag('figure')
                 elem.insert_after(new_fig)
+                if elem.previous_sibling.name == 'p' and elem.previous_sibling.find('img'):
+                    # Unwrap images from <p> if needed
+                    for br in elem.previous_sibling.find_all('br'):
+                        br.decompose()
+                    elem.previous_sibling.unwrap()
                 img = elem.previous_sibling
                 if img.name != 'img':
                     warn('figure_caption_distance', 'Caption text: "' + elem.get_text() + '"')
