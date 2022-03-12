@@ -282,6 +282,9 @@ class MammothParser:
                 warn('table_header_missing', 'Table index ' + str(i + 1))
             if table.find('p'):
                 warn('table_styles_missing', 'Table index ' + str(i + 1))
+            rowspans = table.find_all('td', attrs={'rowspan': True})
+            for td in rowspans:  # So they can be styled
+                td['class'] = 'has-rowspan'
 
     def format_footnotes(self) -> None:
         """Apply some formatting to the footnotes section, if it exists.
