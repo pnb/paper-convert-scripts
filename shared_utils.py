@@ -206,10 +206,10 @@ def save_soup(soup: bs4.BeautifulSoup, output_filename: str) -> None:
             src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </head>
     <body>
-        <div class="paper-contents">
+        <main role="main" class="paper-contents">
     '''
     footer = '''
-        </div>
+        </main>
     </body>
 </html>
 '''
