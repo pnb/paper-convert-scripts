@@ -35,7 +35,7 @@ def warn(warning_name: str, extra_info: str='', tex: bool=False) -> None:
             ofile.write('warning_name,extra_info,is_tex\n')
     with open(warn.output_filename, 'a', encoding='utf8') as ofile:
         writer = csv.writer(ofile, lineterminator='\n')
-        writer.writerow([warning_name, extra_info, tex])
+        writer.writerow([warning_name, extra_info, int(tex)])
     message = CONFIG['warnings'][warning_name]['message']
     if tex and 'tex' in CONFIG['warnings'][warning_name].keys() and \
             'message' in CONFIG['warnings'][warning_name]['tex']:
