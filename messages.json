@@ -74,7 +74,7 @@
         },
         "alt_text_missing": {
             "message": "Missing alt text for image",
-            "help": "Follow the instructions in the template for adding alt text to images. Every image needs alt text to ensure the paper can be understood by people using screen reader software.",
+            "help": "Follow the instructions in the template for adding alt text to images. Every image needs alt text to ensure the paper can be understood by people using screen reader software. Additionally, alt text is used by the HTML conversion program to identify each image, so alt text must be unique for each image; things like image sizes may be wrong otherwise.",
             "tex": {
                 "help": "Use the \\Description{} command, as shown in the template, to add alt text. Every image needs alt text to ensure the paper can be understood by people using screen reader software."
             }
