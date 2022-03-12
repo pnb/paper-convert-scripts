@@ -14,7 +14,7 @@ This will create a new conda environment called `paper_convert` with the require
 
 Edit `config.json` to adjust the paths to required applications, including the correct Python environment.
 
-`config.json` can also be used to modify the warning messages shown when something goes wrong during paper conversion.
+`messages.json` can also be used to modify the warning messages shown when something goes wrong during paper conversion.
 
 ## Using conversion scripts
 

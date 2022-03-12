@@ -9,26 +9,30 @@ import bs4
 with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')) as infile:
     CONFIG = json.load(infile)
     CONFIG['utils_dir'] = os.path.dirname(os.path.realpath(__file__))
+with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'messages.json')) as infile:
+    messages_txt = json.load(infile)
+    WARNING_DEFS = messages_txt['warnings']
 
 
 def warn(warning_name: str, extra_info: str='', tex: bool=False) -> None:
-    """Display and record a warning, as defined in config.json. If `tex` is True, any keys/values in
-    the "tex" key of the warning in config.json will overwrite the default message; see warn_tex().
+    """Display and record a warning, as defined in messages.json. If `tex` is True, any keys/values
+    in the "tex" key of the warning in messages.json will overwrite the default message; see
+    warn_tex().
 
     Extra information may be provided to help fix this specific instance of the warning; for
     example, to include a line number or table number.
 
     Args:
-        warning_name (str): Key from the "warnings" object in config.json
+        warning_name (str): Key from the "warnings" object in messages.json
         extra_info (str, optional): Information useful for debugging this warning. Defaults to ''.
         tex (bool, optional): Use LaTeX key/value, if it exists. Defaults to False.
 
     Raises:
-        NotImplementedError: Indicates warning_name is not defined in config.json's "warnings"
+        NotImplementedError: Indicates warning_name is not defined in messages.json's "warnings"
     """
     if not hasattr(warn, 'output_filename'):
         raise KeyError('warn.output_filename must be set to a CSV file path')
-    if warning_name not in CONFIG['warnings'].keys():
+    if warning_name not in WARNING_DEFS.keys():
         raise NotImplementedError(warning_name, 'is not implemented; check spelling or implement')
     if not os.path.exists(warn.output_filename):
         with open(warn.output_filename, 'w', encoding='utf8') as ofile:
@@ -36,10 +40,10 @@ def warn(warning_name: str, extra_info: str='', tex: bool=False) -> None:
     with open(warn.output_filename, 'a', encoding='utf8') as ofile:
         writer = csv.writer(ofile, lineterminator='\n')
         writer.writerow([warning_name, extra_info, int(tex)])
-    message = CONFIG['warnings'][warning_name]['message']
-    if tex and 'tex' in CONFIG['warnings'][warning_name].keys() and \
-            'message' in CONFIG['warnings'][warning_name]['tex']:
-        message = CONFIG['warnings'][warning_name]['tex']['message']
+    message = WARNING_DEFS[warning_name]['message']
+    if tex and 'tex' in WARNING_DEFS[warning_name].keys() and \
+            'message' in WARNING_DEFS[warning_name]['tex']:
+        message = WARNING_DEFS[warning_name]['tex']['message']
     if extra_info:
         extra_info = '\n    └> ' + str(extra_info)
     print('Conversion warning:', message, extra_info)
@@ -50,7 +54,7 @@ def warn_tex(warning_name: str, extra_info: str='') -> None:
     See warn() documentation for full description.
 
     Args:
-        warning_name (str): Key from the "warnings" object in config.json
+        warning_name (str): Key from the "warnings" object in messages.json
         extra_info (str, optional): Information useful for debugging this warning. Defaults to ''.
     """
     warn(warning_name, extra_info, True)
