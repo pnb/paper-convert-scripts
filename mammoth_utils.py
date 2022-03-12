@@ -245,7 +245,7 @@ class MammothParser:
         """
         docx_soup = BeautifulSoup(self.xml_txt, 'lxml-xml')  # From which we will get cropping info
         for i, img in enumerate(self.soup.find_all('img')):
-            if not validate_alt_text(img, 'image index ' + str(i + 1)):
+            if not validate_alt_text(img, img['src']):
                 continue
             # Crop images if needed, where possible (find them based on alt text -- sort of hacky)
             xml_elem = docx_soup.find('pic:cNvPr', {'descr': img['alt']})
