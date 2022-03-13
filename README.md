@@ -10,6 +10,8 @@ To install the environment, run:
 
 This will create a new conda environment called `paper_convert` with the required packages installed.
 
+LaTeX conversion requires a recent version of TexLive. TexLive 2020 and older do not properly handle subfigures, for example.
+
 ## Configuration
 
 Edit `config.json` to adjust the paths to required applications, including the correct Python environment.
