@@ -427,6 +427,18 @@ class TeXHandler:
             ref_section.find('li').decompose()
         ref_header.insert_after(ref_section)
 
+    def remove_unused_ids(self) -> None:
+        """Remove any leftover `id` attributes that are never referenced by `href` values. This must
+        be done only *after* we are sure the id attributes are not needed; for example, after CSS
+        has been inlined.
+        """
+        used_ids = [a['href'].replace('#', '')
+                    for a in self.soup.find_all('a') if a.has_attr('href')]
+        for elem in self.soup.find_all(attrs={'id': lambda x: x and x not in used_ids}):
+            del elem['id']
+            if elem.name == 'a' and not elem.has_attr('href'):
+                elem.decompose()  # Remove unused anchors
+
     def get_command_content(self, tex_str: str, cmd_name: str) -> list:
         """Find the contents of all occurrences of a LaTeX command, such as "label" or "textbf".
         Does not support commands with [xx] arguments (yet).

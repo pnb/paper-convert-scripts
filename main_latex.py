@@ -82,6 +82,9 @@ for rule in css:
                 cur_style = elem['style'] if elem.has_attr('style') else ''
                 elem['style'] = rule.style.cssText + ';' + cur_style
 
+print('Removing unused IDs')
+texer.remove_unused_ids()
+
 print('Checking styles')
 shared_utils.check_styles(soup)
 
