@@ -45,6 +45,7 @@ docx_conv.crop_images()  # Crop figures and check them
 #       can just appear sort of wherever near where the anchor is. Same maybe for figures?
 print('Checking tables')
 docx_conv.check_tables()
+shared_utils.fix_table_gaps(docx_conv.soup)
 print('Formatting any footnotes')
 docx_conv.format_footnotes()
 print('Copying equations from Pandoc')

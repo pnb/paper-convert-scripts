@@ -59,6 +59,7 @@ print('Merging unnecessary elements')
 texer.merge_elements('span')
 print('Formatting tables')
 texer.format_tables()  # TODO: Need to add stuff into <thead> for accessibility and CSS
+shared_utils.fix_table_gaps(texer.soup)
 print('Formatting figures')
 texer.format_figures()
 print('Formatting equations')

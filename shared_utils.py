@@ -172,6 +172,18 @@ def position_figures_tables(soup: bs4.BeautifulSoup) -> None:
             print('Info: Could not move table/figure to end of section')
 
 
+def fix_table_gaps(soup: bs4.BeautifulSoup) -> None:
+    """Fix blank cells in table where needed, which is especially needed for having accessible
+    headers.
+
+    Args:
+        soup (bs4.BeautifulSoup): Paper soup
+    """
+    for th in soup.find_all('th'):
+        if not th.get_text(strip=True):
+            th.name = 'td'  # Convert empty header cells to <td> which is more appropriate
+
+
 def prettify_soup(soup: bs4.BeautifulSoup) -> str:
     """Generate an HTML string of a BeautifulSoup paper document that is slightly more readable
     than simply calling str(soup).
