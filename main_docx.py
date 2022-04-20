@@ -56,6 +56,8 @@ print('Setting image sizes')
 docx_conv.set_image_sizes()
 print('Formatting references')
 docx_conv.fix_references()
+print('Formatting authors')
+shared_utils.wrap_author_divs(docx_conv.soup)
 print('Checking styles')
 shared_utils.check_styles(docx_conv.soup)
 

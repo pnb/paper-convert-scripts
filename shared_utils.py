@@ -172,6 +172,31 @@ def position_figures_tables(soup: bs4.BeautifulSoup) -> None:
             print('Info: Could not move table/figure to end of section')
 
 
+def wrap_author_divs(soup: bs4.BeautifulSoup) -> None:
+    """Wrap each author (or author group) in a div so they can be displayed side-by-side if space
+    permits.
+
+    Args:
+        soup (bs4.BeautifulSoup): Paper soup with author/affiliation info already parsed
+    """
+    all_authors_wrapper = soup.new_tag('div', attrs={'class': 'all-authors'})
+    inserted = False
+    for auth_start_elem in soup.find_all('div', attrs={'class': 'Author'}):
+        wrapper = soup.new_tag('div', attrs={'class': 'author-chunk'})
+        auth_start_elem.insert_before(wrapper)
+        wrapper.append(auth_start_elem)
+        while wrapper.next_sibling and (
+                isinstance(wrapper.next_sibling, bs4.Tag) and
+                wrapper.next_sibling.has_attr('class') and
+                ('Affiliations' in wrapper.next_sibling['class'] or
+                 'E-Mail' in wrapper.next_sibling['class'])):
+            wrapper.append(wrapper.next_sibling)
+        if not inserted:
+            wrapper.insert_before(all_authors_wrapper)
+            inserted = True
+        all_authors_wrapper.append(wrapper)
+
+
 def fix_table_gaps(soup: bs4.BeautifulSoup) -> None:
     """Fix blank cells in table where needed, which is especially needed for having accessible
     headers.
