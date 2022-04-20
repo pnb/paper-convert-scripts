@@ -112,9 +112,11 @@ class TeXHandler:
         Returns:
             int: Line number (1-indexed) or 0 if no make4ht comment could be found
         """
-        comment = soup_elem.find_previous(string=lambda x: isinstance(x, bs4.Comment))
-        if comment:
-            return int(comment.strip().split(' ')[-1])
+        comment = soup_elem
+        while comment:
+            comment = comment.find_previous(string=lambda x: isinstance(x, bs4.Comment))
+            if comment and comment.strip().startswith('l. '):
+                return int(comment.strip().split(' ')[-1])
         return 0
 
     def tex_line(self, soup_elem: bs4.Tag) -> str:
