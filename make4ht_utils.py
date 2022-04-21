@@ -276,12 +276,21 @@ class TeXHandler:
         shared_utils.validate_alt_text(img_elem, img_elem['src'], True)
         return alt[0] if alt else None
 
-    def _fix_figure_text(self, figure: bs4.Tag, alt: str) -> None:
-        # Sometimes the alt text gets added as a string, so we'll remove that
-        if alt:
-            s = re.sub(r'\W', '', alt)
-            for alt_str_elem in figure.find_all(string=lambda x: s == re.sub(r'\W', '', x)):
-                alt_str_elem.replace_with('')
+    def _fix_figure_text(self, figure: bs4.Tag) -> None:
+        # Sometimes part of the image filename or alt text might get included on the <img> line
+        for img in figure.find_all('img'):
+            el = img.previous_sibling
+            while el and (isinstance(el, bs4.NavigableString) or el.sourceline == img.sourceline):
+                next_el = el.previous_sibling
+                if isinstance(el, bs4.NavigableString) and el.strip():
+                    el.replace_with('')
+                el = next_el
+            el = img.next_sibling
+            while el and (isinstance(el, bs4.NavigableString) or el.sourceline == img.sourceline):
+                next_el = el.next_sibling
+                if isinstance(el, bs4.NavigableString) and el.strip():
+                    el.replace_with('')
+                el = next_el
         # Move everything non-<img> into the caption
         for p in figure.find_all('p'):
             p.unwrap()
@@ -323,7 +332,7 @@ class TeXHandler:
                 while parent.name != 'div' and parent.name != 'figure':
                     parent = parent.parent
                 parent.name = 'figure'
-                self._fix_figure_text(parent, alt)  # Handle subfigure caption
+                self._fix_figure_text(parent)  # Handle subfigure caption
                 parent = parent.parent  # Go up to next level to handle containing <figure>
             while parent.name != 'div' and parent.name != 'figure':
                 parent = parent.parent
@@ -331,7 +340,7 @@ class TeXHandler:
             if not parent.find('div'):  # No (more) subfigures to worry about
                 if 'subfigure' in self.tex_lines[env_start]:
                     parent['class'] = 'has-subfigures'
-                self._fix_figure_text(parent, alt)  # Handle figure caption
+                self._fix_figure_text(parent)  # Handle figure caption
 
             # Set image size class
             if img.has_attr('height'):
