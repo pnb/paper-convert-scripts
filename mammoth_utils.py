@@ -53,8 +53,8 @@ class MammothParser:
         """
         placeholders = []
         # Regex from https://github.com/zlqm/docx-equation/blob/master/docx_equation/docx.py
-        omath_para_pattern = re.compile(r'(<m:oMathPara[^<>]*>.+?</m:oMathPara>)', flags=re.DOTALL)
-        omath_pattern = re.compile(r'(<m:oMath[^<>]*>.+?</m:oMath>)', flags=re.DOTALL)
+        omath_pattern = re.compile(
+            r'(<m:oMathPara[^<>]*>.+?</m:oMathPara>|<m:oMath[^<>]*>.+?</m:oMath>)', flags=re.DOTALL)
         with zipfile.ZipFile(docx_path) as infile:
             with zipfile.ZipFile(os.path.join(self.output_dir, 'tmp.docx'), 'w') as outfile:
                 outfile.comment = infile.comment
@@ -62,10 +62,6 @@ class MammothParser:
                     xml = infile.read(f)
                     if f.filename == 'word/document.xml':
                         txt = xml.decode('utf8')
-                        while re.search(omath_para_pattern, txt):
-                            placeholders.append(str(uuid.uuid4()).replace('-', ''))
-                            placeholder = '<w:r><w:t>' + placeholders[-1] + '</w:t></w:r>'
-                            txt = re.sub(omath_para_pattern, placeholder, txt, count=1)
                         while re.search(omath_pattern, txt):
                             placeholders.append(str(uuid.uuid4()).replace('-', ''))
                             placeholder = '<w:r><w:t>' + placeholders[-1] + '</w:t></w:r>'
