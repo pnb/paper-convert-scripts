@@ -43,7 +43,12 @@ retcode = subprocess.call('make4ht --output-dir .. --format html5+common_domfilt
                           '--build-file make4ht_with_bibtex.mk4 tmp-make4ht.tex '
                           '"mathml,mathjax,svg,fn-in"', shell=True, cwd=extracted_dir)
 if retcode:
-    shared_utils.warn('make4ht_failed', tex=True)
+    print('Retrying without MathML support (sometimes this helps)')
+    retcode = subprocess.call('make4ht --output-dir .. --format html5+common_domfilters '
+                              '--build-file make4ht_with_bibtex.mk4 tmp-make4ht.tex '
+                              '"mathjax,svg,fn-in"', shell=True, cwd=extracted_dir)
+    if retcode:
+        shared_utils.warn('make4ht_failed', tex=True)
 
 # Load HTML
 print('Loading converted HTML')
