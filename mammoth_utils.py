@@ -276,8 +276,11 @@ class MammothParser:
                 warn('table_caption_missing', 'Table index ' + str(i + 1))
             if not table.find('thead'):
                 warn('table_header_missing', 'Table index ' + str(i + 1))
-            if table.find('p'):
-                warn('table_styles_missing', 'Table index ' + str(i + 1))
+            for p in table.find_all('p'):
+                if not p.has_attr('class') or ('table-text' not in p['class'] and
+                                               'table-header' not in p['class']):
+                    warn('table_styles_missing', 'Table index ' + str(i + 1))
+                    break
             rowspans = table.find_all('td', attrs={'rowspan': True})
             for td in rowspans:  # So they can be styled
                 td['class'] = 'has-rowspan'
