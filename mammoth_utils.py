@@ -229,6 +229,8 @@ class MammothParser:
                     next_img = img.previous_sibling
                     new_fig.insert(0, img)
                     img = next_img
+                while elem.find('img'):
+                    new_fig.append(elem.find('img'))
                 new_fig.append(elem)
             # Number figures and tables if the numbers have gotten dropped.
             if match and not match.group(2).isdigit():
