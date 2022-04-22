@@ -292,7 +292,10 @@ class TeXHandler:
                     el.replace_with('')
                 el = next_el
         # Move everything non-<img> into the caption
-        for p in figure.find_all('p', attrs={'id': None}):
+        for p in figure.find_all('p'):
+            if p.has_attr('id'):
+                anchor = self.soup.new_tag('a', attrs={'id': p['id']})
+                p.insert_before(anchor)
             p.unwrap()
         for div in figure.find_all('div'):
             div.name = 'span'  # Change these to spans so we know when we're done (no divs left)
