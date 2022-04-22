@@ -95,15 +95,23 @@ def check_styles(soup: bs4.BeautifulSoup) -> None:
         warn('style_keywords_heading')
     if not soup.find('div', attrs={'class': lambda x: x and 'Keywords' in x}):
         warn('style_keywords')
-    num_authors = len(soup.find_all('div', attrs={'class': lambda x: x and 'Author' in x}))
+    authors = soup.find_all('div', attrs={'class': lambda x: x and 'Author' in x})
     num_affil = len(soup.find_all('div', attrs={'class': lambda x: x and 'Affiliations' in x}))
-    num_emails = len(soup.find_all('div', attrs={'class': lambda x: x and 'E-Mail' in x}))
-    if not num_authors:
+    emails = soup.find_all('div', attrs={'class': lambda x: x and 'E-Mail' in x})
+    if not len(authors):
         warn('style_author')
+    else:
+        for author in authors:
+            if '@' in author.get_text():
+                warn('style_email_in_author', author.get_text().strip())
     if not num_affil:
         warn('style_affiliations')
-    if not num_emails:
+    if not len(emails):
         warn('style_email')
+    else:
+        for email in emails:
+            if ' ' in email.get_text().strip() and email.get_text().count('@') < 2:
+                warn('style_space_in_email', email.get_text().strip())
     # Check headings
     if not get_elem_containing_text(soup, 'h1', 'introduction'):
         warn('style_no_intro')
