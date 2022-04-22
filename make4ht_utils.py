@@ -292,7 +292,7 @@ class TeXHandler:
                     el.replace_with('')
                 el = next_el
         # Move everything non-<img> into the caption
-        for p in figure.find_all('p'):
+        for p in figure.find_all('p', attrs={'id': None}):
             p.unwrap()
         for div in figure.find_all('div'):
             div.name = 'span'  # Change these to spans so we know when we're done (no divs left)
