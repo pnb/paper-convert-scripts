@@ -231,6 +231,7 @@ def prettify_soup(soup: bs4.BeautifulSoup) -> str:
     # TODO: indent nicely and all that
     html = soup.encode_contents(formatter='html').decode('utf8')
     html = re.sub(r'\n\n+', '\n', html)
+    html = html.replace(chr(0x1f86a), '&rarr;').replace(chr(0x1f868), '&larr;')
     return html
 
 
