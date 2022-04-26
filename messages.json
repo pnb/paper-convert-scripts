@@ -72,6 +72,13 @@
                 "help": "Make sure you used the \\bibliographystyle{abbrv} and \\bibliography{sigproc} (or whatever your .bib file is named instead of sigproc.bib) commands in your paper."
             }
         },
+        "mismatched_refs": {
+            "message": "Mismatched references",
+            "help": "The in-text citation numbers do not match your numbered references. Make sure you are using square brackets citation style.",
+            "tex": {
+                "help": "Make sure you used the appropriate \\cite command and square brackets citation style."
+            }
+        },
         "alt_text_missing": {
             "message": "Missing alt text for image",
             "help": "Follow the instructions in the template for adding alt text to images. Every image needs alt text to ensure the paper can be understood by people using screen reader software. Additionally, alt text is used by the HTML conversion program to identify each image, so alt text must be unique for each image; things like image sizes may be wrong otherwise.",

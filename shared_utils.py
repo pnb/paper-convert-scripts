@@ -4,6 +4,7 @@ import json
 import re
 
 import bs4
+from lxml import etree
 
 
 with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')) as infile:
@@ -109,7 +110,15 @@ def check_styles(soup: bs4.BeautifulSoup) -> None:
         warn('style_no_intro')
     if not get_elem_containing_text(soup, 'h1', 'references'):
         warn('style_no_refs')
-
+    # Check every numbered reference appears in the text in square brackets
+    dom = etree.HTML(str(soup))
+    ref_li = dom.xpath("//h1[contains(text(), 'REFERENCES')]/following-sibling::ol/li | //h1[.//*[contains(text(), 'REFERENCES')]]/following-sibling::ol/li") 
+    ref_in_ref = set( range(1,len(ref_li)+1)  ) 
+    ref_in_text_raw = re.findall('\[([\d, ]+)\]', soup.get_text( strip=True) )
+    ref_in_text = set( [ int(i) for i in re.split(r'\D+',','.join(ref_in_text_raw)) ] )
+    mismatched_ref = ref_in_ref.symmetric_difference(ref_in_text)
+    if len(mismatched_ref) > 0:
+        warn('mismatched_refs', sorted (mismatched_ref) )
 
 def validate_alt_text(img_elem: bs4.Tag, identifying_text: str, tex: bool=False) -> bool:
     """Check if the alt text for this <img> element meets expectations. Triggers warnings if not.
