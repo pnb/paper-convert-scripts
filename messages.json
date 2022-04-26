@@ -58,6 +58,14 @@
                 "help": "Make sure author e-mail addresses are defined with the \\email command as shown in the template."
             }
         },
+        "style_email_in_author": {
+            "message": "Author name contains \"@\" symbol",
+            "help": "Text marked with the \"Author\" style contained an \"@\" symbol, suggesting it might contain an email address. Select each email address, open the Styles pane, and make sure it has the \"E-Mail\" style rather than \"Author\" style. Note that if you may need to add a paragraph break (i.e., press Enter) after each email address; otherwise, Word might force each email address to have the same style as the subsequent author's name does (in which case one of them will have the wrong style)."
+        },
+        "style_space_in_email": {
+            "message": "Email address contains a space",
+            "help": "Text marked with the \"E-Mail\" style contained a space, suggesting it might include some other text, such as author names. Open the Styles pane, select each part of the author info, make sure each part has the correct style. Note that if you may need to add a paragraph break (i.e., press Enter) after each email address; otherwise, Word might force each email address to have the same style as the subsequent author's name does (in which case one of them will have the wrong style)."
+        },
         "style_no_intro": {
             "message": "No \"Introduction\" section found",
             "help": "If you intended not to have an introduction section, ignore this message. Otherwise, select your Introduction header in Word, open the Styles pane, and make sure the \"Heading 1\" style is used.",
