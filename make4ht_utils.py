@@ -24,6 +24,8 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
             raw_tex = infile.read()
         # Remove lines starting with %; replace with single % to avoid introducing a <p>
         raw_tex = re.sub(r'([^\\]%).*$', r'\1', raw_tex, flags=re.MULTILINE)
+        # Remove \titlenote{}, which make4ht handles poorly so far
+        raw_tex = re.sub(r'([^\\]|^)\\titlenote\{[^\}]*\}', r'\1', raw_tex, flags=re.MULTILINE)
         return raw_tex
 
     with zipfile.ZipFile(source_zip_path, 'r') as inzip:
