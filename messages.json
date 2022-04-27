@@ -87,6 +87,13 @@
                 "help": "Make sure you used the appropriate \\cite command and square brackets citation style."
             }
         },
+        "incomplete_reference": {
+            "message": "An entry in the reference section appears to be incomplete",
+            "help": "Find the numbered entry in your reference section and add the missing elements. If we did not correctly recognize the entry's type, the warning may be invalid.",
+            "tex": {
+                "help": "Check that the missing elements are in your Bibtex. If you see them but they don't appear in the PDF, you may have them in the wrong Bibtex field"
+            }
+        },
         "alt_text_missing": {
             "message": "Missing alt text for image",
             "help": "Follow the instructions in the template for adding alt text to images. Every image needs alt text to ensure the paper can be understood by people using screen reader software. Additionally, alt text is used by the HTML conversion program to identify each image, so alt text must be unique for each image; things like image sizes may be wrong otherwise.",

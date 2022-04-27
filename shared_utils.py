@@ -5,7 +5,8 @@ import re
 
 import bs4
 from lxml import etree
-
+import subprocess
+from collections import defaultdict
 
 with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')) as infile:
     CONFIG = json.load(infile)
@@ -80,7 +81,7 @@ def get_elem_containing_text(soup: bs4.BeautifulSoup, tagname: str, text: str) -
     return None
 
 
-def check_styles(soup: bs4.BeautifulSoup) -> None:
+def check_styles(soup: bs4.BeautifulSoup,output_dir) -> None:
     """Check the `soup` object to see if it has most of the expected elements with the appropriate
     styles, and trigger warnings if not. This is intended as one of the last steps, after
     postprocessing.
@@ -120,13 +121,40 @@ def check_styles(soup: bs4.BeautifulSoup) -> None:
         warn('style_no_refs')
     # Check every numbered reference appears in the text in square brackets
     dom = etree.HTML(str(soup))
-    ref_li = dom.xpath("//h1[contains(text(), 'REFERENCES')]/following-sibling::ol/li | //h1[.//*[contains(text(), 'REFERENCES')]]/following-sibling::ol/li") 
-    ref_in_ref = set( range(1,len(ref_li)+1)  ) 
+    ref_lis = dom.xpath("//h1[contains(text(), 'REFERENCES')]/following-sibling::ol/li | //h1[.//*[contains(text(), 'REFERENCES')]]/following-sibling::ol/li") 
+    ref_in_ref = set( range(1,len(ref_lis)+1)  ) 
     ref_in_text_raw = re.findall('\[([\d, ]+)\]', soup.get_text( strip=True) )
     ref_in_text = set( [ int(i) for i in re.split(r'\D+',','.join(ref_in_text_raw)) ] )
     mismatched_ref = ref_in_ref.symmetric_difference(ref_in_text)
     if len(mismatched_ref) > 0:
         warn('mismatched_refs', sorted (mismatched_ref) )
+    # Check references are complete; executes anystyle in shell
+    refs = [ ' '.join( "".join(ref_li.itertext() ).split() ) for ref_li in ref_lis ] #lxml makes this ugly
+    fname = os.path.join(output_dir, "extracted_refs.txt")
+    with open(os.path.join(fname), 'w') as ofile:
+        for ref in refs:
+            ofile.write(ref + '\n')
+    subprocess.call([CONFIG['anystyle_path'], '-f' , 'json', 'parse',
+                    fname, output_dir], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # os.unlink(fname)
+    fname = os.path.join(output_dir,"extracted_refs.json")
+    with open(os.path.join(fname)) as ofile:
+        ref_dict_list = json.load(ofile)
+    # os.unlink(fname)
+    # TODO: put this in a config file or something
+    ref_requirements = defaultdict(lambda: ["title", "date"])
+    ref_requirements["book"] = [ "author", "title", "date", "publisher"]
+    ref_requirements["report"] = [ "author", "title", "date", "publisher"]
+    ref_requirements["chapter"] =  ["author", "title", "date", "publisher", "editor", "container-title", "pages", "location"]
+    ref_requirements["paper-conference"] = [ "author", "title", "date", "container-title", "pages"]
+    ref_requirements["article-journal"] = [ "author", "title", "date", "container-title", "pages", "volume", "issue"]
+    
+    for i,ref_dict in enumerate(ref_dict_list,start=1):
+        reqs = set(ref_requirements[ref_dict['type']])
+        t1 = set(ref_dict.keys())
+        missing_reqs = reqs.difference(set(ref_dict.keys()))
+        if len(missing_reqs) > 0:
+            warn('incomplete_reference', f"Reference {i} was recognized as a {ref_dict['type']} and appears to be missing the following elements: " + ", ".join(missing_reqs)  )
 
 def validate_alt_text(img_elem: bs4.Tag, identifying_text: str, tex: bool=False) -> bool:
     """Check if the alt text for this <img> element meets expectations. Triggers warnings if not.
