@@ -121,20 +121,29 @@ def check_styles(soup: bs4.BeautifulSoup,output_dir) -> None:
         warn('style_no_refs')
     # Check every numbered reference appears in the text in square brackets
     dom = etree.HTML(str(soup))
-    ref_lis = dom.xpath("//h1[contains(text(), 'REFERENCES')]/following-sibling::ol/li | //h1[.//*[contains(text(), 'REFERENCES')]]/following-sibling::ol/li") 
-    ref_in_ref = set( range(1,len(ref_lis)+1)  ) 
-    ref_in_text_raw = re.findall('\[([\d, ]+)\]', soup.get_text( strip=True) )
-    ref_in_text = set( [ int(i) for i in re.split(r'\D+',','.join(ref_in_text_raw)) ] )
-    mismatched_ref = ref_in_ref.symmetric_difference(ref_in_text)
-    if len(mismatched_ref) > 0:
-        warn('mismatched_refs', sorted (mismatched_ref) )
+    ref_lis = dom.xpath("//h1[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'references')]/following-sibling::ol/li | //h1[.//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'references')]]/following-sibling::ol/li") 
+    # we found no references in the reference section!
+    if ref_lis == []:
+        warn('no_references_found_in_reference_section')
+    else:
+        ref_in_ref = set( range(1,len(ref_lis)+1)  ) 
+        ref_in_text_raw = re.findall('\[([\d, ]+)\]', soup.get_text( strip=True) )
+        # we found no citations in the text!
+        if ref_in_text_raw == []:
+            warn('no_citations_found_in_text')
+        else:
+            ref_in_text = set( [ int(i) for i in re.split(r'\D+',','.join(ref_in_text_raw)) ] )
+            mismatched_ref = ref_in_ref.symmetric_difference(ref_in_text)
+            if len(mismatched_ref) > 0:
+                warn('mismatched_refs', sorted (mismatched_ref) )
+
     # Check references are complete; executes anystyle in shell
     refs = [ ' '.join( "".join(ref_li.itertext() ).split() ) for ref_li in ref_lis ] #lxml makes this ugly
     fname = os.path.join(output_dir, "extracted_refs.txt")
     with open(os.path.join(fname), 'w') as ofile:
         for ref in refs:
             ofile.write(ref + '\n')
-    subprocess.call([CONFIG['anystyle_path'], '-f' , 'json', 'parse',
+    subprocess.call([CONFIG['anystyle_path'], '-f' , 'json', '--overwrite', 'parse',
                     fname, output_dir], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     # os.unlink(fname)
     fname = os.path.join(output_dir,"extracted_refs.json")
@@ -154,7 +163,8 @@ def check_styles(soup: bs4.BeautifulSoup,output_dir) -> None:
         t1 = set(ref_dict.keys())
         missing_reqs = reqs.difference(set(ref_dict.keys()))
         if len(missing_reqs) > 0:
-            warn('incomplete_reference', f"Reference {i} was recognized as a {ref_dict['type']} and appears to be missing the following elements: " + ", ".join(missing_reqs)  )
+            ref_type = ref_dict['type'] if ref_dict['type'] else 'other'
+            warn('incomplete_reference', f"Reference {i} was recognized as {ref_type} and might be missing the following elements: " + ", ".join(missing_reqs)  )
 
 def validate_alt_text(img_elem: bs4.Tag, identifying_text: str, tex: bool=False) -> bool:
     """Check if the alt text for this <img> element meets expectations. Triggers warnings if not.

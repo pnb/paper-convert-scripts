@@ -80,6 +80,21 @@
                 "help": "Make sure you used the \\bibliographystyle{abbrv} and \\bibliography{sigproc} (or whatever your .bib file is named instead of sigproc.bib) commands in your paper."
             }
         },
+        "no_references_found_in_reference_section": {
+            "message": "No reference section with references found",
+            "help": "Check that your reference section is called 'REFERENCES' and uses the correct style.",
+            "tex": {
+                "help": "Make sure you used the appropriate section command and bibtex style."
+            }
+        },
+        "no_citations_found_in_text": {
+            "message": "No citations found in the text",
+            "help": "Check that your in-text citations use the correct numbered style, e.g. [1].",
+            "tex": {
+                "help": "Make sure you used the appropriate \\cite command and square brackets citation style."
+            }
+        },
+        
         "mismatched_refs": {
             "message": "Mismatched references",
             "help": "The in-text citation numbers do not match your numbered references. Make sure you are using square brackets citation style.",
@@ -88,8 +103,8 @@
             }
         },
         "incomplete_reference": {
-            "message": "An entry in the reference section appears to be incomplete",
-            "help": "Find the numbered entry in your reference section and add the missing elements. If we did not correctly recognize the entry's type, the warning may be invalid.",
+            "message": "An entry in the reference section might be incomplete",
+            "help": "Find the numbered entry in your reference section and check for the missing elements. If we did not correctly recognize the entry's type, the warning may be invalid.",
             "tex": {
                 "help": "Check that the missing elements are in your Bibtex. If you see them but they don't appear in the PDF, you may have them in the wrong Bibtex field"
             }
