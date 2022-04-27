@@ -156,7 +156,7 @@ def check_styles(soup: bs4.BeautifulSoup,output_dir) -> None:
     ref_requirements["report"] = [ "author", "title", "date", "publisher"]
     ref_requirements["chapter"] =  ["author", "title", "date", "publisher", "editor", "container-title", "pages", "location"]
     ref_requirements["paper-conference"] = [ "author", "title", "date", "container-title", "pages"]
-    ref_requirements["article-journal"] = [ "author", "title", "date", "container-title", "pages", "volume", "issue"]
+    ref_requirements["article-journal"] = [ "author", "title", "date", "container-title", "pages", "volume" ] #"issue" is false alarming too much to be useful; TODO train anystyle on EDM style
     
     for i,ref_dict in enumerate(ref_dict_list,start=1):
         reqs = set(ref_requirements[ref_dict['type']])
