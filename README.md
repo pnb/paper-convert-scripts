@@ -12,9 +12,11 @@ This will create a new conda environment called `paper_convert` with the require
 
 LaTeX conversion requires a recent version of TexLive. TexLive 2020 and older do not properly handle subfigures, for example.
 
+Checking reference styles also requires the *anystyle-cli* Ruby gem to be installed, e.g., via `sudo gem install anystyle-cli`.
+
 ## Configuration
 
-Edit `config.json` to adjust the paths to required applications, including the correct Python environment.
+Edit `config.json` to adjust the paths to required applications, including the correct Python environment and path to *anystyle*.
 
 `messages.json` can also be used to modify the warning messages shown when something goes wrong during paper conversion.
 
