@@ -64,7 +64,10 @@
         },
         "style_space_in_email": {
             "message": "Email address contains a space",
-            "help": "Text marked with the \"E-Mail\" style contained a space, suggesting it might include some other text, such as author names. Open the Styles pane, select each part of the author info, make sure each part has the correct style. Note that if you may need to add a paragraph break (i.e., press Enter) after each email address; otherwise, Word might force each email address to have the same style as the subsequent author's name does (in which case one of them will have the wrong style)."
+            "help": "Text marked with the \"E-Mail\" style contained a space, suggesting it might include some other text, such as author names. Open the Styles pane, select each part of the author info, make sure each part has the correct style. Note that if you may need to add a paragraph break (i.e., press Enter) after each email address; otherwise, Word might force each email address to have the same style as the subsequent author's name does (in which case one of them will have the wrong style). If this warning occurs because you are using some custom formatting of emails (e.g., \"[person1, person2] @ domain.com\") you may ignore it.",
+            "tex": {
+                "help": "Check to make sure the \\email command is used for email addresses only. If this warning occurs because you are using some custom formatting of emails (e.g., \"[person1, person2] @ domain.com\") you may ignore it."
+            }
         },
         "style_no_intro": {
             "message": "No \"Introduction\" section found",

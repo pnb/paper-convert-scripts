@@ -112,7 +112,7 @@ def check_styles(soup: bs4.BeautifulSoup,output_dir) -> None:
         warn('style_email')
     else:
         for email in emails:
-            if ' ' in email.get_text().strip() and email.get_text().count('@') < 2:
+            if '@' not in email.get_text().strip().split()[-1]:
                 warn('style_space_in_email', email.get_text().strip())
     # Check headings
     if not get_elem_containing_text(soup, 'h1', 'introduction'):
