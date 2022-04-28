@@ -121,7 +121,7 @@ def check_styles(soup: bs4.BeautifulSoup,output_dir) -> None:
         warn('style_no_refs')
     # Check every numbered reference appears in the text in square brackets
     dom = etree.HTML(str(soup))
-    ref_lis = dom.xpath("//h1[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'references')]/following-sibling::ol/li | //h1[.//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'references')]]/following-sibling::ol/li") 
+    ref_lis = dom.xpath("//h1[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'references')]/following-sibling::ol[1]/li | //h1[.//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'references')]]/following-sibling::ol[1]/li") 
     # we found no references in the reference section!
     if ref_lis == []:
         warn('no_references_found_in_reference_section')
