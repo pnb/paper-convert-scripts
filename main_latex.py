@@ -92,7 +92,7 @@ print('Removing unused IDs')
 texer.remove_unused_ids()
 
 print('Checking styles')
-shared_utils.check_styles(soup)
+shared_utils.check_styles(soup,args.output_dir)
 
 # Save result
 print('Saving result')
