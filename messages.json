@@ -170,6 +170,10 @@
             "message": "Figure not found immediately before caption",
             "help": "Figure captions should appear directly below figure images with nothing between them and the figure image."
         },
+        "figure_caption_unstyled": {
+            "message": "Figure caption may be missing style",
+            "help": "Figure captions should have the \"Caption\" style, as shown in the template. Given that one of the images in the document was immediately followed by \"Figure...\" text, it seems like it may have been intended to be a caption. Using the \"Caption\" style is essential to denote where the caption starts and ends, and whether the image is a figure or an image with some other purpose."
+        },
         "chart_caption_not_found": {
             "message": "Chart caption not found",
             "help": "A \"chart\" is a DrawingML object, such as a graph pasted in from Excel. This warning indicates that the caption could not be found for a chart. Chart captions are just like figure captions, and should start with \"Figure X\" or \"Fig. X\". Chart parsing can be finicky, so please contact support if you believe this warning is incorrect."

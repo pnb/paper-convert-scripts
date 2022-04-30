@@ -89,6 +89,14 @@ def check_styles(soup: bs4.BeautifulSoup,output_dir) -> None:
     Args:
         soup (bs4.BeautifulSoup): Processed paper
     """
+    # Check for <img> with figure "caption" with wrong style (mostly a DOCX problem)
+    for img in soup.find_all('img'):
+        if isinstance(img.next_sibling, bs4.Tag) and \
+                img.next_sibling.get_text().strip().startswith('Figure ') and \
+                img.next_sibling.name != 'figcaption' and not img.next_sibling.find('figcaption'):
+            warn('figure_caption_unstyled', img.next_sibling.get_text().strip())
+
+    # Check metadata-related styles
     if not soup.find('div', attrs={'class': lambda x: x and 'Paper-Title' in x}):
         warn('style_paper_title')
     if not soup.find('h1', attrs={'class': lambda x: x and 'AbstractHeading' in x}):
@@ -157,7 +165,7 @@ def check_styles(soup: bs4.BeautifulSoup,output_dir) -> None:
     ref_requirements["chapter"] =  ["author", "title", "date", "publisher", "editor", "container-title", "pages", "location"]
     ref_requirements["paper-conference"] = [ "author", "title", "date", "container-title", "pages"]
     ref_requirements["article-journal"] = [ "author", "title", "date", "container-title", "pages", "volume" ] #"issue" is false alarming too much to be useful; TODO train anystyle on EDM style
-    
+
     for i,ref_dict in enumerate(ref_dict_list,start=1):
         reqs = set(ref_requirements[ref_dict['type']])
         t1 = set(ref_dict.keys())
@@ -165,6 +173,7 @@ def check_styles(soup: bs4.BeautifulSoup,output_dir) -> None:
         if len(missing_reqs) > 0:
             ref_type = ref_dict['type'] if ref_dict['type'] else 'other'
             warn('incomplete_reference', f"Reference {i} was recognized as {ref_type} and might be missing the following elements: " + ", ".join(missing_reqs)  )
+
 
 def validate_alt_text(img_elem: bs4.Tag, identifying_text: str, tex: bool=False) -> bool:
     """Check if the alt text for this <img> element meets expectations. Triggers warnings if not.
