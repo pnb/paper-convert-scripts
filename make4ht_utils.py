@@ -216,24 +216,30 @@ class TeXHandler:
         """
         table_tex_regex = re.compile(r'(^|[^\\])\\begin\s*\{table')
         for caption_start in self.soup.find_all(string=re.compile(r'Table\s+\d+:')):
-            # Check previous few lines for a table environmentt
+            # Check previous lines for a table environmentt
             line_num = self.tex_line_num(caption_start)
-            for line in self.tex_lines[line_num - 10:line_num]:
-                if table_tex_regex.search(line):
+            for i in range(line_num, 0, -1):
+                if table_tex_regex.search(self.tex_lines[i]):
                     break
             else:
                 continue
             # Combine all sub-sections (e.g., bold) into one caption
+            table_name = caption_start.get_text().strip().split(':')[0]
             while caption_start.parent.name != 'div':  # Rewind to beginning of table container
                 caption_start = caption_start.parent
             while caption_start.previous_sibling:
                 caption_start = caption_start.previous_sibling  # Usually an anchor at this point
+                if isinstance(caption_start, bs4.Tag) and caption_start.find('table'):
+                    warn('table_caption_distance', table_name)  # Caption below table
+                    break
             caption = self.soup.new_tag('caption')
             caption_start.insert_before(caption)
             while caption.next_sibling and (isinstance(caption.next_sibling, bs4.NavigableString) or
                                             caption.next_sibling.name not in ['div', 'table']):
                 caption.append(caption.next_sibling)
             table = caption.find_next('table')  # Move into <table> where it belongs
+            if not table:
+                continue  # Something went pretty wrong, like caption below table
             table.insert(0, caption)
             # Remove <p>s from table rows
             for p in table.find_all('p'):

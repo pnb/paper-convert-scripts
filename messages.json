@@ -161,7 +161,10 @@
         },
         "table_caption_distance": {
             "message": "Table not found immediately below caption",
-            "help": "Table captions should appear directly above tables with nothing between them and the table."
+            "help": "Table captions should appear directly above tables with nothing between them and the table.",
+            "tex": {
+                "help": "The \\caption command should appear before your table content so that the caption is above the table. Check the template to see an example."
+            }
         },
         "figure_caption_distance": {
             "message": "Figure not found immediately before caption",
