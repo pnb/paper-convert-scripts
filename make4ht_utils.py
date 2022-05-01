@@ -20,7 +20,7 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
         str: LaTeX contents
     """
     def _load_tex_str(source_tex_filename: str):
-        with open(source_tex_filename) as infile:
+        with open(source_tex_filename, errors='replace') as infile:
             raw_tex = infile.read()
         # Remove lines starting with %; replace with single % to avoid introducing a <p>
         raw_tex = re.sub(r'([^\\]%).*$', r'\1', raw_tex, flags=re.MULTILINE)
