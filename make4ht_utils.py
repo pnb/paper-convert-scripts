@@ -334,7 +334,7 @@ class TeXHandler:
             obj['src'] = obj['data']
             del obj['name']
         for img in self.soup.find_all('img'):
-            # Repair double // in img src that happens when using a training / with \graphicspath
+            # Repair double // in img src that happens when using a trailing / with \graphicspath
             img['src'] = img['src'].replace('//', '/')
             # Handle alt text and caption
             alt = self.add_alt_text(img)
