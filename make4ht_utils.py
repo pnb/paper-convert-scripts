@@ -52,6 +52,11 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
         print('Including \\input file:', match.group(1) + '.tex')
         extra_tex_str = _load_tex_str(os.path.join(extracted_dir, match.group(1) + '.tex'))
         tex_str = tex_str[:match.start()] + extra_tex_str + tex_str[match.end():]
+
+    # Check for known issues in the raw tex
+    match = re.search(r'\\end\{algorithmic\}[ \t]*\n[ \t]*[a-zA-Z]{1,20}', tex_str, re.MULTILINE)
+    if match:
+        warn('no_newline_after_algorithmic', match.group(0))
     return tex_str
 
 

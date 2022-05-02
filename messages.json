@@ -185,6 +185,10 @@
         "tex_env_parse_fail": {
             "message": "LaTeX environment parsing error",
             "help": "The LaTeX parser was unable to find the environment containing a specific line. This indicates a possible mismatch in \\begin{} and \\end{} statements in your LaTeX source, or a possible bug in the parser (in which case please contact support)."
+        },
+        "no_newline_after_algorithmic": {
+            "message": "Blank line suggested",
+            "help": "It is occasionally helpful to add a blank line after the \\end{algorithmic} command. For example, the LaTeX HTML compiler will sometimes render inline math as block equations (each on its own line) if this blank line is missing. If the result looks OK, you may safely ignore this message."
         }
     }
 }
