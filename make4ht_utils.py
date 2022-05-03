@@ -221,7 +221,7 @@ class TeXHandler:
         """
         table_tex_regex = re.compile(r'(^|[^\\])\\begin\s*\{table')
         for caption_start in self.soup.find_all(string=re.compile(r'Table\s+\d+:')):
-            # Check previous lines for a table environmentt
+            # Check previous lines for a table environment
             line_num = self.tex_line_num(caption_start)
             for i in range(line_num, 0, -1):
                 if table_tex_regex.search(self.tex_lines[i]):
@@ -249,6 +249,11 @@ class TeXHandler:
             # Remove <p>s from table rows
             for p in table.find_all('p'):
                 p.unwrap()
+            thead = table.find('thead')  # Find or create semantic <thead>
+            if not thead:
+                thead = self.soup.new_tag('thead')
+                if table.find('tr'):
+                    table.find('tr').insert_before(thead)
             # Try to figure out what the header is based on \hline, if provided
             first_hline = table.find('tr', attrs={'class': 'hline'})
             if first_hline and first_hline is table.find('tr'):
@@ -258,15 +263,24 @@ class TeXHandler:
                 for header_row in table.find_all('tr'):
                     if header_row is next_hline:
                         break
+                    thead.append(header_row)
                     for td in header_row.find_all('td'):
                         td.name = 'th'
             else:  # Assume header is first row
                 header_row = table.find('tr')
                 if header_row:
+                    thead.append(header_row)
                     for td in header_row.find_all('td'):
                         td.name = 'th'
-            # Remove remaining decorative rows of tables (bad for accessibility)
-            for tr in table.find_all('tr', attrs={'class': 'hline'}):
+            # Add CSS classes for horizontal borders as long it isn't every row
+            data_tr = [tr for tr in table.find_all('tr') if not tr.find('th') and
+                       tr.get_text().strip()]
+            hline_tr = table.find_all('tr', attrs={'class': 'hline'})
+            if len(data_tr) > len(hline_tr):  # Not \hline every row
+                for tr in data_tr[1:]:
+                    if tr.previous_sibling and tr.previous_sibling in hline_tr:
+                        tr['class'] = 'border-above'
+            for tr in hline_tr:  # Remove remaining decorative rows (bad for accessibility)
                 tr.decompose()
 
     def add_alt_text(self, img_elem: bs4.Tag) -> str:
