@@ -249,7 +249,18 @@ class TeXHandler:
             # Remove <p>s from table rows
             for p in table.find_all('p'):
                 p.unwrap()
-            thead = table.find('thead')  # Find or create semantic <thead>
+            # Check for colspan/rowspan nested tables
+            for subtable in table.find_all('table'):
+                parent = subtable.parent
+                while parent.name not in ['td', 'th']:
+                    parent = parent.parent
+                for td in subtable.find_all('td'):
+                    td.name = 'p'
+                    parent.append(td)
+                for wrapper in parent.find_all(['div', 'table']):
+                    wrapper.decompose()
+            # Find or create semantic <thead>
+            thead = table.find('thead')
             if not thead:
                 thead = self.soup.new_tag('thead')
                 if table.find('tr'):
@@ -280,8 +291,9 @@ class TeXHandler:
                 for tr in data_tr[1:]:
                     if tr.previous_sibling and tr.previous_sibling in hline_tr:
                         tr['class'] = 'border-above'
-            for tr in hline_tr:  # Remove remaining decorative rows (bad for accessibility)
-                tr.decompose()
+            for tr in table.find_all('tr'):
+                if not tr.get_text().strip():
+                    tr.decompose()  # Remove remaining decorative rows (bad for accessibility)
 
     def add_alt_text(self, img_elem: bs4.Tag) -> str:
         """Find alt text (Description command) in LaTeX for an <img> and add it to the image.
