@@ -401,6 +401,17 @@ class TeXHandler:
                 num.name = 'span'
                 num['class'] = 'equation-number'
             eq_table.decompose()
+            # Repair occasional MathML generation errors (very specific to TexLive version)
+            for elem in eq.find_all(['mrow', 'mstyle', 'mtd']):
+                for child in elem.contents:
+                    if isinstance(child, bs4.NavigableString) and \
+                            not isinstance(child, bs4.Comment) and child.strip():
+                        if re.match(r'\d.*', child.strip()):
+                            child.wrap(self.soup.new_tag('mn'))  # Number
+                        elif re.match(r'[\+\-\*\/=><&\|%!\^\(\)\?]', child.strip()):
+                            child.wrap(self.soup.new_tag('mo'))  # Operator
+                        else:
+                            child.wrap(self.soup.new_tag('mi'))  # Identifier
 
     def fix_fonts(self) -> None:
         """Insert HTML elements where needed to mark up typeface and font options specified by class
