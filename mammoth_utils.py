@@ -322,7 +322,7 @@ class MammothParser:
         # convert it with LibreOffice
         with open(os.path.join(CONFIG['utils_dir'], 'chart_convert_doc.xml')) as infile:
             scaffold_soup = BeautifulSoup(infile, 'lxml-xml')
-        denumbering_regex = re.compile(r'\s*(Figure|Fig\.)\s+\d*')
+        denumbering_regex = re.compile(r'\s*(Figure|Fig\.)\s+\d*[:\.]?\s*')
         for chart_i, (chart_span, chart_xml) in enumerate(zip(chart_spans, chart_xmls)):
             print('Converting chart', chart_i + 1)
             drawing = chart_xml.parent
