@@ -2,7 +2,8 @@
     "README": "Warnings in this file map warning codes to short messages and extended help messages. Anything in the optional 'tex' nested object will override the values in the parent object if the document source is a LaTeX file instead of a DOCX file.",
     "warnings": {
         "unexpected": {
-            "message": "An unanticipated error occurred that may require improvements to the document parser used in conversion; please notify support"
+            "message": "An unanticipated error occurred that may require improvements to the document parser used in conversion; please notify support",
+            "help": "pnb@illinois.edu"
         },
         "make4ht_failed": {
             "message": "LaTeX compilation errors; see full output (line numbers will match your source file unless you used \\input{})",
