@@ -185,15 +185,28 @@ class TeXHandler:
             if not tabular.get_text().strip():
                 tabular.decompose()
             else:
-                for i, elem in enumerate(tabular.find_all('span')):
+                for superscript in tabular.find_all('math'):  # Handle superscripts for affiliations
+                    prev = superscript.previous_sibling
+                    while prev:
+                        if isinstance(prev, bs4.Tag):
+                            prev.append(superscript)
+                            break
+                        prev = prev.previous_sibling
+                for elem in tabular.find_all('span'):
                     elem.name = 'div'
-                    if i == 0:
-                        elem['class'] = 'Author'
-                    elif '@' in elem.get_text():
+                    if '@' in elem.get_text():
                         elem['class'] = 'E-Mail'
+                    elif elem.has_attr('class') and 'phvr8t-x-x-120' in elem['class']:
+                        elem['class'] = 'Author'
                     else:
                         elem['class'] = 'Affiliations'
-                    tabular.insert_before(elem)
+                    if isinstance(tabular.previous_sibling, bs4.Tag) and \
+                            tabular.previous_sibling.has_attr('class') and \
+                            elem['class'] in tabular.previous_sibling['class']:
+                        tabular.previous_sibling.append(elem)  # Combine consecutive parts
+                        elem.unwrap()
+                    else:
+                        tabular.insert_before(elem)  # New author chunk
                 tabular.decompose()
 
     def merge_elements(self, elem_name: str='span') -> None:
