@@ -413,7 +413,8 @@ class MammothParser:
         ol = self.soup.new_tag('ol')
         ref_header.insert_after(ol)
         num_regex = re.compile(r'\[\d+\]\s*')
-        while ol.next_sibling and ol.next_sibling.name == 'p':
+        while ol.next_sibling and ol.next_sibling.name == 'p' and \
+                ol.next_sibling.get_text(strip=True):
             ref = ol.next_sibling
             ref.name = 'li'
             ol.append(ref)
