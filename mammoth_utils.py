@@ -204,11 +204,17 @@ class MammothParser:
                 table_counter += 1
                 new_num = table_counter
                 # Check that this <table> immediate follows the caption; otherwise they might have
-                # done something like used an image of a table or put the caption below the table
+                # done something like used an image of a table, put the caption below the table, or
+                # put the caption inside the table
+                check_in_table = elem.parent
+                while check_in_table:
+                    if check_in_table.name == 'tr':
+                        warn('table_caption_in_table', 'Caption text: "' + elem.get_text() + '"')
+                    check_in_table = check_in_table.parent
                 table = elem.find_next('table')
-                if table.sourceline - elem.sourceline > 2:
+                if table and table.sourceline - elem.sourceline > 2:
                     warn('table_caption_distance', 'Caption text: "' + elem.get_text() + '"')
-                else:
+                elif table:
                     table.insert(0, elem)  # Move table <caption> inside <table> where it belongs
             else:  # Change to <figcaption> for figures
                 elem.name = 'figcaption'

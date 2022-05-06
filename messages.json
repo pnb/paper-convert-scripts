@@ -160,6 +160,10 @@
             "message": "Unknown caption type",
             "help": "This warning occurs if the parser could not determine whether a caption belonged to a table or figure based on the text of the caption. Figure captions should start with \"Figure X\" or \"Fig. X\", while table captions should start with \"Table X\". Using the Insert Caption functionality in Word when creating captions should ensure this is the case."
         },
+        "table_caption_in_table": {
+            "message": "Table caption inside table row",
+            "help": "Table captions should be separate from the table, not in the table itself. Though it may look the same visually in the original document, semantically it does not make sense for the caption to be treated as tabular data. Hence, it will be odd for someone reading the paper using a screenreader, or when converted to HTML with slightly different visual styles applied."
+        },
         "table_caption_distance": {
             "message": "Table not found immediately below caption",
             "help": "Table captions should appear directly above tables with nothing between them and the table.",
