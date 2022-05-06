@@ -175,6 +175,10 @@
             "message": "Figure caption may be missing style",
             "help": "Figure captions should have the \"Caption\" style, as shown in the template. Given that one of the images in the document was immediately followed by \"Figure...\" text, it seems like it may have been intended to be a caption. Using the \"Caption\" style is essential to denote where the caption starts and ends, and whether the image is a figure or an image with some other purpose."
         },
+        "figure_caption_blank": {
+            "message": "Blank figure caption",
+            "help": "This often happens if something that is not a caption has the \"Caption\" style, such as a blank paragraph (newline) or an image. The message above should show approximately where in the document it occurred. One way to find these cases is to open the Styles pane in Word, click on the down arrow by the \"Caption\" style, and click \"Select All\". After selecting the part that should not be a caption, set the appropriate style (\"Normal\" is often a good choice). This warning is often accompanied by an unknown caption type warning, which might be fixed by fixing this."
+        },
         "chart_caption_not_found": {
             "message": "Chart caption not found",
             "help": "A \"chart\" is a DrawingML object, such as a graph pasted in from Excel. This warning indicates that the caption could not be found for a chart. Chart captions are just like figure captions, and should start with \"Figure X\" or \"Fig. X\". Chart parsing can be finicky, so please contact support if you believe this warning is incorrect."

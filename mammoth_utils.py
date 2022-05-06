@@ -223,8 +223,6 @@ class MammothParser:
                         br.decompose()
                     elem.previous_sibling.unwrap()
                 img = elem.previous_sibling
-                if img.name != 'img':
-                    warn('figure_caption_distance', 'Caption text: "' + elem.get_text() + '"')
                 while img and img.name == 'img':
                     next_img = img.previous_sibling
                     new_fig.insert(0, img)
@@ -372,6 +370,9 @@ class MammothParser:
                 warn('chart_caption_distance', 'Chart with alt text "' + alt + '"')
             chart_span.decompose()  # Remove [CHART], which may be part of the caption
             caption_text = re.sub(denumbering_regex, '', caption.get_text(strip=True))
+            if not caption_text:
+                warn('figure_caption_blank', 'Near chart with alt text "' + alt + '"')
+                continue
             for cap in self.soup.find_all('figcaption'):
                 if re.sub(denumbering_regex, '', cap.get_text(strip=True)) == caption_text:
                     cap.insert_before(img)
@@ -392,6 +393,14 @@ class MammothParser:
                     drawing = drawing.parent
                 width = int(drawing.find('wp:extent')['cx']) / 914400  # Convert width to inches
                 set_img_class(img, width)
+
+    def check_caption_placement(self) -> None:
+        """Check whether or not images have successfully been incorporated into <figure> tags with
+        captions.
+        """
+        for figcaption in self.soup.find_all('figcaption'):
+            if not figcaption.parent.find('img'):
+                warn('figure_caption_distance', 'Caption text: "' + figcaption.get_text() + '"')
 
     def fix_references(self) -> None:
         """Standardize formatting of references.
