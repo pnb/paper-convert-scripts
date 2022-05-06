@@ -433,14 +433,18 @@ class TeXHandler:
         class_elem_map = {
             'aeb10-': 'strong',
             'aeti9-': 'em',
+            'aeti7-': 'em',
             'phvbo8t-': 'em',  # Title oblique
             'aett9-': 'code',
             'aebxti-': ['strong', 'em'],
+            'aer-7': None,  # Unwrap; not a good/necessary style to keep (tiny text)
         }
         for prefix, name in class_elem_map.items():
             for elem in self.soup.find_all('span',
                                            attrs={'class': lambda x: x and x.startswith(prefix)}):
-                if isinstance(name, str):
+                if not name:
+                    elem.unwrap()
+                elif isinstance(name, str):
                     elem.name = name
                 else:
                     elem.name = name[-1]
