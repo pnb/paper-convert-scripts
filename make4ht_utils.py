@@ -381,13 +381,16 @@ class TeXHandler:
             # Repair double // in img src that happens when using a trailing / with \graphicspath
             img['src'] = img['src'].replace('//', '/')
             # Handle alt text and caption
-            alt = self.add_alt_text(img)
+            self.add_alt_text(img)
             env_start, _ = self.get_tex_environment(self.tex_line_num(img))
             parent = img.parent
-            if 'subfigure' in self.tex_lines[env_start]:
+            subfigure_wrapper = img.find_parent('div', attrs={'class': 'subfigure'})
+            if 'subfigure' in self.tex_lines[env_start] or subfigure_wrapper:
+                if subfigure_wrapper:
+                    for wrapper in subfigure_wrapper.find_all(['table', 'tr', 'td']):
+                        wrapper.unwrap()
                 img['class'] = 'subfigure'
-                while parent.name != 'div' and parent.name != 'figure':
-                    parent = parent.parent
+                parent = img.find_parent(['div', 'figure'])
                 parent.name = 'figure'
                 self._fix_figure_text(parent)  # Handle subfigure caption
                 parent = parent.parent  # Go up to next level to handle containing <figure>
