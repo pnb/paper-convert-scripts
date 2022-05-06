@@ -162,7 +162,7 @@
         },
         "table_caption_in_table": {
             "message": "Table caption inside table row",
-            "help": "Table captions should be separate from the table, not in the table itself. Though it may look the same visually in the original document, semantically it does not make sense for the caption to be treated as tabular data. Hence, it will be odd for someone reading the paper using a screenreader, or when converted to HTML with slightly different visual styles applied."
+            "help": "Table captions should be separate from the table, not in the table itself. Though it may look the same visually in the original document, semantically it does not make sense for the caption to be treated as tabular data. Hence, it will be odd for someone reading the paper using a screen reader, or when converted to HTML with slightly different visual styles applied."
         },
         "table_caption_distance": {
             "message": "Table not found immediately below caption",
