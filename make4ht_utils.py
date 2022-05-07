@@ -382,7 +382,8 @@ class TeXHandler:
             img['src'] = img['src'].replace('//', '/')
             # Handle alt text and caption
             self.add_alt_text(img)
-            env_start, _ = self.get_tex_environment(self.tex_line_num(img))
+            img_text_line_num = self.tex_line_num(img)
+            env_start, _ = self.get_tex_environment(img_text_line_num)
             parent = img.parent
             subfigure_wrapper = img.find_parent('div', attrs={'class': 'subfigure'})
             if 'subfigure' in self.tex_lines[env_start] or subfigure_wrapper:
@@ -405,6 +406,8 @@ class TeXHandler:
             # Set image size class
             if img.has_attr('height'):
                 del img['height']  # Fixes wrong width/height proportions; width is more important
+            if 'scale=' in self.tex_lines[img_text_line_num] and img.has_attr('width'):
+                del img['width']  # Using scale= leads to tiny width, so we just have to skip it
             width_in = 3  # Assume medium-ish for "figure" environment
             if img.has_attr('width'):
                 width_in = int(img['width']) / 72
