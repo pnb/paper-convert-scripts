@@ -203,6 +203,7 @@ class TeXHandler:
                     if isinstance(tabular.previous_sibling, bs4.Tag) and \
                             tabular.previous_sibling.has_attr('class') and \
                             elem['class'] in tabular.previous_sibling['class']:
+                        tabular.previous_sibling.append(self.soup.new_string(' '))
                         tabular.previous_sibling.append(elem)  # Combine consecutive parts
                         elem.unwrap()
                     else:
