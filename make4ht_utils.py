@@ -485,7 +485,7 @@ class TeXHandler:
         ref_header = shared_utils.get_elem_containing_text(self.soup, 'h1', 'references')
         if not ref_header:
             return  # Already going to warn about this in style check
-        new_ref_regex = re.compile(r'\[\d+\]\s*$')
+        new_ref_regex = re.compile(r'\[\d+\]\s*')
         ref_section = self.soup.new_tag('ol', attrs={'class': 'references'})
         biber_section = ref_header.find_next('dl')
         if biber_section:  # Biber style
