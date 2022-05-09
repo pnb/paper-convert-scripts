@@ -261,7 +261,7 @@ class TeXHandler:
                 continue  # Something went pretty wrong, like caption below table
             table.insert(0, caption)
             # Remove <p>s from table rows
-            for p in table.find_all('p'):
+            for p in table.find_all('p', limit=1000):
                 p.unwrap()
             # Check for colspan/rowspan nested tables
             for subtable in table.find_all('table'):
