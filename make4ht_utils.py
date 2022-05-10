@@ -149,11 +149,10 @@ class TeXHandler:
         header_fonts = ['ptmb8t-x-x-120', 'ptmri8t-x-x-110']
         for h_text in self.soup.find_all('span', attrs={'class': header_fonts}):
             h = h_text.parent
-            if h.name == 'p':  # Otherwise already handled
+            if h.name == 'p':  # Otherwise already handled (abstract, etc.)
                 h['class'] = 'not-numbered'
-                number = h.find('span')
-                num_text = number.get_text().strip()
-                if 'ptmb8t-x-x-120' in number['class']:
+                num_text = h_text.get_text().strip()
+                if 'ptmb8t-x-x-120' in h_text['class']:
                     if num_text.endswith('.') or '.' not in num_text:
                         h.name = 'h1'
                         if h.get_text().lower().strip() == 'abstract':
