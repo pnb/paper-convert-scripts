@@ -338,7 +338,8 @@ class TeXHandler:
                     el.replace_with('')
                 el = next_el
             el = img.next_sibling
-            while el and (isinstance(el, bs4.NavigableString) or el.sourceline == img.sourceline):
+            while el and (isinstance(el, bs4.NavigableString) or
+                          el.sourceline == img.sourceline and el.name != 'a'):
                 next_el = el.next_sibling
                 if isinstance(el, bs4.NavigableString) and el.strip():
                     el.replace_with('')
