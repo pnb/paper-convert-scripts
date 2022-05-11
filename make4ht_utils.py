@@ -357,8 +357,8 @@ class TeXHandler:
                                                          elem.name != 'img'):
                 caption.insert(0, elem)
         figure.append(caption)
-        # Sometomes there is a leftover ":" element for some reason
-        caption_remnant = caption.find('span', attrs={'class': 'caption'})
+        # Sometimes there is a leftover ":" element for some reason
+        caption_remnant = caption.find('span', attrs={'class': ['caption', 'id']})
         if caption_remnant and caption_remnant.get_text().strip() == ':':
             caption_remnant.decompose()
 
