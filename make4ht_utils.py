@@ -307,6 +307,21 @@ class TeXHandler:
             for tr in table.find_all('tr'):
                 if not tr.get_text().strip():
                     tr.decompose()  # Remove remaining decorative rows (bad for accessibility)
+            # Check if there are too many colgroups
+            example_row = table.find('tr')
+            if example_row:
+                col_count = len(example_row.find_all(['th', 'td']))
+                colgroups = table.find_all('colgroup')
+                if len(colgroups) >= col_count:  # Vertical lines every column (remove them)
+                    for cg in colgroups:
+                        cg.decompose()
+                else:
+                    cols = table.find_all('col')  # Marker inside <colgroup>
+                    if len(cols) > col_count:  # Extra vertical line at end of table
+                        if len(cols[-1].parent.find_all('col')) == 1:
+                            cols[-1].parent.decompose()  # Sole <col> inside <colgroup>
+                        else:
+                            cols[-1].decompose()  # One of 2+ cols, keep the colgroup
 
     def add_alt_text(self, img_elem: bs4.Tag) -> str:
         """Find alt text (Description command) in LaTeX for an <img> and add it to the image.
