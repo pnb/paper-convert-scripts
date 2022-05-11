@@ -246,14 +246,14 @@ class MammothParser:
         """Crop images, if needed, and check that each one has a valid alt text set.
         """
         docx_soup = BeautifulSoup(self.xml_txt, 'lxml-xml')  # From which we will get cropping info
-        for i, img in enumerate(self.soup.find_all('img')):
+        for _, img in enumerate(self.soup.find_all('img')):
             if not validate_alt_text(img, img['src']):
                 continue
             # Crop images if needed, where possible (find them based on alt text -- sort of hacky)
-            xml_elem = docx_soup.find('pic:cNvPr', {'descr': img['alt']})
-            drawing = xml_elem.parent
-            while drawing.name != 'drawing':  # Find parent <w:drawing> element
-                drawing = drawing.parent
+            xml_elem = docx_soup.find('pic:cNvPr', attrs={'descr': img['alt']})
+            if not xml_elem:
+                continue  # Only happens in strange cases, might indicate alt-text problem?
+            drawing = xml_elem.find_parent('drawing')  # Find parent <w:drawing> element
             crop = drawing.find('a:srcRect')  # Find crop element if it exists
             # Crop coordinates are given as proportions * 100k
             t = int(crop['t']) / 100000 if crop and crop.has_attr('t') else 0
