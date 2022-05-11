@@ -413,6 +413,8 @@ class TeXHandler:
             if img.has_attr('width'):
                 width_in = int(img['width']) / 72
                 del img['width']
+                if 'subfigure' in self.tex_lines[env_start] or subfigure_wrapper:
+                    width_in = width_in * .8  # Assume subfigures should be a bit smaller
             if 'figure*' in self.tex_lines[env_start]:
                 width_in = 5  # Assume large for a "figure*" environment
             shared_utils.set_img_class(img, width_in)
