@@ -43,9 +43,12 @@ retcode = subprocess.call('make4ht --output-dir .. --format html5+common_domfilt
                           '--build-file make4ht_with_bibtex.mk4 tmp-make4ht.tex '
                           '"mathml,mathjax,svg,fn-in"', shell=True, cwd=extracted_dir)
 if retcode:
-    shared_utils.warn('make4ht_failed', tex=True)
+    shared_utils.warn('make4ht_warnings', tex=True)
 
 # Load HTML
+if not os.path.exists(os.path.join(extracted_dir, 'tmp-make4ht.html')):
+    shared_utils.warn('make4ht_failed', tex=True)
+    exit()
 print('Loading converted HTML')
 with open(os.path.join(extracted_dir, 'tmp-make4ht.html')) as infile:
     soup = BeautifulSoup(infile, 'html.parser')

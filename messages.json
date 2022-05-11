@@ -2,12 +2,16 @@
     "README": "Warnings in this file map warning codes to short messages and extended help messages. Anything in the optional 'tex' nested object will override the values in the parent object if the document source is a LaTeX file instead of a DOCX file.",
     "warnings": {
         "unexpected": {
-            "message": "An unanticipated error occurred that may require improvements to the document parser used in conversion; please notify support",
-            "help": "pnb@illinois.edu"
+            "message": "Unexpected error!",
+            "help": "An unanticipated error occurred that may require improvements to the document parser used in conversion; please notify support"
         },
         "make4ht_failed": {
-            "message": "LaTeX compilation errors; see full output (line numbers will match your source file unless you used \\input{})",
-            "help": "If the document compiles on your own computer (or Overleaf, etc.), this error might be caused by using unsupported packages or a different build system. Modeling your paper closely to the template may help. In some cases the document can be converted anyway."
+            "message": "Document compilation failed",
+            "help": "LaTeX (make4ht, specifically) did not produce an output file. This indicates that LaTeX encountered an unrecoverable error. The last warning in the conversion log output may indicate which step failed. Often this is marked with a \"[FATAL]\" message."
+        },
+        "make4ht_warnings": {
+            "message": "LaTeX compilation warnings; see full output (line numbers will match your source file unless you used \\input{})",
+            "help": "In most cases, LaTeX warnings are not a problem. Typically, they occur because the LaTeX HTML compiler (make4ht) does not recognize some package; \"Undefined control sequence\" warnings are especially common in this case. However, often it will produce a reasonable output anyway. Hence, you can ignore this warning unless there is another problem, like the document failed to compile or the output looks wrong, in which case the LaTeX warnings may be helpful."
         },
         "style_paper_title": {
             "message": "Did not find \"Paper-Title\" style",
