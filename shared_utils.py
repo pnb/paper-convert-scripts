@@ -81,69 +81,71 @@ def get_elem_containing_text(soup: bs4.BeautifulSoup, tagname: str, text: str) -
     return None
 
 
-def check_styles(soup: bs4.BeautifulSoup,output_dir) -> None:
+def check_styles(soup: bs4.BeautifulSoup, output_dir: str, tex: bool=False) -> None:
     """Check the `soup` object to see if it has most of the expected elements with the appropriate
     styles, and trigger warnings if not. This is intended as one of the last steps, after
     postprocessing.
 
     Args:
         soup (bs4.BeautifulSoup): Processed paper
+        output_dir (str): Output folder, needed to store temporary files
+        tex (bool, optional): Generate warnings flagged as LaTeX warnings. Defaults to False.
     """
     # Check for <img> with figure "caption" with wrong style (mostly a DOCX problem)
     for img in soup.find_all('img'):
         if isinstance(img.next_sibling, bs4.Tag) and \
                 img.next_sibling.get_text().strip().startswith('Figure ') and \
                 img.next_sibling.name != 'figcaption' and not img.next_sibling.find('figcaption'):
-            warn('figure_caption_unstyled', img.next_sibling.get_text().strip())
+            warn('figure_caption_unstyled', img.next_sibling.get_text().strip(), tex)
 
     # Check metadata-related styles
     if not soup.find('div', attrs={'class': lambda x: x and 'Paper-Title' in x}):
-        warn('style_paper_title')
+        warn('style_paper_title', tex=tex)
     if not soup.find('h1', attrs={'class': lambda x: x and 'AbstractHeading' in x}):
-        warn('style_abstract_heading')
+        warn('style_abstract_heading', tex=tex)
     if not soup.find('h1', attrs={'class': lambda x: x and 'KeywordsHeading' in x}):
-        warn('style_keywords_heading')
+        warn('style_keywords_heading', tex=tex)
     if not soup.find('div', attrs={'class': lambda x: x and 'Keywords' in x}):
-        warn('style_keywords')
+        warn('style_keywords', tex=tex)
     authors = soup.find_all('div', attrs={'class': lambda x: x and 'Author' in x})
     num_affil = len(soup.find_all('div', attrs={'class': lambda x: x and 'Affiliations' in x}))
     emails = soup.find_all('div', attrs={'class': lambda x: x and 'E-Mail' in x})
     if not len(authors):
-        warn('style_author')
+        warn('style_author', tex=tex)
     else:
         for author in authors:
             if '@' in author.get_text():
-                warn('style_email_in_author', author.get_text().strip())
+                warn('style_email_in_author', author.get_text().strip(), tex)
     if not num_affil:
-        warn('style_affiliations')
+        warn('style_affiliations', tex=tex)
     if not len(emails):
-        warn('style_email')
+        warn('style_email', tex=tex)
     else:
         for email in emails:
             if '@' not in email.get_text().strip().split()[-1]:
-                warn('style_space_in_email', email.get_text().strip())
+                warn('style_space_in_email', email.get_text().strip(), tex)
     # Check headings
     if not get_elem_containing_text(soup, 'h1', 'introduction'):
-        warn('style_no_intro')
+        warn('style_no_intro', tex=tex)
     if not get_elem_containing_text(soup, 'h1', 'references'):
-        warn('style_no_refs')
+        warn('style_no_refs', tex=tex)
     # Check every numbered reference appears in the text in square brackets
     dom = etree.HTML(str(soup))
     ref_lis = dom.xpath("//h1[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'references')]/following-sibling::ol[1]/li | //h1[.//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'references')]]/following-sibling::ol[1]/li") 
     # we found no references in the reference section!
     if ref_lis == []:
-        warn('no_references_found_in_reference_section')
+        warn('no_references_found_in_reference_section', tex=tex)
     else:
         ref_in_ref = set( range(1,len(ref_lis)+1)  ) 
         ref_in_text_raw = re.findall('\[([\d, ]+)\]', soup.get_text( strip=True) )
         # we found no citations in the text!
         if ref_in_text_raw == []:
-            warn('no_citations_found_in_text')
+            warn('no_citations_found_in_text', tex=tex)
         else:
             ref_in_text = set( [ int(i) for i in re.split(r'\D+',','.join(ref_in_text_raw)) ] )
             mismatched_ref = ref_in_ref.symmetric_difference(ref_in_text)
             if len(mismatched_ref) > 0:
-                warn('mismatched_refs', sorted (mismatched_ref) )
+                warn('mismatched_refs', sorted(mismatched_ref), tex=tex)
 
     # Check references are complete; executes anystyle in shell
     refs = [ ' '.join( "".join(ref_li.itertext() ).split() ) for ref_li in ref_lis ] #lxml makes this ugly
@@ -172,7 +174,7 @@ def check_styles(soup: bs4.BeautifulSoup,output_dir) -> None:
         missing_reqs = reqs.difference(set(ref_dict.keys()))
         if len(missing_reqs) > 0:
             ref_type = ref_dict['type'] if ref_dict['type'] else 'other'
-            warn('incomplete_reference', f"Reference {i} was recognized as {ref_type} and might be missing the following elements: " + ", ".join(missing_reqs)  )
+            warn('incomplete_reference', f"Reference {i} was recognized as {ref_type} and might be missing the following elements: " + ", ".join(missing_reqs), tex)
 
 
 def validate_alt_text(img_elem: bs4.Tag, identifying_text: str, tex: bool=False) -> bool:
