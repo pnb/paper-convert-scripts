@@ -163,7 +163,7 @@ class TeXHandler:
                             h.find_next('p').name = 'div'
                     else:
                         h.name = 'h2'
-                elif 'ptmri8t-x-x-110' in number['class']:
+                elif 'ptmri8t-x-x-110' in h_text['class']:
                     h.name = 'h3'
         # Title
         title_first = self.soup.find('span', attrs={'class': 'phvb8t-x-x-180'})
