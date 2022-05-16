@@ -232,7 +232,8 @@ class MammothParser:
                         br.decompose()
                     elem.previous_sibling.unwrap()
                 img = elem.previous_sibling
-                while img and img.name == 'img':
+                while img and (img.name == 'img' or
+                               (isinstance(img, NavigableString) and not img.strip())):
                     next_img = img.previous_sibling
                     new_fig.insert(0, img)
                     img = next_img
