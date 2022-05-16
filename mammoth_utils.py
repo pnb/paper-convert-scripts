@@ -282,18 +282,20 @@ class MammothParser:
         """Check that tables have captions and appropriate header and text styles set.
         """
         for i, table in enumerate(self.soup.find_all('table')):
-            if not table.find('caption'):
-                warn('table_caption_missing', 'Table index ' + str(i + 1))
-            if not table.find('thead'):
-                warn('table_header_missing', 'Table index ' + str(i + 1))
-            for p in table.find_all('p'):
-                if not p.has_attr('class') or ('table-text' not in p['class'] and
-                                               'table-header' not in p['class']):
-                    warn('table_styles_missing', 'Table index ' + str(i + 1))
-                    break
-            rowspans = table.find_all('td', attrs={'rowspan': True})
-            for td in rowspans:  # So they can be styled
-                td['class'] = 'has-rowspan'
+            if len(table.find_all('tr')) == 1:  # Single row presentation table
+                table['role'] = 'presentation'
+            else:
+                if not table.find('caption'):
+                    warn('table_caption_missing', 'Table index ' + str(i + 1))
+                if not table.find('thead'):
+                    warn('table_header_missing', 'Table index ' + str(i + 1))
+                for p in table.find_all('p'):
+                    if not p.has_attr('class') or ('table-text' not in p['class'] and
+                                                'table-header' not in p['class']):
+                        warn('table_styles_missing', 'Table index ' + str(i + 1))
+                        break
+            for td in table.find_all('td', attrs={'rowspan': True}):
+                td['class'] = 'has-rowspan'  # Mark rowspan cells so they can be styled
 
     def format_footnotes(self) -> None:
         """Apply some formatting to the footnotes section, if it exists.
