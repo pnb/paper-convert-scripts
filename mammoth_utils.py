@@ -209,7 +209,7 @@ class MammothParser:
                 check_in_table = elem.parent
                 while check_in_table:
                     if check_in_table.name == 'tr':
-                        warn('table_caption_in_table', 'Caption text: "' + elem.get_text() + '"')
+                        warn('caption_in_table', 'Caption text: "' + elem.get_text() + '"')
                     check_in_table = check_in_table.parent
                 table = elem.find_next('table')
                 if table and table.sourceline - elem.sourceline > 2:
@@ -223,7 +223,10 @@ class MammothParser:
                 # Move <figcaption> inside a new <figure> containing the <img>(s)
                 new_fig = self.soup.new_tag('figure')
                 elem.insert_after(new_fig)
-                if elem.previous_sibling.name == 'p' and elem.previous_sibling.find('img'):
+                if elem.find_parent('tr'):
+                    warn('caption_in_table', 'Caption text: "' + elem.get_text() + '"')
+                if elem.previous_sibling and elem.previous_sibling.name == 'p' and \
+                        elem.previous_sibling.find('img'):
                     # Unwrap images from <p> if needed
                     for br in elem.previous_sibling.find_all('br'):
                         br.decompose()
@@ -246,7 +249,7 @@ class MammothParser:
         """Crop images, if needed, and check that each one has a valid alt text set.
         """
         docx_soup = BeautifulSoup(self.xml_txt, 'lxml-xml')  # From which we will get cropping info
-        for _, img in enumerate(self.soup.find_all('img')):
+        for img in self.soup.find_all('img'):
             if not validate_alt_text(img, img['src']):
                 continue
             # Crop images if needed, where possible (find them based on alt text -- sort of hacky)

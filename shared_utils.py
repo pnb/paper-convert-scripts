@@ -177,6 +177,22 @@ def check_styles(soup: bs4.BeautifulSoup, output_dir: str, tex: bool=False) -> N
             warn('incomplete_reference', f"Reference {i} was recognized as {ref_type} and might be missing the following elements: " + ", ".join(missing_reqs), tex)
 
 
+def check_alt_text_duplicates(soup: bs4.BeautifulSoup, tex: bool=False) -> None:
+    """Check if all alt texts in the given document are unique, which they should be for both
+    semantic and practical reasons (because DOCX conversion uses alt text as an identifier).
+
+    Args:
+        soup (bs4.BeautifulSoup): Soup for document to check
+        tex (bool): Whether or not to trigger LaTeX warnings, if there are any warnings
+    """
+    alt_texts = set()
+    for img in soup.find_all('img'):
+        if img.has_attr('alt'):
+            if img['alt'] in alt_texts:
+                warn('alt_text_duplicate', 'Alt text: "' + img['alt'] + '"', tex)
+            alt_texts.add(img['alt'])
+
+
 def validate_alt_text(img_elem: bs4.Tag, identifying_text: str, tex: bool=False) -> bool:
     """Check if the alt text for this <img> element meets expectations. Triggers warnings if not.
 

@@ -128,6 +128,13 @@
             "message": "Alt text may be too long (over 150 characters)",
             "help": "Alt text should be 150 characters or less to provide the best experience to people using screen reader software, since some screen readers may stop reading the text at that point."
         },
+        "alt_text_duplicate": {
+            "message": "Duplicate alt text for image",
+            "help": "Alt text should be unique per image, so that someone using screen reader software can understand the unique contents of each image. Even if the images are duplicates, the alt text should be unique to explain which image is a duplicate and why. Additionally, the HTML converter uses alt text as a unique identifier to find size and cropping information about images, so without unique alt text the images may be displayed incorrectly.",
+            "tex": {
+                "help": "Alt text should be unique per image, so that someone using screen reader software can understand the unique contents of each image. Even if the images are duplicates, the alt text should be unique to explain which image is a duplicate and why."
+            }
+        },
         "tex_file_missing": {
             "message": "No .tex files found in root of .zip file; cannot process",
             "help": "The most likely cause of this problem is if your LaTeX source file is in a folder inside the .zip file. To fix this, create a .zip file by selecting all the files in your project and compressing them, rather than compressing the containing folder."
@@ -164,9 +171,9 @@
             "message": "Unknown caption type",
             "help": "This warning occurs if the parser could not determine whether a caption belonged to a table or figure based on the text of the caption. Figure captions should start with \"Figure X\" or \"Fig. X\", while table captions should start with \"Table X\". Using the Insert Caption functionality in Word when creating captions should ensure this is the case."
         },
-        "table_caption_in_table": {
-            "message": "Table caption inside table row",
-            "help": "Table captions should be separate from the table, not in the table itself. Though it may look the same visually in the original document, semantically it does not make sense for the caption to be treated as tabular data. Hence, it will be odd for someone reading the paper using a screen reader, or when converted to HTML with slightly different visual styles applied."
+        "caption_in_table": {
+            "message": "Caption inside table row",
+            "help": "Captions should usually not be inside tables, with rare exceptions for tables of many small figures (e.g., a grid of icons with subcaptions). Though it may look the same visually in the original document, semantically it does not make sense for the caption to be treated as tabular data. Hence, it will be odd for someone reading the paper using a screen reader, or when converted to HTML."
         },
         "table_caption_distance": {
             "message": "Table not found immediately below caption",
