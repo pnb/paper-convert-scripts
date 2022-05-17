@@ -436,8 +436,8 @@ class TeXHandler:
                 del img['width']
                 if 'subfigure' in self.tex_lines[env_start] or subfigure_wrapper:
                     width_in = width_in * .8  # Assume subfigures should be a bit smaller
-            if 'figure*' in self.tex_lines[env_start]:
-                width_in = 5  # Assume large for a "figure*" environment
+            if 'figure*' in self.tex_lines[env_start] and len(parent.find_all('img')) == 1:
+                width_in = 5  # Assume large for a "figure*" environment with 1 image
             shared_utils.set_img_class(img, width_in)
 
     def format_equations(self) -> None:
