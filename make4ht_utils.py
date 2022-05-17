@@ -322,6 +322,12 @@ class TeXHandler:
                             cols[-1].parent.decompose()  # Sole <col> inside <colgroup>
                         else:
                             cols[-1].decompose()  # One of 2+ cols, keep the colgroup
+            # Check for lone content not in cells
+            for elem in table.find_all('div'):
+                if not elem.find_parent(['th', 'td']):  # Not in a cell
+                    prev_cell = elem.find_previous_sibling(['th', 'td'])
+                    if prev_cell:
+                        prev_cell.append(elem)
 
     def add_alt_text(self, img_elem: bs4.Tag) -> str:
         """Find alt text (Description command) in LaTeX for an <img> and add it to the image.
