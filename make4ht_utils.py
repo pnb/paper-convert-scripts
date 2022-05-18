@@ -184,13 +184,15 @@ class TeXHandler:
             if not tabular.get_text().strip():
                 tabular.decompose()
             else:
+                append_superscript = True
                 for superscript in tabular.find_all('math'):  # Handle superscripts for affiliations
-                    prev = superscript.previous_sibling
-                    while prev:
-                        if isinstance(prev, bs4.Tag):
-                            prev.append(superscript)
-                            break
-                        prev = prev.previous_sibling
+                    if append_superscript and superscript.find_previous_sibling('span'):
+                        superscript.find_previous_sibling('span').append(superscript)
+                    elif superscript.find_next_sibling('span'):
+                        superscript.find_next_sibling('span').insert(0, superscript)
+                        append_superscript = False  # Prepend instead
+                    else:
+                        warn('unexpected', 'Could not format affiliation superscript')
                 for elem in tabular.find_all('span'):
                     elem.name = 'div'
                     if '@' in elem.get_text():
