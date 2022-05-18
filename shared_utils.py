@@ -187,7 +187,7 @@ def check_alt_text_duplicates(soup: bs4.BeautifulSoup, tex: bool=False) -> None:
     """
     alt_texts = set()
     for img in soup.find_all('img'):
-        if img.has_attr('alt'):
+        if img.has_attr('alt') and img['alt']:
             if img['alt'] in alt_texts:
                 warn('alt_text_duplicate', 'Alt text: "' + img['alt'] + '"', tex)
             alt_texts.add(img['alt'])
