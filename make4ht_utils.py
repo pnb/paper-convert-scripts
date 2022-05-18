@@ -480,6 +480,8 @@ class TeXHandler:
             'aeti7-': 'em',
             'phvbo8t-': 'em',  # Title oblique
             'aett9-': 'code',
+            'ectt-': 'code',
+            'ectc-': 'code',
             'aebxti-': ['strong', 'em'],
             'aer-7': None,  # Unwrap; not a good/necessary style to keep (tiny text)
         }
