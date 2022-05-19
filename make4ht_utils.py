@@ -344,11 +344,12 @@ class TeXHandler:
         tex_section = '\n'.join(self.tex_lines[env_start:env_end + 1])
         alts = self.get_command_content(tex_section, 'Description')
         img_i = img_elem.parent.find_all('img').index(img_elem)
-        img_elem['alt'] = ''
+        if img_elem.has_attr('alt'):  # Make4ht defaults to "PIC" which is not real alt text
+            del img_elem['alt']
         if len(alts) > img_i:
             img_elem['alt'] = alts[img_i]
         shared_utils.validate_alt_text(img_elem, img_elem['src'], True)
-        return img_elem['alt'] if img_elem['alt'] else None
+        return img_elem['alt'] if img_elem.has_attr('alt') else None
 
     def _fix_figure_text(self, figure: bs4.Tag) -> None:
         # Sometimes part of the image filename or alt text might get included on the <img> line
