@@ -12,6 +12,8 @@ import shared_utils
 ap = argparse.ArgumentParser(description='Convert LaTeX to HTML')
 ap.add_argument('source_file_path', help='Path to the source .zip file')
 ap.add_argument('output_dir', help='Path to output folder (will be created if needed)')
+ap.add_argument('--no-mathml', default=False, action='store_true',
+                help='Do not use MathML conversion in make4ht')
 args = ap.parse_args()
 
 print('Creating output folder')
@@ -37,9 +39,10 @@ with open(mk4_template) as infile:
     with open(os.path.join(extracted_dir, 'make4ht_with_bibtex.mk4'), 'w') as ofile:
         ofile.write('Make:add("bibtex", "%s ${input}")\n' % bib_backend)
         ofile.write(infile.read())
+mathml = '' if args.no_mathml else 'mathml,'
 retcode = subprocess.call('make4ht --output-dir .. --format html5+common_domfilters '
                           '--build-file make4ht_with_bibtex.mk4 tmp-make4ht.tex '
-                          '"mathml,mathjax,svg,fn-in"', shell=True, cwd=extracted_dir)
+                          '"' + mathml + 'mathjax,svg,fn-in"', shell=True, cwd=extracted_dir)
 if retcode:
     shared_utils.warn('make4ht_warnings', tex=True)
 
