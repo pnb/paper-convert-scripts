@@ -61,8 +61,8 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
 
 
 def get_bib_backend(tex_str: str) -> str:
-    """Try to determine what bibliography backend a paper uses. Assumes bibtex if it can't find the
-    backend.
+    """Try to determine what bibliography backend a paper uses. Assumes BibTeX if it can't find any
+    info. Assumes Biber if it finds BibLaTeX but no backend is specified (Biber is default there).
 
     Args:
         tex_str (str): LaTeX document source code
@@ -70,11 +70,13 @@ def get_bib_backend(tex_str: str) -> str:
     Returns:
         str: Name of backend command to use for compiling the document (e.g., biber, bibtex)
     """
-    bib_regex = re.compile(r'^\s*\\usepackage\s*\[.*backend=(\w+).*\]\s*\{\s*biblatex\s*\}',
+    bib_regex = re.compile(r'^\s*\\usepackage\s*(\[.*backend=(\w+).*\])?\s*\{\bbiblatex\b\}',
                            re.MULTILINE)
     match = bib_regex.search(tex_str)
     if match:
-        return match.group(1)
+        if match.group(2):
+            return match.group(2)
+        return 'biber'
     return 'bibtex'
 
 
