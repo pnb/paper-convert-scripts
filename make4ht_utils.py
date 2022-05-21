@@ -524,7 +524,7 @@ class TeXHandler:
                 ref_section.append(elem)
                 elem.name = 'li'
                 doi = elem.find('a')
-                if doi and not doi['href'].startswith('http'):
+                if doi and doi.has_attr('href') and not doi['href'].startswith('http'):
                     doi['href'] = 'https://doi.org/' + doi['href']
             biber_section.decompose()
         else:  # Bibtex style
