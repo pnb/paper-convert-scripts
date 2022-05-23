@@ -195,20 +195,27 @@ class TeXHandler:
                         append_superscript = False  # Prepend instead
                     else:
                         warn('unexpected', 'Could not format affiliation superscript')
+                beyond_author_name = False  # Assume first thing is author name
                 for elem in tabular.find_all('span'):
                     elem.name = 'div'
-                    if '@' in elem.get_text():
-                        elem['class'] = 'E-Mail'
-                    elif elem.has_attr('class') and 'phvr8t-x-x-120' in elem['class']:
-                        elem['class'] = 'Author'
+                    if beyond_author_name or '@' in elem.get_text() or \
+                            'phvr8t-x-x-120' not in elem['class']:
+                        beyond_author_name = True  # Evidence we are past the author name part
+                        if '@' in elem.get_text() or 'phvr8t-x-x-120' in elem['class']:
+                            elem['class'] = 'E-Mail'
+                        else:
+                            elem['class'] = 'Affiliations'
                     else:
-                        elem['class'] = 'Affiliations'
+                        elem['class'] = 'Author'
                     if isinstance(tabular.previous_sibling, bs4.Tag) and \
                             tabular.previous_sibling.has_attr('class') and \
                             elem['class'] in tabular.previous_sibling['class']:
                         tabular.previous_sibling.append(self.soup.new_string(' '))
                         tabular.previous_sibling.append(elem)  # Combine consecutive parts
                         elem.unwrap()
+                        if tabular.previous_sibling['class'] == 'E-Mail':
+                            for txt in tabular.previous_sibling.contents:
+                                txt.replace_with(txt.strip())  # Remove any whitespace from emails
                     else:
                         tabular.insert_before(elem)  # New author chunk
                 tabular.decompose()
