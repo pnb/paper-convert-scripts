@@ -291,8 +291,9 @@ class MammothParser:
                     warn('table_header_missing', 'Table index ' + str(i + 1))
                 for p in table.find_all('p'):
                     if not p.has_attr('class') or ('table-text' not in p['class'] and
-                                                'table-header' not in p['class']):
-                        warn('table_styles_missing', 'Table index ' + str(i + 1))
+                                                   'table-header' not in p['class']):
+                        warn('table_styles_missing', 'Table index ' + str(i + 1) + '; text: "' +
+                             p.get_text(strip=True) + '"')
                         break
             for td in table.find_all('td', attrs={'rowspan': True}):
                 td['class'] = 'has-rowspan'  # Mark rowspan cells so they can be styled
