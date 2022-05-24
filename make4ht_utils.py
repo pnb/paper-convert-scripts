@@ -196,6 +196,7 @@ class TeXHandler:
                     else:
                         warn('unexpected', 'Could not format affiliation superscript')
                 beyond_author_name = False  # Assume first thing is author name
+                newline_after = False  # Track visual breaks after lines of multi-line affiliations
                 for elem in tabular.find_all('span'):
                     elem.name = 'div'
                     if beyond_author_name or '@' in elem.get_text() or \
@@ -207,17 +208,21 @@ class TeXHandler:
                             elem['class'] = 'Affiliations'
                     else:
                         elem['class'] = 'Author'
-                    if isinstance(tabular.previous_sibling, bs4.Tag) and \
+
+                    next_tag = elem.find_next_sibling(['span', 'br'])
+                    if not newline_after and isinstance(tabular.previous_sibling, bs4.Tag) and \
                             tabular.previous_sibling.has_attr('class') and \
                             elem['class'] in tabular.previous_sibling['class']:
-                        tabular.previous_sibling.append(self.soup.new_string(' '))
                         tabular.previous_sibling.append(elem)  # Combine consecutive parts
                         elem.unwrap()
                         if tabular.previous_sibling['class'] == 'E-Mail':
                             for txt in tabular.previous_sibling.contents:
                                 txt.replace_with(txt.strip())  # Remove any whitespace from emails
                     else:
+                        if elem.next_sibling and isinstance(elem.next_sibling, bs4.NavigableString):
+                            elem.append(self.soup.new_string(' '))  # In case of later concatenation
                         tabular.insert_before(elem)  # New author chunk
+                    newline_after = next_tag and next_tag.name == 'br'
                 tabular.decompose()
 
     def merge_elements(self, elem_name: str='span') -> None:
