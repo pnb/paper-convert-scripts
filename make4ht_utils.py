@@ -222,7 +222,7 @@ class TeXHandler:
                         if elem.next_sibling and isinstance(elem.next_sibling, bs4.NavigableString):
                             elem.append(self.soup.new_string(' '))  # In case of later concatenation
                         tabular.insert_before(elem)  # New author chunk
-                    newline_after = next_tag and next_tag.name == 'br'
+                    newline_after = not next_tag or next_tag.name == 'br'
                 tabular.decompose()
 
     def merge_elements(self, elem_name: str='span') -> None:
