@@ -272,6 +272,8 @@ def wrap_author_divs(soup: bs4.BeautifulSoup) -> None:
                 wrapper.next_sibling.has_attr('class') and
                 ('Affiliations' in wrapper.next_sibling['class'] or
                  'E-Mail' in wrapper.next_sibling['class'])):
+            if 'E-Mail' in wrapper.next_sibling['class'] and wrapper.next_sibling.find('a'):
+                wrapper.next_sibling.find('a').unwrap()  # Remove occasional mailto: for consistency
             wrapper.append(wrapper.next_sibling)
         if not inserted:
             wrapper.insert_before(all_authors_wrapper)
