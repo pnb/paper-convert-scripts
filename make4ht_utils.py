@@ -248,6 +248,9 @@ class TeXHandler:
         accessibility and simplicity. Assumes the table header is defined either by an \\hline or
         the first row of the table is the header if it is not clear from \\hline.
         """
+        for adjustbox in self.soup.find_all('div', attrs={'class': 'adjustbox'}):
+            adjustbox.unwrap()  # Remove any unused size adjustment wrappers
+
         table_tex_regex = re.compile(r'(^|[^\\])\\begin\s*\{table')
         for caption_start in self.soup.find_all(string=re.compile(r'Table\s+\d+:')):
             # Check previous lines for a table environment
