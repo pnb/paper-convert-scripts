@@ -185,45 +185,56 @@ class TeXHandler:
         for tabular in meta_section.find_all('div', attrs={'class': 'tabular'}):
             if not tabular.get_text().strip():
                 tabular.decompose()
-            else:
-                append_superscript = True
-                for superscript in tabular.find_all('math'):  # Handle superscripts for affiliations
-                    if append_superscript and superscript.find_previous_sibling('span'):
-                        superscript.find_previous_sibling('span').append(superscript)
-                    elif superscript.find_next_sibling('span'):
-                        superscript.find_next_sibling('span').insert(0, superscript)
-                        append_superscript = False  # Prepend instead
+                continue
+            # Handle superscripts for affiliations
+            for math_sup in tabular.find_all('math'):
+                if len(math_sup.contents) == 1:
+                    math_sup.name = 'sup'
+                    math_sup.contents[0].replace_with(self.soup.new_string(math_sup.get_text()))
+                else:
+                    warn('unexpected', 'Affiliation superscript format not understood')
+            for sup in tabular.find_all('sup'):
+                for span in sup.find_all('span'):
+                    span.unwrap()
+                if isinstance(sup.previous_sibling, bs4.Tag) and \
+                        sup.previous_sibling.name == 'span' or (
+                            isinstance(sup.previous_sibling, bs4.Comment) and
+                            sup.find_previous_sibling('span')):
+                    sup.find_previous_sibling('span').append(sup)
+                elif sup.find_next_sibling('span'):  # Prepend instead
+                    sup.find_next_sibling('span').insert(0, sup)
+                else:
+                    warn('unexpected', 'Could not format affiliation superscript')
+            # Combine/format parts of author info
+            beyond_author_name = False  # Assume first thing is author name
+            newline_after = False  # Track visual breaks after lines of multi-line affiliations
+            for elem in tabular.find_all('span'):
+                elem.name = 'div'
+                if beyond_author_name or '@' in elem.get_text() or \
+                        'phvr8t-x-x-120' not in elem['class']:
+                    beyond_author_name = True  # Evidence we are past the author name part
+                    if '@' in elem.get_text() or 'phvr8t-x-x-120' in elem['class']:
+                        elem['class'] = 'E-Mail'
                     else:
-                        warn('unexpected', 'Could not format affiliation superscript')
-                beyond_author_name = False  # Assume first thing is author name
-                newline_after = False  # Track visual breaks after lines of multi-line affiliations
-                for elem in tabular.find_all('span'):
-                    elem.name = 'div'
-                    if beyond_author_name or '@' in elem.get_text() or \
-                            'phvr8t-x-x-120' not in elem['class']:
-                        beyond_author_name = True  # Evidence we are past the author name part
-                        if '@' in elem.get_text() or 'phvr8t-x-x-120' in elem['class']:
-                            elem['class'] = 'E-Mail'
-                        else:
-                            elem['class'] = 'Affiliations'
-                    else:
-                        elem['class'] = 'Author'
+                        elem['class'] = 'Affiliations'
+                else:
+                    elem['class'] = 'Author'
 
-                    next_tag = elem.find_next_sibling(['span', 'br'])
-                    if not newline_after and isinstance(tabular.previous_sibling, bs4.Tag) and \
-                            tabular.previous_sibling.has_attr('class') and \
-                            elem['class'] in tabular.previous_sibling['class']:
-                        tabular.previous_sibling.append(elem)  # Combine consecutive parts
-                        elem.unwrap()
-                        if tabular.previous_sibling['class'] == 'E-Mail':
-                            for txt in tabular.previous_sibling.contents:
-                                txt.replace_with(txt.strip())  # Remove any whitespace from emails
-                    else:
-                        if elem.next_sibling and isinstance(elem.next_sibling, bs4.NavigableString):
-                            elem.append(self.soup.new_string(' '))  # In case of later concatenation
-                        tabular.insert_before(elem)  # New author chunk
-                    newline_after = not next_tag or next_tag.name == 'br'
-                tabular.decompose()
+                next_tag = elem.find_next_sibling(['span', 'br'])
+                if not newline_after and isinstance(tabular.previous_sibling, bs4.Tag) and \
+                        tabular.previous_sibling.has_attr('class') and \
+                        elem['class'] in tabular.previous_sibling['class']:
+                    tabular.previous_sibling.append(elem)  # Combine consecutive parts
+                    elem.unwrap()
+                    if tabular.previous_sibling['class'] == 'E-Mail':
+                        for txt in tabular.previous_sibling.contents:
+                            txt.replace_with(txt.strip())  # Remove any whitespace from emails
+                else:
+                    if elem.next_sibling and isinstance(elem.next_sibling, bs4.NavigableString):
+                        elem.append(self.soup.new_string(' '))  # In case of later concatenation
+                    tabular.insert_before(elem)  # New author chunk
+                newline_after = not next_tag or next_tag.name == 'br'
+            tabular.decompose()
 
     def merge_elements(self, elem_name: str='span') -> None:
         """Merge consecutive elements that share the same class and (optionally) style; make4ht adds
