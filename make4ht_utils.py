@@ -499,9 +499,11 @@ class TeXHandler:
                             child.wrap(self.soup.new_tag('mo'))  # Operator
                         else:
                             child.wrap(self.soup.new_tag('mi'))  # Identifier
-            for elem in eq.find_all('mo'):  # Extraneous <mo> surrounding <mtr> elements
+            for elem in eq.find_all('mo'):
                 if all(isinstance(c, bs4.Tag) and c.name == 'mtr' for c in elem.contents):
-                    elem.unwrap()
+                    elem.unwrap()  # Extraneous <mo> surrounding <mtr> elements
+                elif re.match(r'[a-zA-Z]', elem.get_text(strip=True)):
+                    elem.name = 'mi'  # Identifier, not operator (e.g., first letter in MSE)
 
     def fix_fonts(self) -> None:
         """Insert HTML elements where needed to mark up typeface and font options specified by class
