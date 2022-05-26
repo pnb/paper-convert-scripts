@@ -286,9 +286,11 @@ class MammothParser:
                 table['role'] = 'presentation'
             else:
                 if not table.find('caption'):
-                    warn('table_caption_missing', 'Table index ' + str(i + 1))
+                    warn('table_caption_missing', 'Table index ' + str(i + 1) + '; table text: "' +
+                         table.get_text(strip=True)[:15] + '..."')
                 if not table.find('thead'):
-                    warn('table_header_missing', 'Table index ' + str(i + 1))
+                    warn('table_header_missing', 'Table index ' + str(i + 1) + '; table text: "' +
+                         table.get_text(strip=True)[:15] + '..."')
                 for p in table.find_all('p'):
                     if not p.has_attr('class') or ('table-text' not in p['class'] and
                                                    'table-header' not in p['class']):
