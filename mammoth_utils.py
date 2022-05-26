@@ -435,3 +435,18 @@ class MammothParser:
             ol.append(ref)
             if isinstance(ref.contents[0], NavigableString):
                 ref.contents[0].replace_with(num_regex.sub('', ref.contents[0]))
+
+    def format_authors(self) -> None:
+        """Do any formatting fixes that can be managed for author info, though if the template is
+        followed exactly this is typically unnecessary.
+        """
+        # If the author info is in a table, undo that
+        info_styles = ['Author', 'Affiliations', 'E-Mail']
+        wrappers = []
+        for elem in self.soup.find_all('div', attrs={'class': lambda c: c in info_styles}):
+            wrapper = elem.find_parent('table')
+            if wrapper:
+                wrapper.insert_before(elem)
+                wrappers.append(wrapper)
+        for wrapper in wrappers:
+            wrapper.decompose()  # This works even if the wrapper has already decomposed

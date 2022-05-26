@@ -30,6 +30,9 @@ pandoc_soup = BeautifulSoup(html, 'html.parser')
 # some Pandoc things in later using BeautifulSoup.
 docx_conv = mammoth_utils.MammothParser(args.source_file_path, args.output_dir)
 
+print('Formatting authors')
+docx_conv.format_authors()
+shared_utils.wrap_author_divs(docx_conv.soup)
 print('Processing captions')
 docx_conv.process_captions()
 
@@ -58,8 +61,6 @@ shared_utils.check_alt_text_duplicates(docx_conv.soup)
 docx_conv.check_caption_placement()
 print('Formatting references')
 docx_conv.fix_references()
-print('Formatting authors')
-shared_utils.wrap_author_divs(docx_conv.soup)
 print('Checking styles')
 shared_utils.check_styles(docx_conv.soup,args.output_dir)
 
