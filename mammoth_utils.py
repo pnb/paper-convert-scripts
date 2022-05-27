@@ -6,7 +6,7 @@ import re
 import uuid
 import copy
 
-from bs4 import BeautifulSoup, NavigableString
+import bs4
 import mammoth
 import PIL.Image
 
@@ -70,7 +70,7 @@ class MammothParser:
                     outfile.writestr(f, xml)
         return placeholders
 
-    def _load_docx_soup(self, style_map: str) -> BeautifulSoup:
+    def _load_docx_soup(self, style_map: str) -> bs4.BeautifulSoup:
         """Use Mammoth to convert the current .docx file for this parser (after preprocessing is
         done) to HTML and load into a BeautifulSoup object.
 
@@ -78,7 +78,7 @@ class MammothParser:
             style_map (str): Style map to use (see Mammoth docs for what this is)
 
         Returns:
-            BeautifulSoup: Soup of the converted HTML document (body only; no <head>, <title>, etc.)
+            bs4.BeautifulSoup: Soup of the converted HTML document (body only; no <head>, etc.)
         """
         with open(os.path.join(self.output_dir, 'tmp.docx'), 'rb') as infile:
             result = mammoth.convert_to_html(
@@ -87,7 +87,7 @@ class MammothParser:
                 convert_image=mammoth.images.img_element(self._convert_image))
             if len(result.messages):
                 print('\n'.join(m.message for m in result.messages))
-            soup = BeautifulSoup(result.value, 'html.parser')
+            soup = bs4.BeautifulSoup(result.value, 'html.parser')
 
         # Unwrap <p><img></p> into <img> to make navigating through images easier
         for img in soup.find_all('img'):
@@ -156,12 +156,12 @@ class MammothParser:
                 return {'src': num + '.png'}
             warn('unknown_image_type', image.content_type)
 
-    def add_pandoc_equations(self, pandoc_soup: BeautifulSoup) -> None:
+    def add_pandoc_equations(self, pandoc_soup: bs4.BeautifulSoup) -> None:
         """Replace the placeholders we added in for equations (since Mammoth does not convert them)
         with the actual equations, as converted to MathML with Pandoc.
 
         Args:
-            pandoc_soup (BeautifulSoup): Document converted to HTML with Pandoc
+            pandoc_soup (bs4.BeautifulSoup): Document converted to HTML with Pandoc
         """
         equations = pandoc_soup.find_all('math')
         if len(equations) != len(self.eq_placeholders):
@@ -233,7 +233,7 @@ class MammothParser:
                     elem.previous_sibling.unwrap()
                 img = elem.previous_sibling
                 while img and (img.name == 'img' or
-                               (isinstance(img, NavigableString) and not img.strip())):
+                               (isinstance(img, bs4.NavigableString) and not img.strip())):
                     next_img = img.previous_sibling
                     new_fig.insert(0, img)
                     img = next_img
@@ -249,7 +249,7 @@ class MammothParser:
     def crop_images(self) -> None:
         """Crop images, if needed, and check that each one has a valid alt text set.
         """
-        docx_soup = BeautifulSoup(self.xml_txt, 'lxml-xml')  # From which we will get cropping info
+        docx_soup = bs4.BeautifulSoup(self.xml_txt, 'lxml-xml')  # From which we will get crop info
         for img in self.soup.find_all('img'):
             if not validate_alt_text(img, img['src']):
                 continue
@@ -311,7 +311,7 @@ class MammothParser:
         separator = self.soup.new_tag('hr')
         footnote_section.insert_before(separator)
 
-    def convert_drawingml(self, pandoc_soup: BeautifulSoup) -> None:
+    def convert_drawingml(self, pandoc_soup: bs4.BeautifulSoup) -> None:
         """Check for "charts", a type of figure in DrawingML format that happens when you copy a
         figure from an Excel spreadsheet to Word, for example.
         Some info: http://www.officeopenxml.com/drwOverview.php
@@ -322,10 +322,10 @@ class MammothParser:
         can convert to SVG instead.
 
         Args:
-            pandoc_soup (BeautifulSoup): Soup parsed by Pandoc (which notes the location of charts)
+            pandoc_soup (bs4.BeautifulSoup): Soup parsed by Pandoc (which has chart locations)
         """
         chart_spans = pandoc_soup.find_all('span', {'class': 'chart'})
-        chart_xmls = BeautifulSoup(self.xml_txt, 'lxml-xml').find_all('c:chart')
+        chart_xmls = bs4.BeautifulSoup(self.xml_txt, 'lxml-xml').find_all('c:chart')
         if len(chart_spans) != len(chart_xmls):
             warn('unexpected', 'Mismatching chart counts: %d, %d' %
                  (len(chart_spans), len(chart_xmls)))
@@ -334,7 +334,7 @@ class MammothParser:
         # For each chart we will create a minimal .docx file with only that chart in it, then
         # convert it with LibreOffice
         with open(os.path.join(CONFIG['utils_dir'], 'chart_convert_doc.xml')) as infile:
-            scaffold_soup = BeautifulSoup(infile, 'lxml-xml')
+            scaffold_soup = bs4.BeautifulSoup(infile, 'lxml-xml')
         denumbering_regex = re.compile(r'\s*(Figure|Fig\.)\s+\d*[:\.]?\s*')
         for chart_i, (chart_span, chart_xml) in enumerate(zip(chart_spans, chart_xmls)):
             print('Converting chart', chart_i + 1)
@@ -399,7 +399,7 @@ class MammothParser:
         """Add image size classes and styles (if applicable) based on sizes found in the .docx XML
         source.
         """
-        docx_soup = BeautifulSoup(self.xml_txt, 'lxml-xml')
+        docx_soup = bs4.BeautifulSoup(self.xml_txt, 'lxml-xml')
         for img in self.soup.find_all('img'):
             # Find image in docx based on alt text
             if img.has_attr('alt'):
@@ -433,7 +433,7 @@ class MammothParser:
             ref = ol.next_sibling
             ref.name = 'li'
             ol.append(ref)
-            if isinstance(ref.contents[0], NavigableString):
+            if isinstance(ref.contents[0], bs4.NavigableString):
                 ref.contents[0].replace_with(num_regex.sub('', ref.contents[0]))
 
     def format_authors(self) -> None:
