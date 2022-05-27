@@ -60,7 +60,7 @@ class MammothParser:
                 outfile.comment = infile.comment
                 for f in infile.infolist():
                     xml = infile.read(f)
-                    if f.filename == 'word/document.xml':
+                    if f.filename in ['word/document.xml', 'word/footnotes.xml']:
                         txt = xml.decode('utf8')
                         while re.search(omath_pattern, txt):
                             placeholders.append(str(uuid.uuid4()).replace('-', ''))
