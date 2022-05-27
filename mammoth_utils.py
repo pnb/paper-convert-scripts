@@ -225,20 +225,19 @@ class MammothParser:
                 elem.insert_after(new_fig)
                 if elem.find_parent('tr'):
                     warn('caption_in_table', 'Caption text: "' + elem.get_text() + '"')
-                if elem.previous_sibling and elem.previous_sibling.name == 'p' and \
-                        elem.previous_sibling.find('img'):
-                    # Unwrap images from <p> if needed
-                    for br in elem.previous_sibling.find_all('br'):
-                        br.decompose()
-                    elem.previous_sibling.unwrap()
                 img = elem.previous_sibling
-                while img and (img.name == 'img' or
-                               (isinstance(img, bs4.NavigableString) and not img.strip())):
+                while img and ((isinstance(img, bs4.NavigableString) and not img.strip()) or
+                               img.name == 'img' or img.name == 'a' or
+                               (img.name == 'p' and img.find('img'))):
                     next_img = img.previous_sibling
                     new_fig.insert(0, img)
                     img = next_img
-                while elem.find('img'):
-                    new_fig.append(elem.find('img'))
+                    elem.previous_sibling.unwrap()
+                # Unwrap images from <p> and other containers if needed
+                for wrapper in new_fig.find_all(['p', 'em', 'strong']):
+                    wrapper.unwrap()
+                for br in new_fig.find_all('br'):
+                    br.decompose()
                 new_fig.append(elem)
             # Number figures and tables if the numbers have gotten dropped.
             if match and not match.group(2).isdigit():
