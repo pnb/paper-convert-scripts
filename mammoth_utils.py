@@ -232,7 +232,6 @@ class MammothParser:
                     next_img = img.previous_sibling
                     new_fig.insert(0, img)
                     img = next_img
-                    elem.previous_sibling.unwrap()
                 # Unwrap images from <p> and other containers if needed
                 for wrapper in new_fig.find_all(['p', 'em', 'strong']):
                     wrapper.unwrap()
