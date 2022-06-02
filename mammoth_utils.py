@@ -212,10 +212,12 @@ class MammothParser:
                         warn('caption_in_table', 'Caption text: "' + elem.get_text() + '"')
                     check_in_table = check_in_table.parent
                 table = elem.find_next('table')
-                if table and table.sourceline - elem.sourceline > 2:
+                if not table or table.sourceline - elem.sourceline > 2:
                     warn('table_caption_distance', 'Caption text: "' + elem.get_text() + '"')
                 elif table:
                     table.insert(0, elem)  # Move table <caption> inside <table> where it belongs
+                if isinstance(elem.next_sibling, bs4.Tag) and elem.next_sibling.name == 'img':
+                    warn('image_as_table', 'Caption text: "' + elem.get_text() + '"')
             else:  # Change to <figcaption> for figures
                 elem.name = 'figcaption'
                 figure_counter += 1

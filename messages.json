@@ -182,6 +182,10 @@
                 "help": "The \\caption command should appear before your table content so that the caption is above the table. Check the template to see an example."
             }
         },
+        "image_as_table": {
+            "message": "Image found below table caption",
+            "help": "There is an image directly below a table caption, where a table is expected. If this is an image or screenshot of a table, it should be converted to a real table. An image of a table will not be readable by people using screen reader software, nor by automated tools (e.g., search engines)."
+        },
         "figure_caption_distance": {
             "message": "Figure not found immediately before caption",
             "help": "Figure captions should appear directly below figure images with nothing between them and the figure image."
