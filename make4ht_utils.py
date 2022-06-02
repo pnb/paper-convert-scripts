@@ -63,20 +63,24 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
 def get_bib_backend(tex_str: str) -> str:
     """Try to determine what bibliography backend a paper uses. Assumes BibTeX if it can't find any
     info. Assumes Biber if it finds BibLaTeX but no backend is specified (Biber is default there).
+    Returns None in the rare case that bibliography items appear hard-coded in the Tex source.
 
     Args:
         tex_str (str): LaTeX document source code
 
     Returns:
-        str: Name of backend command to use for compiling the document (e.g., biber, bibtex)
+        str: Name of backend command to use for compiling (e.g., "biber", "bibtex") or None
     """
-    bib_regex = re.compile(r'^\s*\\usepackage\s*(\[.*backend=(\w+).*\])?\s*\{\bbiblatex\b\}',
-                           re.MULTILINE)
-    match = bib_regex.search(tex_str)
+    backend_regex = re.compile(r'^\s*\\usepackage\s*(\[.*backend=(\w+).*\])?\s*\{\bbiblatex\b\}',
+                               re.MULTILINE)
+    match = backend_regex.search(tex_str)
     if match:
         if match.group(2):
             return match.group(2)
         return 'biber'
+    if not re.search(r'^\s*\\bibliography\s*\{', tex_str, re.MULTILINE) and \
+            re.search(r'^\s*\\bibitem\s*\{', tex_str, re.MULTILINE):
+        return None  # Bibliography items hard-coded inito the .tex doc
     return 'bibtex'
 
 
