@@ -227,6 +227,8 @@ class MammothParser:
                 elem.insert_after(new_fig)
                 if elem.find_parent('tr'):
                     warn('caption_in_table', 'Caption text: "' + elem.get_text() + '"')
+                for img in elem.find_all('img'):  # Any images inside the same "Caption" paragraph
+                    new_fig.append(img)
                 img = elem.previous_sibling
                 while img and ((isinstance(img, bs4.NavigableString) and not img.strip()) or
                                img.name == 'img' or img.name == 'a' or
