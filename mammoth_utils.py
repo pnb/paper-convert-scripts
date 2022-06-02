@@ -452,3 +452,7 @@ class MammothParser:
                 wrappers.append(wrapper)
         for wrapper in wrappers:
             wrapper.decompose()  # This works even if the wrapper has already decomposed
+        # Remove any blank authors (e.g., because of Author style misapplied to whitespace)
+        for elem in self.soup.find_all('div', attrs={'class': lambda c: c in info_styles}):
+            if not elem.get_text(strip=True):
+                elem.decompose()
