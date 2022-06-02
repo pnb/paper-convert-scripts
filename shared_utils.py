@@ -305,10 +305,11 @@ def prettify_soup(soup: bs4.BeautifulSoup) -> str:
         str: HTML (UTF-8 encoded)
     """
     # Only insert newlines where it is safe to do so (not going to add semantic space)
-    # TODO: indent nicely and all that
+    # TODO: indent nicely and all that, accounting for <pre> and white-space: pre CSS; others?
     html = soup.encode_contents(formatter='html').decode('utf8')
     html = re.sub(r'\n\n+', '\n', html)
-    html = html.replace(chr(0x1f86a), '&rarr;').replace(chr(0x1f868), '&larr;')
+    html = html.replace(chr(0x1f86a), '&rarr;').replace(chr(0x1f868), '&larr;') \
+        .replace('&hyphen;', '-')
     return html
 
 
