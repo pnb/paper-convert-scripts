@@ -96,7 +96,7 @@ def check_styles(soup: bs4.BeautifulSoup, output_dir: str, tex: bool=False) -> N
         if isinstance(img.next_sibling, bs4.Tag) and \
                 img.next_sibling.get_text().strip().startswith('Figure ') and \
                 img.next_sibling.name != 'figcaption' and not img.next_sibling.find('figcaption'):
-            warn('figure_caption_unstyled', img.next_sibling.get_text().strip(), tex)
+            warn('figure_caption_unstyled', img.next_sibling.get_text(strip=True)[:20] + '...', tex)
 
     # Check metadata-related styles
     if not soup.find('div', attrs={'class': lambda x: x and 'Paper-Title' in x}):
