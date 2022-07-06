@@ -260,12 +260,12 @@ def add_paper_listing(bib_id: str, ul: bs4.Tag) -> None:
 
     authors_elem = index_soup.new_tag('div', attrs={'class': 'author-list'})
     title_authors_elem.append(authors_elem)
-    authors_formatted = ''
-    for author in bib_entry.persons['author']:
-        if authors_formatted:
-            authors_formatted += ' | '
-        authors_formatted += str(author)
-    authors_elem.append(index_soup.new_string(authors_formatted))
+    for author_i, author in enumerate(bib_entry.persons['author']):
+        if author_i > 0:
+            sep_elem = index_soup.new_tag('span', attrs={'class': 'author-name-separator'})
+            sep_elem.append(index_soup.new_string(' | '))
+            title_authors_elem.append(sep_elem)
+        title_authors_elem.append(index_soup.new_string(str(author)))
 
 
 # First handle any papers matching categories
