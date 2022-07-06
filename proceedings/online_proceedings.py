@@ -43,6 +43,19 @@ def hash_title(orig_title: str) -> str:
     return re.sub(r'[^a-z0-9]', '', orig_title.lower())
 
 
+def unescape_bib(field_value: str) -> str:
+    """Pybtex doesn't seem to properly un-escape escaped characters, so do that here. Only handles
+    cases that have come up so far.
+
+    Args:
+        field_value (str): String from some Pybtex entry.field['fieldname']
+
+    Returns:
+        str: Unescaped value
+    """
+    return field_value.replace('\\#', '#')
+
+
 category_regexes = {}
 if args.category_regex_file:
     print('Loading categories')
@@ -89,13 +102,14 @@ for dir in os.listdir(args.html_papers_dir):
         bib_entry = bib_data[std_title].entries[bib_id]
         # Replace the <title> with the exact match from BibTex, leaving the <div> title as-is, since
         # it may contain superscripts or other stuff
+        title_from_bib = html.escape(unescape_bib(bib_entry.fields['title']))
         title_elem.clear()
-        title_elem.append(soup.new_string(html.escape(bib_entry.fields['title'])))
+        title_elem.append(soup.new_string(title_from_bib))
 
         # citation_title
         meta_title = soup.new_tag('meta', attrs={
             'name': 'citation_title',
-            'content': html.escape(bib_entry.fields['title'])
+            'content': title_from_bib
         })
         first_meta_tag.insert_before(meta_title)
         first_meta_tag.insert_before(soup.new_string('\n'))
@@ -256,7 +270,7 @@ def add_paper_listing(bib_id: str, ul: bs4.Tag) -> None:
         'class': 'title-link'
     })
     title_authors_elem.append(title_link)
-    title_link.append(index_soup.new_string(bib_entry.fields['title']))
+    title_link.append(index_soup.new_string(unescape_bib(bib_entry.fields['title'])))
 
     authors_elem = index_soup.new_tag('div', attrs={'class': 'author-list'})
     title_authors_elem.append(authors_elem)
