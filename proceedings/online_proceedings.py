@@ -179,7 +179,7 @@ for dir in os.listdir(args.html_papers_dir):
         soup.find('main').insert_before(nav)
         nav.insert_after(soup.new_string('\n'))
 
-        nav_back = soup.new_tag('a', attrs={'href': '../'})
+        nav_back = soup.new_tag('a', attrs={'href': '../index.html'})
         nav_back.append(soup.new_string('&larr; All papers'))
         nav.append(nav_back)
         nav.append(soup.new_string('\n'))
