@@ -1,0 +1,64 @@
+.proceedings-contents {
+    font-family: 'Source Sans Pro', Helvetica,Arial,sans-serif;
+    line-height: 1.4;
+    font-size: 16px;
+    max-width: 50em;
+    padding: 2em;
+}
+
+.proceedings-contents h1 {
+    font-size: 2em;
+    margin: 0 0 1em 0;
+}
+
+.proceedings-contents h2 {
+    font-size: 1.5em;
+    margin: 1em 0 1em 0;
+    padding: .5em;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+}
+
+.proceedings-contents .proceedings-title-authors a {
+    text-decoration: none;
+}
+
+.proceedings-contents .proceedings-title-authors a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+}
+
+.proceedings-contents ul.proceedings-list {
+    padding: 0;
+}
+
+.proceedings-contents ul.proceedings-list li {
+    list-style-type: none;
+    display: grid;
+    grid-template-columns: 5em auto;
+    margin: 2em 0 2em 0;
+}
+
+.proceedings-contents .proceedings-extras a.pdf-link,
+.proceedings-contents .proceedings-extras a.bib-link {
+    display: inline-block;
+    background: #66f;
+    border: 1px solid #338;
+    border-radius: .2em;
+    color: #fff;
+    text-decoration: none;
+    font-size: .75rem;
+    padding: 0 .3em 0 .3em;
+    margin: .1em;
+}
+
+.proceedings-contents .proceedings-extras a.pdf-link:hover,
+.proceedings-contents .proceedings-extras a.bib-link:hover {
+    box-shadow: 0 0 .125em #000;
+}
+
+.proceedings-contents .proceedings-extras a.bib-link {
+    background: #666;
+    border-color: #333;
+}

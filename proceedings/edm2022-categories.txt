@@ -1,0 +1,14 @@
+Full Papers
+.*EDM-long-papers.*
+
+Short Papers
+.*EDM-short-papers.*
+
+Posters
+.*EDM-posters.*
+
+Doctoral Consortium
+.*EDM-doctoral-consortium.*
+
+Industry Track
+.*EDM-industry-track.*
