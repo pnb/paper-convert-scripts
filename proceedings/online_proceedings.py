@@ -184,13 +184,13 @@ for dir in os.listdir(args.html_papers_dir):
         nav.append(nav_back)
         nav.append(soup.new_string('\n'))
 
-        nav_pdf = soup.new_tag('a', attrs={'href': './' + bib_id + '.pdf'})
-        nav_pdf.append(soup.new_string('Download PDF'))
+        nav_pdf = soup.new_tag('a', attrs={'href': './' + bib_id + '.pdf', 'class': 'pdf-link'})
+        nav_pdf.append(soup.new_string('pdf'))
         nav.append(nav_pdf)
         nav.append(soup.new_string('\n'))
 
-        nav_bib = soup.new_tag('a', attrs={'href': './' + bib_id + '.bib'})
-        nav_bib.append(soup.new_string('.bib'))
+        nav_bib = soup.new_tag('a', attrs={'href': './' + bib_id + '.bib', 'class': 'bib-link'})
+        nav_bib.append(soup.new_string('bib'))
         nav.append(nav_bib)
         nav.append(soup.new_string('\n'))
 
