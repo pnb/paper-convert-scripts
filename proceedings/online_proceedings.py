@@ -6,6 +6,7 @@ import shutil
 
 import bs4
 import pybtex.database
+import pypandoc
 
 
 ap = argparse.ArgumentParser(description='Generate proceedings from HTML converter output and .bib '
@@ -22,6 +23,8 @@ ap.add_argument('--category-regex-file', help='Path to a text file with a list o
                 'names, each with a regular expression on the next line, which will be matched to '
                 'BibTex keys; any uncategorized papers will appear at the top; regular expressions '
                 'will be matched in order, with the first match found being applied')
+ap.add_argument('--intro-md', help='Path to a Markdown file that can be shown as a preface page; '
+                'the title will be drawn from the first heading found in the file')
 args = ap.parse_args()
 
 try:
@@ -247,6 +250,24 @@ title_elem.append(index_soup.new_string(bib_entry.fields['booktitle']))
 h1_elem = index_soup.find('h1')
 h1_elem.clear()
 h1_elem.append(index_soup.new_string(bib_entry.fields['booktitle']))
+
+# Add intro/frontmatter if provided
+if args.intro_md:
+    print('Creating introduction page')
+    intro_html = pypandoc.convert_file(args.intro_md, 'html')
+    with open(os.path.join(script_dir, 'intro_template.html'), encoding='utf8') as infile:
+        intro_soup = bs4.BeautifulSoup(infile.read(), 'lxml')
+    intro_soup.find('main').append(bs4.BeautifulSoup(intro_html, 'lxml'))
+    first_header = intro_soup.find(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+    assert first_header, 'No header found in ' + args.intro_md
+    intro_soup.find('title').clear()
+    intro_soup.find('title').append(intro_soup.new_string(first_header.get_text(strip=True)))
+    with open(os.path.join(args.output_dir, 'intro.html'), 'w', encoding='utf8') as ofile:
+        ofile.write(str(intro_soup))
+    # Now link to it from the proceedings page
+    intro_link = index_soup.new_tag('a', attrs={'href': 'intro.html', 'class': 'intro-link'})
+    intro_link.append(index_soup.new_string(first_header.get_text(strip=True)))
+    main_elem.append(intro_link)
 
 
 def add_paper_listing(bib_id: str, ul: bs4.Tag) -> None:
