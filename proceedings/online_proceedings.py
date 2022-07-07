@@ -202,6 +202,15 @@ for dir in os.listdir(args.html_papers_dir):
         nav.append(nav_doi)
         nav.append(soup.new_string('\n'))
 
+        # Add in table resizing JS; in the future this should happen in paper conversion
+        table_resizer = soup.find('script', attrs={'src': '../table_sizer.js'})
+        if not table_resizer:
+            table_resizer = soup.new_tag('script', attrs={
+                'src': '../table_sizer.js',
+                'defer': 'true'
+            })
+            soup.find('script').insert_before(table_resizer)
+
         # Copy images, flatten any image directory structure, and change references to them
         try:
             os.mkdir(os.path.join(args.output_dir, bib_id))
