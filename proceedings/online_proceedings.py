@@ -174,7 +174,7 @@ for dir in os.listdir(args.html_papers_dir):
         first_meta_tag.insert_before(meta_doi)
         first_meta_tag.insert_before(soup.new_string('\n'))
 
-        # Add banner with PDF/index link
+        # Add banner with PDF/index/bib/doi links
         nav = soup.new_tag('header', attrs={'class': 'paper-header'})
         soup.find('main').insert_before(nav)
         nav.insert_after(soup.new_string('\n'))
@@ -192,6 +192,14 @@ for dir in os.listdir(args.html_papers_dir):
         nav_bib = soup.new_tag('a', attrs={'href': './' + bib_id + '.bib', 'class': 'bib-link'})
         nav_bib.append(soup.new_string('bib'))
         nav.append(nav_bib)
+        nav.append(soup.new_string('\n'))
+
+        nav_doi = soup.new_tag('a', attrs={
+            'href': 'https://doi.org/' + bib_entry.fields['doi'],
+            'class': 'doi-link'
+        })
+        nav_doi.append(soup.new_string('doi'))
+        nav.append(nav_doi)
         nav.append(soup.new_string('\n'))
 
         # Copy images, flatten any image directory structure, and change references to them
@@ -261,6 +269,13 @@ def add_paper_listing(bib_id: str, ul: bs4.Tag) -> None:
     })
     bib_link.append(index_soup.new_string('bib'))
     extras_elem.append(bib_link)
+
+    doi_link = soup.new_tag('a', attrs={
+        'href': 'https://doi.org/' + bib_entry.fields['doi'],
+        'class': 'doi-link'
+    })
+    doi_link.append(index_soup.new_string('doi'))
+    extras_elem.append(doi_link)
 
     title_authors_elem = index_soup.new_tag('div', attrs={'class': 'proceedings-title-authors'})
     list_elem.append(title_authors_elem)
