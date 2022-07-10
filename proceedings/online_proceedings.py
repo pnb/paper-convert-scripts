@@ -25,6 +25,7 @@ ap.add_argument('--category-regex-file', help='Path to a text file with a list o
                 'will be matched in order, with the first match found being applied')
 ap.add_argument('--intro-md', help='Path to a Markdown file that can be shown as a preface page; '
                 'the title will be drawn from the first heading found in the file')
+ap.add_argument('--copyright', help='Path to a copyright notice snippet in HTML format')
 args = ap.parse_args()
 
 try:
@@ -204,6 +205,11 @@ for dir in os.listdir(args.html_papers_dir):
         nav_doi.append(soup.new_string('doi'))
         nav.append(nav_doi)
         nav.append(soup.new_string('\n'))
+
+        # Add copyright notice, optionally
+        if args.copyright:
+            with open(args.copyright) as infile:
+                soup.find('main').append(bs4.BeautifulSoup(infile.read(), 'lxml'))
 
         # Add in table resizing JS; in the future this should happen in paper conversion
         table_resizer = soup.find('script', attrs={'src': '../table_sizer.js'})
