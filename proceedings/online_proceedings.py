@@ -209,7 +209,8 @@ for dir in os.listdir(args.html_papers_dir):
         # Add copyright notice, optionally
         if args.copyright:
             with open(args.copyright) as infile:
-                soup.find('main').append(bs4.BeautifulSoup(infile.read(), 'lxml'))
+                # Use html.parser to avoid inserting <html><body> in the snippet like lxml does
+                soup.find('main').append(bs4.BeautifulSoup(infile.read(), 'html.parser'))
 
         # Add in table resizing JS; in the future this should happen in paper conversion
         table_resizer = soup.find('script', attrs={'src': '../table_sizer.js'})
