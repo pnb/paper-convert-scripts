@@ -317,11 +317,13 @@ def add_paper_listing(bib_id: str, ul: bs4.Tag) -> None:
     title_authors_elem = index_soup.new_tag('div', attrs={'class': 'proceedings-title-authors'})
     list_elem.append(title_authors_elem)
 
+    title_heading = index_soup.new_tag('h3', attrs={'class': 'paper-list-title'})
+    title_authors_elem.append(title_heading)
     title_link = index_soup.new_tag('a', attrs={
         'href': './' + bib_id + '/index.html',
         'class': 'title-link'
     })
-    title_authors_elem.append(title_link)
+    title_heading.append(title_link)  # Wrap title in <h3> to allow easier screen reader nav
     title_link.append(index_soup.new_string(unescape_bib(bib_entry.fields['title'])))
 
     authors_elem = index_soup.new_tag('div', attrs={'class': 'author-list'})
