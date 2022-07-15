@@ -59,6 +59,7 @@ def unescape_bib(field_value: str) -> str:
     Returns:
         str: Unescaped value
     """
+    field_value = re.sub(r'(?<!\\)[\{\}]', '', field_value)  # "{" and "}" (capitalization)
     return field_value.replace('\\#', '#')
 
 
