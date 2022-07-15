@@ -90,6 +90,7 @@ for bibfile in os.listdir(args.bib_dir):
 
 print('Processing papers')
 paper_index = {}  # Map first page number => hashed title, for creating index page
+processed_titles = set()  # Track which ones we've taken care of for double checking at the end
 for dir in os.listdir(args.html_papers_dir):
     dir = os.path.join(args.html_papers_dir, dir)
     if os.path.isdir(dir):  # Is a paper directory, presumably
@@ -244,6 +245,7 @@ for dir in os.listdir(args.html_papers_dir):
         # Copy .pdf
         shutil.copy(os.path.join(args.pdf_dir, bib_id + '.pdf'),
                     os.path.join(args.output_dir, bib_id, bib_id + '.pdf'))
+        processed_titles.add(std_title)
 
 
 # Create index page, grouped by category (if provided) and sorted in order of first page number
@@ -373,3 +375,11 @@ with open(os.path.join(args.output_dir, 'index.html'), 'w', encoding='utf8') as 
 
 # Copy CSS
 shutil.copy(os.path.join(script_dir, 'edm2022-proceedings.css'), args.output_dir)
+
+# Check for unexpected mismatches
+extra_bib_titles = set(bib_data.keys()).difference(processed_titles)
+if extra_bib_titles:
+    print('\nBibTex entries not matched to a paper:')
+    for std_title in extra_bib_titles:
+        bib_id = next(iter(bib_data[std_title].entries))
+        print(' *', bib_data[std_title].entries[bib_id].fields['title'])
