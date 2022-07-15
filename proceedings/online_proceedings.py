@@ -15,6 +15,8 @@ ap.add_argument('html_papers_dir', help='Path to a directory with a set of conve
                 'subdirectories (e.g., 0BSeO3So4v, PHxnRWijaa)')
 ap.add_argument('bib_dir', help='Path to directory with a set of .bib files, one per paper (to be '
                 'matched based on paper title)')
+ap.add_argument('pdf_dir', help='Path to directory with a set of .pdf files, with filenames that '
+                'correspond to .bib filenames')
 ap.add_argument('output_dir', help='Path to output directory')
 ap.add_argument('url_base', help='URL where the result will eventually be placed (e.g., '
                 '"https://example.com/proceedings/"); this is necessary because PDF URL metadata '
@@ -236,8 +238,12 @@ for dir in os.listdir(args.html_papers_dir):
         with open(os.path.join(args.output_dir, bib_id, 'index.html'), 'w',
                   encoding='utf8') as ofile:
             ofile.write(soup.decode(formatter=None))
+        # Copy .bib
         shutil.copy(os.path.join(args.bib_dir, bib_id + '.bib'),
                     os.path.join(args.output_dir, bib_id, bib_id + '.bib'))
+        # Copy .pdf
+        shutil.copy(os.path.join(args.pdf_dir, bib_id + '.pdf'),
+                    os.path.join(args.output_dir, bib_id, bib_id + '.pdf'))
 
 
 # Create index page, grouped by category (if provided) and sorted in order of first page number
