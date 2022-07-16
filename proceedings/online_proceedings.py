@@ -364,7 +364,10 @@ for cat_regex, cat_title in category_regexes.items():
 if paper_index:
     print('Indexing uncategorized papers')
     uncategorized_ul = index_soup.new_tag('ul', attrs={'class': 'proceedings-list'})
-    h1_elem.insert_after(uncategorized_ul)
+    if intro_link:
+        intro_link.insert_after(uncategorized_ul)
+    else:
+        h1_elem.insert_after(uncategorized_ul)
     for first_page_num in sorted(paper_index.keys()):
         std_title = paper_index[first_page_num]
         bib_id = next(iter(bib_data[std_title].entries))
