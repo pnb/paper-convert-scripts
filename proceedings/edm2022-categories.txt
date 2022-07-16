@@ -12,3 +12,6 @@ Doctoral Consortium
 
 Industry Track
 .*EDM-industry-track.*
+
+Workshop/Tutorial Abstracts
+.*EDM-workshop-tutorials.*
