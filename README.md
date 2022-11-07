@@ -22,7 +22,7 @@ Edit `config.json` to adjust the paths to required applications, including the c
 
 ## Using conversion scripts
 
-Scripts can be run via the *paper-convert-www* frontend or from the command line.
+Scripts can be run via the [paper-convert-www](https://github.com/pnb/paper-convert-www) frontend or from the command line.
 
 If run from the command line, scripts must be run from the current directory. The result will be an `index.html` file in the specified output folder, which may also include `conversion_warnings.csv` containing a record of possible problems encountered during conversion. Additionally, there will be any images that are part of the paper.
 
