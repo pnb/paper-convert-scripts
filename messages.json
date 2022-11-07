@@ -175,6 +175,10 @@
             "message": "Caption inside table row",
             "help": "Captions should usually not be inside tables, with rare exceptions for tables of many small figures (e.g., a grid of icons with subcaptions). Though it may look the same visually in the original document, semantically it does not make sense for the caption to be treated as tabular data. Hence, it will be odd for someone reading the paper using a screen reader, or when converted to HTML."
         },
+        "no_caption_number_period": {
+            "message": "No period after caption number",
+            "help": "Captions should have a period after the caption number, like \"Figure 1. Some caption here\"."
+        },
         "table_caption_distance": {
             "message": "Table not found immediately below caption",
             "help": "Table captions should appear directly above tables with nothing between them and the table.",

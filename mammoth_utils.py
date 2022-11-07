@@ -242,11 +242,14 @@ class MammothParser:
                 for br in new_fig.find_all('br'):
                     br.decompose()
                 new_fig.append(elem)
-            # Number figures and tables if the numbers have gotten dropped.
+            # Number figures and tables if the numbers have gotten dropped
             if match and not match.group(2).isdigit():
                 txt = elem.find(string=caption_regex)
-                numbered_txt = re.sub(caption_regex, r'\1 ' + str(new_num) + '.', txt, count=1)
+                suffix = '.' if match.group(2) == '.' else '. ' + match.group(2)
+                numbered_txt = re.sub(caption_regex, r'\1 ' + str(new_num) + suffix, txt, count=1)
                 txt.replace_with(numbered_txt)
+            elif match and elem.get_text()[match.end(0)] != '.':
+                warn('no_caption_number_period', match.group(0))
 
     def crop_images(self) -> None:
         """Crop images, if needed, and check that each one has a valid alt text set.
