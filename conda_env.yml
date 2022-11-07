@@ -3,17 +3,17 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - beautifulsoup4=4.10.0
+  - beautifulsoup4=4.11.1
   - cairo=1.16.0
-  - cssutils=2.3.0
-  - lxml=4.7.1
-  - numpy=1.21.2
-  - pandoc=2.12
+  - cssutils=2.6.0
+  - lxml=4.9.1
+  - numpy=1.23.3
+  - pandoc=2.19.2
   - pdf2svg=0.2.3
-  - pillow=8.4.0
-  - pip=21.2.4
+  - pillow=9.2.0
+  - pip=22.3.1
   - pybtex=0.24.0
-  - pypandoc=1.6.3
-  - python=3.9.7
+  - pypandoc=1.10
+  - python=3.10.6
   - pip:
-    - mammoth==1.4.18
+    - mammoth==1.5.0
