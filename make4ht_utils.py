@@ -58,19 +58,23 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
     if match:
         warn('no_newline_after_algorithmic', match.group(0))
     tex_str = tex_str.replace('\\Bar{', '\\bar{').replace('\\Tilde{', '\\tilde{')
+
     # Look for image filenames with uppercase and/or mismatching case letters, which causes issues
     # across different OSs and issues with make4ht if the filename extension is uppercase
     img_fnames = set(get_command_content(tex_str, 'includegraphics'))
     for dir, _, fnames in os.walk(extracted_dir):
         for fname in fnames:
             path = os.path.join(dir, fname)
-            relative_path = re.sub(r'^' + re.escape(extracted_dir) + r'/?', '', path)
+            relative_path = re.sub(r'^' + re.escape(extracted_dir) + r'/?', '', path).lower()
             for img in img_fnames:
-                if img.lower() == relative_path.lower():
+                # Check if this is probably the file being referenced; this matching is imperfect
+                # in situations where authors have the same image filename in two different
+                # directories or the same filename with different capitalizations (terrible ideas)
+                if img.lower() == relative_path or relative_path.endswith(img.lower()):
                     if fname != fname.lower():  # Uppercase letters in image filename; rename file
                         os.rename(path, os.path.join(dir, fname.lower()))
                     newimg = img[:-len(fname)] + fname.lower()
-                    if newimg != img:  # Replace lowercase filename in Tex
+                    if newimg != img:  # Replace lowercase filename in tex
                         tex_str = tex_str.replace('{' + img + '}', '{' + newimg + '}')
                     img_fnames.remove(img)
                     break
