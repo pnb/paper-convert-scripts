@@ -167,6 +167,10 @@
             "message": "Unexpected image format",
             "help": "The image may have to be converted to a web-compatible format after document conversion. Please notify support."
         },
+        "missing_image": {
+            "message": "Missing image file or mismatched filename",
+            "help": "An image filename in the document source could not be matched to an existing file. Check filename and subdirectory capitalization. Consider also moving all images to the same folder as your .tex file, and using all lowercase filenames, which may help."
+        },
         "unknown_caption_type": {
             "message": "Unknown caption type",
             "help": "This warning occurs if the parser could not determine whether a caption belonged to a table or figure based on the text of the caption. Figure captions should start with \"Figure X\" or \"Fig. X\", while table captions should start with \"Table X\". Using the Insert Caption functionality in Word when creating captions should ensure this is the case."

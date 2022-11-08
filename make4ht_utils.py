@@ -57,7 +57,51 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
     match = re.search(r'\\end\{algorithmic\}[ \t]*\n[ \t]*[a-zA-Z]{1,20}', tex_str, re.MULTILINE)
     if match:
         warn('no_newline_after_algorithmic', match.group(0))
+    # Look for image filenames with uppercase and/or mismatching case letters, which causes issues
+    # across different OSs and issues with make4ht if the filename extension is uppercase
+    img_fnames = set(get_command_content(tex_str, 'includegraphics'))
+    for dir, _, fnames in os.walk(extracted_dir):
+        for fname in fnames:
+            path = os.path.join(dir, fname)
+            relative_path = re.sub(r'^' + re.escape(extracted_dir) + r'/?', '', path)
+            for img in img_fnames:
+                if img.lower() == relative_path.lower():
+                    if fname != fname.lower():  # Uppercase letters in image filename; rename file
+                        os.rename(path, os.path.join(dir, fname.lower()))
+                    newimg = img[:-len(fname)] + fname.lower()
+                    if newimg != img:  # Replace lowercase filename in Tex
+                        tex_str = tex_str.replace('{' + img + '}', '{' + newimg + '}')
+                    img_fnames.remove(img)
+                    break
+    for img in img_fnames:  # Warn for any remaining, unmatched images
+        warn('missing_image', img)
     return tex_str
+
+
+def get_command_content(tex_str: str, cmd_name: str) -> list:
+    """Find the contents of all occurrences of a LaTeX command, such as "label" or "textbf".
+    Ignores command parameters in square brackets if they exist.
+
+    Args:
+        tex_str (str): LaTeX code
+        cmd_names (str): Command to search for (without preceding slash)
+
+    Returns:
+        list of str: content of command[params]{content} for each occurrence of command
+    """
+    start_regex = re.compile(r'([^\\]|^)\\(' + cmd_name + r')(\[[^]]+\])?\{')
+    cmds = []
+    for match in start_regex.finditer(tex_str):
+        bracket_depth = 0
+        for match_end in range(match.end() - 1, len(tex_str)):
+            if tex_str[match_end] == '{':
+                bracket_depth += 1
+            elif tex_str[match_end] == '}':
+                bracket_depth -= 1
+                if bracket_depth == 0:
+                    break
+        cmds.append(tex_str[match.end():match_end])
+    return cmds
 
 
 def get_bib_backend(tex_str: str) -> str:
@@ -376,7 +420,7 @@ class TeXHandler:
         """
         env_start, env_end = self.get_tex_environment(self.tex_line_num(img_elem))
         tex_section = '\n'.join(self.tex_lines[env_start:env_end + 1])
-        alts = self.get_command_content(tex_section, 'Description')
+        alts = get_command_content(tex_section, 'Description')
         img_i = img_elem.parent.find_all('img').index(img_elem)
         if img_elem.has_attr('alt'):  # Make4ht defaults to "PIC" which is not real alt text
             del img_elem['alt']
@@ -597,33 +641,8 @@ class TeXHandler:
             if elem.name == 'a' and not elem.has_attr('href'):
                 elem.decompose()  # Remove unused anchors
 
-    def get_command_content(self, tex_str: str, cmd_name: str) -> list:
-        """Find the contents of all occurrences of a LaTeX command, such as "label" or "textbf".
-        Does not support commands with [xx] arguments (yet).
-
-        Args:
-            tex_str (str): LaTeX code
-            cmd_names (str): Command to search for (without preceding slash)
-
-        Returns:
-            list of str: content of command{content} for each occurrence of command
-        """
-        start_regex = re.compile(r'([^\\]|^)\\(' + cmd_name + r')\{')
-        cmds = []
-        for match in start_regex.finditer(tex_str):
-            bracket_depth = 0
-            for match_end in range(match.end() - 1, len(tex_str)):
-                if tex_str[match_end] == '{':
-                    bracket_depth += 1
-                elif tex_str[match_end] == '}':
-                    bracket_depth -= 1
-                    if bracket_depth == 0:
-                        break
-            cmds.append(tex_str[match.end():match_end])
-        return cmds
-
     def get_tex_environment(self, tex_line_num: int) -> tuple[int, int]:
-        """Get the LaTeX environmemt that contains a specified line number, assuming the environment
+        """Get the LaTeX environment that contains a specified line number, assuming the environment
         consists of a \\begin{something} and \\end{something} pair. If the line number corresponds
         to a begin or end command, that will the environment returned (rather than its parent).
 
