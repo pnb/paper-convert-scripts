@@ -117,6 +117,13 @@
                 "help": "Check that the missing elements are in your Bibtex. If you see them but they don't appear in the PDF, you may have them in the wrong Bibtex field."
             }
         },
+        "broken_internal_ref": {
+            "message": "Broken internal cross-reference",
+            "help": "Look for \"Error!\" in your document and fix the broken internal cross-reference. You may need to open the print dialog in Word (then simply close it without printing) to force internal cross-references to refresh.",
+            "tex": {
+                "help": "Search for \"??\" in the converted document to see where the error occurs. The most common cause is equations, which need to use <code>\\eqref</code> from the <code>amsmath</code> package so that they can be handled separately from regular <code>\\ref</code> references to tables, figures, and sections."
+            }
+        },
         "alt_text_missing": {
             "message": "Missing alt text for image",
             "help": "Follow the instructions in the template for adding alt text to images. Every image needs alt text to ensure the paper can be understood by people using screen reader software. Additionally, alt text is used by the HTML conversion program to identify each image, so alt text must be unique for each image; things like image sizes may be wrong otherwise.",

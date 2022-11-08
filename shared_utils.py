@@ -129,6 +129,9 @@ def check_styles(soup: bs4.BeautifulSoup, output_dir: str, tex: bool=False) -> N
         warn('style_no_intro', tex=tex)
     if not get_elem_containing_text(soup, 'h1', 'references'):
         warn('style_no_refs', tex=tex)
+    # Check for broken equation number references
+    for broken_ref in soup.find_all(string=['??', 'Error! Reference source not found.']):
+        warn('broken_internal_ref', 'Text: "' + broken_ref + '"', tex)
     # Check every numbered reference appears in the text in square brackets
     dom = etree.HTML(str(soup))
     ref_lis = dom.xpath("//h1[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'references')]/following-sibling::ol[1]/li | //h1[.//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'references')]]/following-sibling::ol[1]/li") 
@@ -337,6 +340,7 @@ def save_soup(soup: bs4.BeautifulSoup, output_filename: str) -> None:
                     load: ['[tex]/textmacros']
                 },
                 tex: {
+                    tags: 'ams',
                     macros: {
                         bm: ["\\\\boldsymbol{#1}", 1]
                     },

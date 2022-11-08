@@ -1,5 +1,6 @@
 import argparse
 import os
+import shutil
 import subprocess
 
 from bs4 import BeautifulSoup
@@ -34,18 +35,21 @@ with open(os.path.join(extracted_dir, 'tmp-make4ht.tex'), 'w') as ofile:
 bib_backend = make4ht_utils.get_bib_backend(tex)
 
 print('Converting via make4ht')
-mk4_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'make4ht_hardcode_bib.mk4')
+scripts_dir = os.path.dirname(os.path.realpath(__file__))
+mk4_template = os.path.join(scripts_dir, 'make4ht_hardcode_bib.mk4')
 if bib_backend:
-    mk4_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'make4ht_template.mk4')
+    mk4_template = os.path.join(scripts_dir, 'make4ht_template.mk4')
 with open(mk4_template) as infile:
     with open(os.path.join(extracted_dir, 'make4ht_with_bibtex.mk4'), 'w') as ofile:
         if bib_backend:
             ofile.write('Make:add("bibtex", "%s ${input}")\n' % bib_backend)
         ofile.write(infile.read())
+shutil.copy(os.path.join(scripts_dir, 'make4ht_preamble.cfg'), extracted_dir)
 mathml = '' if args.no_mathml else 'mathml,'
 retcode = subprocess.call('make4ht --output-dir .. --format html5+common_domfilters '
                           '--build-file make4ht_with_bibtex.mk4 tmp-make4ht.tex '
-                          '"' + mathml + 'mathjax,svg,fn-in"', shell=True, cwd=extracted_dir)
+                          '"' + mathml + 'mathjax,svg,fn-in" --config make4ht_preamble',
+                          shell=True, cwd=extracted_dir)
 if retcode:
     shared_utils.warn('make4ht_warnings', tex=True)
 
