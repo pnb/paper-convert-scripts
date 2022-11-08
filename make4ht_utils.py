@@ -57,6 +57,7 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
     match = re.search(r'\\end\{algorithmic\}[ \t]*\n[ \t]*[a-zA-Z]{1,20}', tex_str, re.MULTILINE)
     if match:
         warn('no_newline_after_algorithmic', match.group(0))
+    tex_str = tex_str.replace('\\Bar{', '\\bar{').replace('\\Tilde{', '\\tilde{')
     # Look for image filenames with uppercase and/or mismatching case letters, which causes issues
     # across different OSs and issues with make4ht if the filename extension is uppercase
     img_fnames = set(get_command_content(tex_str, 'includegraphics'))
