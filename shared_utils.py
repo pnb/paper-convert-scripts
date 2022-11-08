@@ -333,10 +333,14 @@ def save_soup(soup: bs4.BeautifulSoup, output_filename: str) -> None:
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
         <script>
             MathJax = {
+                loader: {
+                    load: ['[tex]/textmacros']
+                },
                 tex: {
                     macros: {
                         bm: ["\\\\boldsymbol{#1}", 1]
-                    }
+                    },
+                    packages: {'[+]': ['textmacros']}
                 }
             }
         </script>
