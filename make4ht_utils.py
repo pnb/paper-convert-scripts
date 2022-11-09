@@ -1,6 +1,8 @@
 import re
 import zipfile
 import os
+import shutil
+import uuid
 
 import bs4
 
@@ -30,6 +32,15 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
 
     with zipfile.ZipFile(source_zip_path, 'r') as inzip:
         inzip.extractall(extracted_dir)
+    # If only one child and it is a folder, move all contents into the parent dir
+    if len(os.listdir(extracted_dir)) == 1:
+        orig_name = os.path.join(extracted_dir, os.listdir(extracted_dir)[0])
+        if os.path.isdir(orig_name):
+            tmp_name = os.path.join(extracted_dir, str(uuid.uuid4()))  # Rename to avoid conflicts
+            shutil.move(orig_name, tmp_name)
+            for fname in os.listdir(tmp_name):
+                shutil.move(os.path.join(tmp_name, fname), os.path.join(extracted_dir, fname))
+
     tex_files = [f for f in os.listdir(extracted_dir) if f.endswith('.tex') and f != 'tmp.tex']
     if len(tex_files) == 1:
         tex_fname = tex_files[0]

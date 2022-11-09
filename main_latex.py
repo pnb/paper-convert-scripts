@@ -1,6 +1,5 @@
 import argparse
 import os
-import glob
 import shutil
 import subprocess
 
@@ -26,8 +25,7 @@ try:
 except FileExistsError:
     print('Output folder already exists; contents may be overwritten')
     # Clean up old files
-    for tex_file in glob.glob(os.path.join(extracted_dir, '*.tex')):
-        os.remove(tex_file)
+    shutil.rmtree(extracted_dir)
 
 
 # Combine any \input files into 1 (makes postprocessing much easier for line numbers)
