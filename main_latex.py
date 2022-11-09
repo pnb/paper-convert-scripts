@@ -1,5 +1,6 @@
 import argparse
 import os
+import glob
 import shutil
 import subprocess
 
@@ -18,12 +19,15 @@ ap.add_argument('--mathml', default=False, action='store_true',
 args = ap.parse_args()
 
 print('Creating output folder')
+extracted_dir = os.path.join(args.output_dir, 'source')
+shared_utils.warn.output_filename = os.path.join(args.output_dir, 'conversion_warnings.csv')
 try:
     os.mkdir(args.output_dir)
 except FileExistsError:
     print('Output folder already exists; contents may be overwritten')
-extracted_dir = os.path.join(args.output_dir, 'source')
-shared_utils.warn.output_filename = os.path.join(args.output_dir, 'conversion_warnings.csv')
+    # Clean up old files
+    for tex_file in glob.glob(os.path.join(extracted_dir, '*.tex')):
+        os.remove(tex_file)
 
 
 # Combine any \input files into 1 (makes postprocessing much easier for line numbers)
