@@ -87,8 +87,6 @@ texer.fix_fonts()
 print('Parsing references')
 texer.fix_references()
 
-# TODO: Move table* to end of section
-
 # Inline any styles made by ID
 print('Inlining styles selected by ID')
 css = cssutils.parseFile(os.path.join(extracted_dir, 'tmp-make4ht.css'))

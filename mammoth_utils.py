@@ -108,8 +108,6 @@ class MammothParser:
             mammoth.transforms.documents.Paragraph: Transformed text
         """
         monospace_fonts = set(["consolas", "courier", "courier new"])
-        # TODO: Sort of doubt this will work for inline preformatted text, e.g., package names
-        # I think this might have runs nested in runs?
         runs = mammoth.transforms.get_descendants_of_type(paragraph, mammoth.documents.Run)
         if runs and all(run.font and run.font.lower() in monospace_fonts for run in runs):
             return paragraph.copy(style_id="code", style_name="Code")
@@ -146,7 +144,7 @@ class MammothParser:
             if image.content_type in ['image/x-emf', 'image/x-wmf']:
                 print('Converting EMF/WMF image to PNG')
                 if image.content_type == 'image/x-wmf':
-                    warn('wmf_images')  # TODO: Could maybe handle, but is it needed these days?
+                    warn('wmf_images')
                 fname = os.path.join(self.output_dir, num) + '.' + image.content_type[-3:]
                 with open(os.path.join(fname), 'wb') as ofile:
                     ofile.write(image_bytes.read())
@@ -278,9 +276,7 @@ class MammothParser:
                     print('Cropping image file:', img['src'], 'LTRB:', crop_box)
                     pil_image = pil_image.crop(box=crop_box)
                     pil_image.save(fname)
-                else:  # Do crop with an HTML element
-                    # TODO: not currently needed; only theoretically needed for SVG, but SVG doesn't
-                    # seem to work right now anyway
+                else:  # Do crop with an HTML element (for SVG)
                     pass
 
     def check_tables(self) -> None:
@@ -308,7 +304,6 @@ class MammothParser:
     def format_footnotes(self) -> None:
         """Apply some formatting to the footnotes section, if it exists.
         """
-        # TODO: Minor formatting standardization between Latex and Word: [1] vs. 1 and return arrows
         first_footnote = self.soup.find('li', attrs={'id': 'footnote-1'})
         if not first_footnote:
             return
@@ -371,13 +366,11 @@ class MammothParser:
             # Find alt text
             descr = drawing.find('wp:docPr', {'descr': True})
             alt = descr['descr'] if descr else ''
-            # TODO: Need to set figure size class, just like for other figures
             # Insert new figure into soup
             img = self.soup.new_tag('img', alt=alt, src='chart' + str(chart_i + 1) + '.png')
             validate_alt_text(img, 'chart index' + str(chart_i))
             # Find next caption in Pandoc soup, or parent if the chart is within a caption, then get
             # the caption text and find the corresponding <figcaption> in the Mammoth soup
-            # TODO: I feel like there is maybe a less error-prone way of finding the correct place
             caption = chart_span.find_parent('div', {'data-custom-style': 'caption'})
             if caption and caption.sourceline > chart_span.sourceline:
                 caption = None  # Incorrect match

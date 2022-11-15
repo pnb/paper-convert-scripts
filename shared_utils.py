@@ -158,18 +158,15 @@ def check_styles(soup: bs4.BeautifulSoup, output_dir: str, tex: bool=False) -> N
             ofile.write(ref + '\n')
     subprocess.call([CONFIG['anystyle_path'], '-f' , 'json', '--overwrite', 'parse',
                     fname, output_dir], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    # os.unlink(fname)
     fname = os.path.join(output_dir,"extracted_refs.json")
     with open(os.path.join(fname)) as ofile:
         ref_dict_list = json.load(ofile)
-    # os.unlink(fname)
-    # TODO: put this in a config file or something
     ref_requirements = defaultdict(lambda: ["title", "date"])
     ref_requirements["book"] = [ "author", "title", "date", "publisher"]
     ref_requirements["report"] = [ "author", "title", "date", "publisher"]
     ref_requirements["chapter"] =  ["author", "title", "date", "publisher", "editor", "container-title", "pages", "location"]
     ref_requirements["paper-conference"] = [ "author", "title", "date", "container-title", "pages"]
-    ref_requirements["article-journal"] = [ "author", "title", "date", "container-title", "pages", "volume" ] #"issue" is false alarming too much to be useful; TODO train anystyle on EDM style
+    ref_requirements["article-journal"] = [ "author", "title", "date", "container-title", "pages", "volume" ] #"issue" is false alarming too much to be useful
 
     for i,ref_dict in enumerate(ref_dict_list,start=1):
         reqs = set(ref_requirements[ref_dict['type']])
@@ -224,7 +221,6 @@ def set_img_class(img_elem: bs4.Tag, width_inches: float) -> None:
         img_elem (bs4.Tag): <img> element; e.g., `soup.find('img')`
         width_inches (float): Image width in inches
     """
-    # TODO: automatically check DPI on rasterized figures, warn on small DPI
     cur_class = img_elem['class'] if img_elem.has_attr('class') else ''
     if isinstance(cur_class, list):
         cur_class = ' '.join(cur_class)
@@ -308,7 +304,6 @@ def prettify_soup(soup: bs4.BeautifulSoup) -> str:
         str: HTML (UTF-8 encoded)
     """
     # Only insert newlines where it is safe to do so (not going to add semantic space)
-    # TODO: indent nicely and all that, accounting for <pre> and white-space: pre CSS; others?
     html = soup.encode_contents(formatter='html').decode('utf8')
     html = re.sub(r'\n\n+', '\n', html)
     html = html.replace(chr(0x1f86a), '&rarr;').replace(chr(0x1f868), '&larr;') \

@@ -36,16 +36,9 @@ shared_utils.wrap_author_divs(docx_conv.soup)
 print('Processing captions')
 docx_conv.process_captions()
 
-# TODO: Check for possible SVG files that correspond to PNG "preview version" files
-#   -- problem is the filenames in docx/media/ don't match for PNG/SVG; probably have to match by
-#      alt text in docx_bs
-#   -- They are both in the same <w:drawing> at least, but would have to load
-#      _rels/document.xml.rels to find the rId for the <asvg:svgBlip> in <w:drawing>
 print('Checking figures')
 docx_conv.crop_images()  # Crop figures and check them
 
-# TODO: If possible, find two-column tables and move them to the end of a section; currently they
-#       can just appear sort of wherever near where the anchor is. Same maybe for figures?
 print('Checking tables')
 docx_conv.check_tables()
 shared_utils.fix_table_gaps(docx_conv.soup)

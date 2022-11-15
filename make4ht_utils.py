@@ -373,7 +373,7 @@ class TeXHandler:
                 if table.find('tr'):
                     table.find('tr').insert_before(thead)
             for partial_line in table.find_all('tr', attrs={'class': 'cline'}):
-                partial_line.decompose()  # TODO: Handle \cline better (use its semantics)
+                partial_line.decompose()
             # Try to figure out what the header is based on \hline, if provided
             first_hline = table.find('tr', attrs={'class': 'hline'})
             if first_hline and first_hline is table.find('tr'):
