@@ -25,7 +25,10 @@ try:
 except FileExistsError:
     print('Output folder already exists; contents may be overwritten')
     # Clean up old files
-    shutil.rmtree(extracted_dir)
+    try:
+        shutil.rmtree(extracted_dir)
+    except FileNotFoundError:
+        pass
 
 
 # Combine any \input files into 1 (makes postprocessing much easier for line numbers)
