@@ -72,7 +72,8 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
 
     # Look for image filenames with uppercase and/or mismatching case letters, which causes issues
     # across different OSs and issues with make4ht if the filename extension is uppercase
-    img_fnames = set(get_command_content(tex_str, 'includegraphics'))
+    img_fnames = set([re.sub(r'^\./', '', x)  # Remove any ./ cur dir prefix
+                      for x in get_command_content(tex_str, 'includegraphics')])
     for dir, _, fnames in os.walk(extracted_dir):
         for fname in fnames:
             path = os.path.join(dir, fname)
