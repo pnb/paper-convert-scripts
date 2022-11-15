@@ -61,6 +61,18 @@ if retcode:
 # Load HTML
 if not os.path.exists(os.path.join(extracted_dir, 'tmp-make4ht.html')):
     shared_utils.warn('make4ht_failed', tex=True)
+    if os.path.exists(os.path.join(extracted_dir, 'tmp-make4ht.blg')):
+        print('\nBibliography log:')
+        error_count = 0
+        with open(os.path.join(extracted_dir, 'tmp-make4ht.blg')) as blg:
+            for line in blg.readlines():
+                if line.startswith('You\'ve used'):
+                    break  # End of useful output
+                print(line.strip())
+                if line.startswith('I\'m skipping'):
+                    error_count += 1
+        if error_count:
+            shared_utils.warn('bib_compile_errors', str(error_count) + ' error(s)', tex=True)
     exit()
 print('Loading converted HTML')
 with open(os.path.join(extracted_dir, 'tmp-make4ht.html')) as infile:

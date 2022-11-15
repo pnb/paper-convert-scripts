@@ -11,7 +11,11 @@
         },
         "make4ht_warnings": {
             "message": "LaTeX compilation warnings; see full output (line numbers will match your source file unless you used \\input{})",
-            "help": "In most cases, LaTeX warnings are not a problem. Typically, they occur because the LaTeX HTML compiler (make4ht) does not recognize some package; \"Undefined control sequence\" warnings are especially common in this case. However, often it will produce a reasonable output anyway. Hence, you can ignore this warning unless there is another problem, like the document failed to compile or the output looks wrong, in which case the LaTeX warnings may be helpful."
+            "help": "In most cases, LaTeX warnings are not a problem. Typically, they occur because the LaTeX HTML compiler (make4ht) does not recognize some package; \"Undefined control sequence\" warnings are especially common in this case. However, conversion will often produce a reasonable output anyway. Hence, you can ignore this warning unless there is another problem, like the document failed to compile or the output looks wrong, in which case the LaTeX warnings may be helpful."
+        },
+        "bib_compile_errors": {
+            "message": "Bibliography compilation errors (see log)",
+            "help": "This type of error can be caused by various problems like repeated entries or missing expected entries in the bibliography file. The bibliography log toward the end of the conversion output should have more information to help you fix these issues. Warnings like \"empty journal\" usually do not stop compilation, though they might be worth examining anyway; other types of errors often do prevent compilation."
         },
         "style_paper_title": {
             "message": "Did not find \"Paper-Title\" style",
