@@ -101,6 +101,7 @@ texer.fix_references()
 
 # Inline any styles made by ID
 print('Inlining styles selected by ID')
+cssutils.log.setLevel('FATAL')
 css = cssutils.parseFile(os.path.join(extracted_dir, 'tmp-make4ht.css'))
 for rule in css:
     if rule.type == rule.STYLE_RULE:
