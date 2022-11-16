@@ -109,16 +109,16 @@
         
         "mismatched_refs": {
             "message": "Mismatched references",
-            "help": "The in-text citation numbers do not match your numbered references, indicating that there might be unused references in your References section, or citations to missing references. Make sure you are using square brackets citation style if you are not already. Sometimes this message may be incorrect; for example, if a range in an equation (e.g., [1, 100]) is mistaken for a reference.",
+            "help": "The in-text citation numbers do not match your numbered references, indicating that there might be unused references in your References section, or citations to missing references. Make sure you are using square brackets citation style if you are not already.",
             "tex": {
-                "help": "Make sure you used the appropriate \\cite command and square brackets citation style. Sometimes this message may be incorrect; for example, if a range in an equation (e.g., [1, 100]) is mistaken for a reference."
+                "help": "Make sure you used the appropriate \\cite command and square brackets citation style. If you already did that, this message may be a false positive, but please double check the citation numbers noted here to be sure."
             }
         },
         "incomplete_reference": {
             "message": "An entry in the reference section might be incomplete",
             "help": "Find the numbered entry in your reference section and check for the missing elements. If we did not correctly recognize the entry's type, the warning may be invalid, but please double check these anyway.",
             "tex": {
-                "help": "Check that the missing elements are in your Bibtex. If you see them but they don't appear in the PDF, you may have them in the wrong Bibtex field."
+                "help": "Check that the missing elements are in your Bibtex. If you see them but they don't appear in the PDF, you may have them in the wrong Bibtex field. If we did not correctly recognize the entry's type, the warning may be invalid, but please double check these anyway."
             }
         },
         "broken_internal_ref": {
