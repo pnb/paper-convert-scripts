@@ -30,9 +30,17 @@ class MammothParser:
         self.eq_placeholders = self._add_equation_placeholders(docx_path)
 
         # Load the XML just of the document.xml file, which we will use throughout for finding
-        # things that aren't parsed well.
+        # things that aren't parsed well
         with zipfile.ZipFile(docx_path) as infile:
             self.xml_txt = infile.read('word/document.xml').decode('utf8')
+
+        xml_soup = bs4.BeautifulSoup(self.xml_txt, 'lxml-xml')
+        for wingdings_tag in xml_soup.find_all('w:rFonts', attrs={'w:ascii': 'Wingdings'}):
+            run = wingdings_tag.parent
+            while run and run.name != 'r':
+                run = run.parent
+            if run:
+                warn('wingdings', run.get_text(strip=True))
 
         print('Loading via Mammoth')
         with open(os.path.join(CONFIG['utils_dir'], 'mammoth_style_map.txt')) as infile:
