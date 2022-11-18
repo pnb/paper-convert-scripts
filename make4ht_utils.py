@@ -656,7 +656,7 @@ class TeXHandler:
             if elem.name == 'a' and not elem.has_attr('href'):
                 elem.decompose()  # Remove unused anchors
 
-    def get_tex_environment(self, tex_line_num: int) -> tuple[int, int]:
+    def get_tex_environment(self, tex_line_num: int) -> "tuple[int, int]":
         """Get the LaTeX environment that contains a specified line number, assuming the environment
         consists of a \\begin{something} and \\end{something} pair. If the line number corresponds
         to a begin or end command, that will the environment returned (rather than its parent).
