@@ -90,8 +90,6 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
                         tex_str = tex_str.replace('{' + img + '}', '{' + newimg + '}')
                     img_fnames.remove(img)
                     break
-    for img in img_fnames:  # Warn for any remaining, unmatched images
-        warn('missing_image', img)
     return tex_str
 
 
