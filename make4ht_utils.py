@@ -70,6 +70,12 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
     if match:
         warn('no_newline_after_algorithmic', match.group(0))
     tex_str = tex_str.replace('\\Bar{', '\\bar{').replace('\\Tilde{', '\\tilde{')
+    siunitx_tabulars = re.findall(r'\\begin\{tabular.?\}\s*\{[^\[]*S\[.*\}', tex_str)
+    if siunitx_tabulars:
+        print('Found `siunitx` "S" column in tabular environment; please note that this can cause '
+              'conversion issues especially if an S column is the last column in the table')
+        for tabular in siunitx_tabulars:
+            print('###', tabular, '\n')
 
     # Look for image filenames with uppercase and/or mismatching case letters, which causes issues
     # across different OSs and issues with make4ht if the filename extension is uppercase
