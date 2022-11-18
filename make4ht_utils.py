@@ -33,8 +33,9 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
     with zipfile.ZipFile(source_zip_path, 'r') as inzip:
         inzip.extractall(extracted_dir)
     # If only one child and it is a folder, move all contents into the parent dir
-    if len(os.listdir(extracted_dir)) == 1:
-        orig_name = os.path.join(extracted_dir, os.listdir(extracted_dir)[0])
+    children = [x for x in os.listdir(extracted_dir) if x != '__MACOSX']
+    if len(children) == 1:
+        orig_name = os.path.join(extracted_dir, children[0])
         if os.path.isdir(orig_name):
             tmp_name = os.path.join(extracted_dir, str(uuid.uuid4()))  # Rename to avoid conflicts
             shutil.move(orig_name, tmp_name)
