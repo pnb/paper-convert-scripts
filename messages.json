@@ -5,6 +5,10 @@
             "message": "Unexpected error!",
             "help": "An unanticipated error occurred that may require improvements to the document parser used in conversion; please notify support"
         },
+        "timeout": {
+            "message": "Conversion time limit exceeded",
+            "help": "The conversion time limit is more than enough for successfully converted papers. If the time limit is exceeded, something unexpected is happening during conversion. Please notify support."
+        },
         "make4ht_failed": {
             "message": "Document compilation failed",
             "help": "LaTeX (make4ht, specifically) did not produce an output file. This indicates that LaTeX encountered an unrecoverable error. The last warning in the conversion log output may indicate which step failed. Often this is marked with a \"[FATAL]\" message."
