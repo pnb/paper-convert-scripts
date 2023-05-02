@@ -61,8 +61,11 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
         match = input_regex.search(tex_str)
         if not match:
             break
-        print('Including \\input file:', match.group(1) + '.tex')
-        extra_tex_str = _load_tex_str(os.path.join(extracted_dir, match.group(1) + '.tex'))
+        input_fname = match.group(1)
+        if not input_fname.lower().endswith('.tex'):
+            input_fname += '.tex'
+        print('Including \\input file:', input_fname)
+        extra_tex_str = _load_tex_str(os.path.join(extracted_dir, input_fname))
         tex_str = tex_str[:match.start()] + extra_tex_str + tex_str[match.end():]
 
     # Check for known issues in the raw tex
