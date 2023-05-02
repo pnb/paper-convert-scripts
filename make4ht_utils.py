@@ -198,6 +198,27 @@ class TeXHandler:
                 return int(comment.strip().split(' ')[-1])
         return 0
 
+    def find_image_line_num(self, starting_line_num: int, fname: str) -> int:
+        """Find a LaTeX line number after a given line number that includes a specific image file
+        (ignoring the extension which may differ due to conversion). Useful for cases where Make4ht
+        does not provide the latest line number.
+
+        Args:
+            starting_line_num (int): Starting point, usually from `tex_line_num()`
+            fname (str): Filename to look for (case insensitive)
+
+        Returns:
+            int: Line number, or starting line number if the image was not found
+        """
+        prefix = fname.lower()
+        if '.' in prefix:
+            prefix = prefix[:prefix.rfind('.')]
+        for i in range(starting_line_num - 1, len(self.tex_lines)):
+            curline = self.tex_lines[i].lower()
+            if R'\includegraphics' in curline and '{' + prefix in curline:
+                return i + 1
+        return starting_line_num
+
     def tex_line(self, soup_elem: bs4.Tag) -> str:
         """Get the line of LaTeX code corresponding to a BeautifulSoup element. See
         `tex_line_num()` documentation.
@@ -509,6 +530,7 @@ class TeXHandler:
             # Handle alt text and caption
             self.add_alt_text(img)
             img_text_line_num = self.tex_line_num(img)
+            img_text_line_num = self.find_image_line_num(img_text_line_num, img['src'])
             env_start, _ = self.get_tex_environment(img_text_line_num)
             parent = img.parent
             subfigure_wrapper = img.find_parent('div', attrs={'class': 'subfigure'})
