@@ -29,6 +29,13 @@
                 "help": "This error is unlikely to occur and may indicate a large problem. Check that the \\maketitle command was used in LaTeX, and that the template is correct."
             }
         },
+        "style_long_heading": {
+            "message": "Very long heading",
+            "help": "A heading has unusually long length. If this text was not intended as a heading, change the style to the appropriate style. To do so, select the heading text in Word, open the styles pane, and verify that the correct style is applied (\"Normal\" is often a good choice).",
+            "tex": {
+                "help": "A heading has unusually long length. Please double check that this is intended, and that it looks correct in the converted document."
+            }
+        },
         "style_abstract_heading": {
             "message": "Could not find abstract heading",
             "help": "Select the text of the \"Abstract\" heading in Word, open the Styles pane, and make sure that the \"Abstract Heading\" style is used.",
