@@ -130,7 +130,7 @@ def check_styles(soup: bs4.BeautifulSoup, output_dir: str, tex: bool=False) -> N
     if not get_elem_containing_text(soup, 'h1', 'references'):
         warn('style_no_refs', tex=tex)
     for hx in soup.find_all(['h1', 'h2', 'h3', 'h4']):
-        if len(hx.get_text(strip=True)) > 125:
+        if len(hx.get_text(strip=True)) > 200:
             warn('style_long_heading', hx.get_text(strip=True), tex)
     # Check for broken equation number references
     for broken_ref in soup.find_all(string=['??', 'Error! Reference source not found.']):
