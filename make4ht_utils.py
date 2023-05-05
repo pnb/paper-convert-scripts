@@ -28,6 +28,7 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
         raw_tex = re.sub(r'([^\\]%).*$', r'\1', raw_tex, flags=re.MULTILINE)
         # Remove \titlenote{}, which make4ht handles poorly so far
         raw_tex = re.sub(r'([^\\]|^)\\titlenote\{[^\}]*\}', r'\1', raw_tex, flags=re.MULTILINE)
+        raw_tex = raw_tex.replace(R'\thanks{', R'\footnotemark[1]\thanks{')
         return raw_tex
 
     with zipfile.ZipFile(source_zip_path, 'r') as inzip:
@@ -287,6 +288,9 @@ class TeXHandler:
                     math_sup.contents[0].replace_with(self.soup.new_string(math_sup.get_text()))
                 else:
                     warn('unexpected', 'Affiliation superscript format not understood')
+            for fnmark in tabular.find_all('span', attrs={'class': 'footnote-mark'}):
+                fnmark.name = 'sup'
+                fnmark.string = '*'
             for sup in tabular.find_all('sup'):
                 for span in sup.find_all('span'):
                     span.unwrap()
