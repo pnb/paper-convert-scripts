@@ -15,6 +15,8 @@ ap.add_argument('source_file_path', help='Path to the source .zip file')
 ap.add_argument('output_dir', help='Path to output folder (will be created if needed)')
 ap.add_argument('--mathml', default=False, action='store_true',
                 help='Use MathML conversion in make4ht')
+ap.add_argument('--skip-compile', default=False, action='store_true',
+                help='Skip (re)compilation; useful only for quickly debugging postprocessing steps')
 args = ap.parse_args()
 
 print('Creating output folder')
@@ -25,10 +27,11 @@ try:
 except FileExistsError:
     print('Output folder already exists; contents may be overwritten')
     # Clean up old files
-    try:
-        shutil.rmtree(extracted_dir)
-    except FileNotFoundError:
-        pass
+    if not args.skip_compile:
+        try:
+            shutil.rmtree(extracted_dir)
+        except FileNotFoundError:
+            pass
 
 
 # Combine any \input files into 1 (makes postprocessing much easier for line numbers)
@@ -39,24 +42,25 @@ with open(os.path.join(extracted_dir, 'tmp-make4ht.tex'), 'w') as ofile:
 
 bib_backend = make4ht_utils.get_bib_backend(tex)
 
-print('Converting via make4ht')
-scripts_dir = os.path.dirname(os.path.realpath(__file__))
-mk4_template = os.path.join(scripts_dir, 'make4ht_hardcode_bib.mk4')
-if bib_backend:
-    mk4_template = os.path.join(scripts_dir, 'make4ht_template.mk4')
-with open(mk4_template) as infile:
-    with open(os.path.join(extracted_dir, 'make4ht_with_bibtex.mk4'), 'w') as ofile:
-        if bib_backend:
-            ofile.write('Make:add("bibtex", "%s ${input}")\n' % bib_backend)
-        ofile.write(infile.read())
-shutil.copy(os.path.join(scripts_dir, 'make4ht_preamble.cfg'), extracted_dir)
-mathml = 'mathml,' if args.mathml else ''
-retcode = subprocess.call('make4ht --output-dir .. --format html5+common_domfilters '
-                          '--build-file make4ht_with_bibtex.mk4 tmp-make4ht.tex '
-                          '"' + mathml + 'mathjax,svg,fn-in" --config make4ht_preamble',
-                          shell=True, cwd=extracted_dir)
-if retcode:
-    shared_utils.warn('make4ht_warnings', tex=True)
+if not args.skip_compile:
+    print('Converting via make4ht')
+    scripts_dir = os.path.dirname(os.path.realpath(__file__))
+    mk4_template = os.path.join(scripts_dir, 'make4ht_hardcode_bib.mk4')
+    if bib_backend:
+        mk4_template = os.path.join(scripts_dir, 'make4ht_template.mk4')
+    with open(mk4_template) as infile:
+        with open(os.path.join(extracted_dir, 'make4ht_with_bibtex.mk4'), 'w') as ofile:
+            if bib_backend:
+                ofile.write('Make:add("bibtex", "%s ${input}")\n' % bib_backend)
+            ofile.write(infile.read())
+    shutil.copy(os.path.join(scripts_dir, 'make4ht_preamble.cfg'), extracted_dir)
+    mathml = 'mathml,' if args.mathml else ''
+    retcode = subprocess.call('make4ht --output-dir .. --format html5+common_domfilters '
+                              '--build-file make4ht_with_bibtex.mk4 tmp-make4ht.tex '
+                              '"' + mathml + 'mathjax,svg,fn-in" --config make4ht_preamble',
+                              shell=True, cwd=extracted_dir)
+    if retcode:
+        shared_utils.warn('make4ht_warnings', tex=True)
 
 # Load HTML
 if not os.path.exists(os.path.join(extracted_dir, 'tmp-make4ht.html')):
