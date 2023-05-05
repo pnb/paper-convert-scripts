@@ -322,7 +322,8 @@ class TeXHandler:
                     elem.unwrap()
                     if tabular.previous_sibling['class'] == 'E-Mail':
                         for txt in tabular.previous_sibling.contents:
-                            txt.replace_with(txt.strip())  # Remove any whitespace from emails
+                            if type(txt) == bs4.NavigableString:
+                                txt.replace_with(txt.strip())  # Remove any whitespace from emails
                 else:
                     if elem.next_sibling and isinstance(elem.next_sibling, bs4.NavigableString):
                         elem.append(self.soup.new_string(' '))  # In case of later concatenation
@@ -526,6 +527,9 @@ class TeXHandler:
             obj['src'] = obj['data']
             del obj['name']
         for img in self.soup.find_all('img'):
+            if img.has_attr('class') and 'oalign' in img['class'] and img['src'].endswith('x.svg'):
+                img.decompose()  # Artifact of some LaTeX alignment function
+                continue
             if img.parent.has_attr('class') and 'centerline' in img.parent['class']:
                 img.parent.unwrap()  # Remove extra div added if somebody uses \centerline
             # Repair double // in img src that happens when using a trailing / with \graphicspath
