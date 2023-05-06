@@ -535,9 +535,12 @@ class TeXHandler:
             obj['src'] = obj['data']
             del obj['name']
         for img in self.soup.find_all('img'):
-            if img.has_attr('class') and 'oalign' in img['class'] and img['src'].endswith('x.svg'):
-                img.decompose()  # Artifact of some LaTeX alignment function
-                continue
+            if img['src'].startswith('tmp-make4ht'):  # Generated image
+                if img.has_attr('class') and 'oalign' in img['class']:
+                    img.decompose()  # Artifact of some LaTeX alignment function
+                    continue
+                elif img.has_attr('alt') and 'Algorithm' in img['alt']:
+                    continue  # Skip over images generated of algorithm listings
             if img.parent.has_attr('class') and 'centerline' in img.parent['class']:
                 img.parent.unwrap()  # Remove extra div added if somebody uses \centerline
             # Repair double // in img src that happens when using a trailing / with \graphicspath
