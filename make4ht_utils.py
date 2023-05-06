@@ -370,7 +370,7 @@ class TeXHandler:
                     break
             else:
                 continue
-            # Combine all sub-sections (e.g., bold) into one caption
+            # Find beginning of table container where caption should be inserted
             table_name = caption_start.get_text().strip().split(':')[0]
             while caption_start.parent.name != 'div':  # Rewind to beginning of table container
                 caption_start = caption_start.parent
@@ -381,6 +381,10 @@ class TeXHandler:
                     break
             caption = self.soup.new_tag('caption')
             caption_start.insert_before(caption)
+            # Sometimes a <figure> wraps the table for no reason, and causes problems; remove it
+            for figure in caption_start.parent.find_all('figure', recursive=False):
+                figure.unwrap()  # Direct descendants only (recursive=False)
+            # Combine all sub-sections (e.g., bold) into one caption
             while caption.next_sibling and (isinstance(caption.next_sibling, bs4.NavigableString) or
                                             caption.next_sibling.name not in ['div', 'table']):
                 caption.append(caption.next_sibling)
