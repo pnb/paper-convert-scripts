@@ -42,6 +42,8 @@ with open(os.path.join(extracted_dir, 'tmp-make4ht.tex'), 'w') as ofile:
     ofile.write(texstr)
 
 bib_backend = make4ht_utils.get_bib_backend(texstr)
+make4ht_utils.check_file_hash(os.path.join(extracted_dir, 'edm_article.cls'),
+                              '7efa88c45209f518695575100a433dca2e32f7a02d3d237e9f4c5bd1cb1c3553')
 
 if not args.skip_compile:
     print('Converting via make4ht')

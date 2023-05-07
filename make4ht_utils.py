@@ -3,6 +3,7 @@ import zipfile
 import os
 import shutil
 import uuid
+import hashlib
 
 from shared_utils import warn_tex as warn
 
@@ -149,3 +150,17 @@ def get_bib_backend(tex_str: str) -> str:
             re.search(r'^\s*\\bibitem\s*\{', tex_str, re.MULTILINE):
         return None  # Bibliography items hard-coded inito the .tex doc
     return 'bibtex'
+
+
+def check_file_hash(file_path: str, sha256_expected: str):
+    """Compare the SHA256 hash of a file to an expected hash. Especially useful for making sure
+    authors are using the correct version of the article style, and have not modified it.
+
+    Args:
+        file_path (str): Path to file to check
+        sha256_expected (str): Expected SHA256 hash
+    """
+    with open(file_path, 'rb') as infile:
+        sha256_actual = hashlib.sha256(infile.read()).hexdigest()
+    if sha256_actual != sha256_expected:
+        warn('file_hash_' + os.path.split(file_path)[1])
