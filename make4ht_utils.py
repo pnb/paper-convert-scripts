@@ -26,7 +26,12 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
         raw_tex = re.sub(r'([^\\]%).*$', r'\1', raw_tex, flags=re.MULTILINE)
         # Remove \titlenote{}, which make4ht handles poorly so far
         raw_tex = re.sub(r'([^\\]|^)\\titlenote\{[^\}]*\}', r'\1', raw_tex, flags=re.MULTILINE)
-        raw_tex = raw_tex.replace(R'\thanks{', R'\footnotemark[1]\thanks{')
+        thanksparts = raw_tex.split(R'\thanks{')
+        if len(thanksparts) > 1:
+            raw_tex = ''
+            for i, part in enumerate(thanksparts[:-1]):
+                raw_tex += part + R'\footnotemark[' + str(i + 1) + R']\thanks{'
+            raw_tex += thanksparts[-1]
         return raw_tex
 
     with zipfile.ZipFile(source_zip_path, 'r') as inzip:
