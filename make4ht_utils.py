@@ -160,7 +160,10 @@ def check_file_hash(file_path: str, sha256_expected: str):
         file_path (str): Path to file to check
         sha256_expected (str): Expected SHA256 hash
     """
-    with open(file_path, 'rb') as infile:
-        sha256_actual = hashlib.sha256(infile.read()).hexdigest()
+    try:
+        with open(file_path, 'rb') as infile:
+            sha256_actual = hashlib.sha256(infile.read()).hexdigest()
+    except FileNotFoundError:
+        sha256_actual = ''
     if sha256_actual != sha256_expected:
         warn('file_hash_' + os.path.split(file_path)[1])
