@@ -53,7 +53,7 @@ def add_authors(texer: TeXHandler) -> None:
 
 def format_author_superscripts(texer: TeXHandler, tabular: bs4.Tag) -> None:
     """Handle superscripts for affiliations."""
-    for math_sup in tabular.find_all('math'):
+    for math_sup in tabular.find_all('math'):  # MathML conversion only, I believe
         if len(math_sup.contents) == 1:
             math_sup.name = 'sup'
             math_sup.contents[0].replace_with(texer.soup.new_string(math_sup.get_text()))
@@ -66,7 +66,6 @@ def format_author_superscripts(texer: TeXHandler, tabular: bs4.Tag) -> None:
             fnmark['class'].append('fresh-author-footnote')
         fnmark_i = len(texer.soup.find_all('sup', attrs={'class': 'fresh-author-footnote'}))
         fnmark.string = fnmark_seq[fnmark_i]
-        print(fnmark, fnmark_i)
     for sup in tabular.find_all('sup'):
         for span in sup.find_all('span'):
             span.unwrap()
@@ -75,6 +74,7 @@ def format_author_superscripts(texer: TeXHandler, tabular: bs4.Tag) -> None:
                     isinstance(sup.previous_sibling, bs4.Comment) and
                     sup.find_previous_sibling('span')):
             sup.find_previous_sibling('span').append(sup)
+            sup.insert_after(texer.soup.new_string(' '))
         elif sup.find_next_sibling('span'):  # Prepend instead
             sup.find_next_sibling('span').insert(0, sup)
         else:
