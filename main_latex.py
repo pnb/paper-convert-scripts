@@ -8,6 +8,7 @@ import cssutils
 
 import make4ht_utils
 import shared_utils
+import tex
 
 
 ap = argparse.ArgumentParser(description='Convert LaTeX to HTML')
@@ -36,11 +37,11 @@ except FileExistsError:
 
 # Combine any \input files into 1 (makes postprocessing much easier for line numbers)
 print('Reading LaTeX source')
-tex = make4ht_utils.get_raw_tex_contents(args.source_file_path, extracted_dir)
+texstr = make4ht_utils.get_raw_tex_contents(args.source_file_path, extracted_dir)
 with open(os.path.join(extracted_dir, 'tmp-make4ht.tex'), 'w') as ofile:
-    ofile.write(tex)
+    ofile.write(texstr)
 
-bib_backend = make4ht_utils.get_bib_backend(tex)
+bib_backend = make4ht_utils.get_bib_backend(texstr)
 
 if not args.skip_compile:
     print('Converting via make4ht')
@@ -82,7 +83,7 @@ print('Loading converted HTML')
 with open(os.path.join(extracted_dir, 'tmp-make4ht.html')) as infile:
     soup = BeautifulSoup(infile, 'html.parser')
 
-texer = make4ht_utils.TeXHandler(tex, soup)
+texer = tex.TeXHandler(texstr, soup)
 print('Parsing headers')
 texer.add_headers()
 print('Parsing authors')
@@ -91,7 +92,7 @@ shared_utils.wrap_author_divs(texer.soup)
 print('Merging unnecessary elements')
 texer.merge_elements('span')
 print('Formatting tables')
-texer.format_tables()
+tex.format_tables(texer)
 shared_utils.fix_table_gaps(texer.soup)
 print('Formatting figures')
 texer.format_figures()
