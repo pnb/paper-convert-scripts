@@ -36,6 +36,8 @@ class TeXHandler:
                     top_parent = cur_elem
                 cur_elem = cur_elem.parent
             top_parent.decompose()
+        
+        self._copy_def_commands()
 
     def tex_line_num(self, soup_elem: bs4.Tag) -> int:
         """Get the line number of LaTeX code corresponding to a BeautifulSoup element (1-indexed).
@@ -382,3 +384,15 @@ class TeXHandler:
         else:
             warn('tex_env_parse_fail', tex_line_num)
         return (start_line_num, end_line_num)
+
+    def _copy_def_commands(self) -> None:
+        """Find \\def commands in Tex and copy them to the soup for MathJax to parse.
+        """
+        defs = []
+        for line in self.tex_lines:
+            if line.lstrip().startswith('\\def\\'):
+                defs.append(line.strip())
+        if defs:
+            defcontainer = self.soup.new_tag('div', attrs={'class': 'hidden'})
+            defcontainer.append('\\(\n  ' + '\n  '.join(defs) + '\n\\)')
+            self.soup.body.insert(0, defcontainer)
