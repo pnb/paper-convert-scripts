@@ -2,9 +2,9 @@ from . import TeXHandler
 
 
 def add_headings(texer: TeXHandler) -> None:
-    """Add <h1>, <h2>, etc. headers to the soup based on clues such as font names left by make4ht.
+    """Add <h1>, <h2>, etc. headings to the soup based on clues such as font names left by make4ht.
     """
-    # (Sub)section headers
+    # (Sub)section headings
     heading_fonts = ['ptmb8t-x-x-120', 'ptmri8t-x-x-110']
     for h_text in texer.soup.find_all('span', attrs={'class': heading_fonts}):
         h = h_text.parent

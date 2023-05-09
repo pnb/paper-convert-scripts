@@ -426,13 +426,13 @@ class MammothParser:
     def fix_references(self) -> None:
         """Standardize formatting of references.
         """
-        ref_header = get_elem_containing_text(self.soup, 'h1', 'references')
-        if not ref_header:
+        ref_heading = get_elem_containing_text(self.soup, 'h1', 'references')
+        if not ref_heading:
             return  # Already going to warn about this
-        if ref_header.next_sibling and ref_header.next_sibling.name == 'ol':
+        if ref_heading.next_sibling and ref_heading.next_sibling.name == 'ol':
             return  # Already fine
         ol = self.soup.new_tag('ol')
-        ref_header.insert_after(ol)
+        ref_heading.insert_after(ol)
         num_regex = re.compile(r'\[\d+\]\s*')
         while ol.next_sibling and ol.next_sibling.name == 'p' and \
                 ol.next_sibling.get_text(strip=True):

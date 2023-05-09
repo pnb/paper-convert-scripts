@@ -301,12 +301,12 @@ class TeXHandler:
         """Format the references section. Requires that fonts have already been fixed to make
         finding the references section easier.
         """
-        ref_header = shared_utils.get_elem_containing_text(self.soup, 'h1', 'references')
-        if not ref_header:
+        ref_heading = shared_utils.get_elem_containing_text(self.soup, 'h1', 'references')
+        if not ref_heading:
             return  # Already going to warn about this in style check
         new_ref_regex = re.compile(r'\[\d+\]\s*')
         ref_section = self.soup.new_tag('ol', attrs={'class': 'references'})
-        biber_section = ref_header.find_next('dl')
+        biber_section = ref_heading.find_next('dl')
         if biber_section:  # Biber style
             for elem in reversed(biber_section.find_all('dd')):
                 if elem.find('p'):
@@ -320,7 +320,7 @@ class TeXHandler:
         else:  # Bibtex style
             cur_li = self.soup.new_tag('li')
             ref_section.append(cur_li)
-            for elem in reversed(ref_header.find_next('p').contents):
+            for elem in reversed(ref_heading.find_next('p').contents):
                 if isinstance(elem, bs4.NavigableString) and new_ref_regex.search(elem):
                     new_str = new_ref_regex.sub('', elem)
                     if new_str.strip():
@@ -334,7 +334,7 @@ class TeXHandler:
                     ref_section.insert(0, cur_li)
             # Remove first empty ref number added
             ref_section.find('li').decompose()
-        ref_header.insert_after(ref_section)
+        ref_heading.insert_after(ref_section)
 
     def remove_unused_ids(self) -> None:
         """Remove any leftover `id` attributes that are never referenced by `href` values. This must

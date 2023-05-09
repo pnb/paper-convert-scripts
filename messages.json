@@ -95,14 +95,14 @@
         },
         "style_no_intro": {
             "message": "No \"Introduction\" section found",
-            "help": "If you intended not to have an introduction section, ignore this message. Otherwise, select your Introduction header in Word, open the Styles pane, and make sure the \"Heading 1\" style is used.",
+            "help": "If you intended not to have an introduction section, ignore this message. Otherwise, select your Introduction heading in Word, open the Styles pane, and make sure the \"Heading 1\" style is used.",
             "tex": {
                 "help": "If you intended not to have an introduction section, ignore this message. Otherwise, make sure you used the \\section{Introduction} command in your paper."
             }
         },
         "style_no_refs": {
             "message": "No \"References\" section found",
-            "help": "Click on your References header in Word, open the Styles pane, and make sure the \"Heading 1\" style is used.",
+            "help": "Click on your References heading in Word, open the Styles pane, and make sure the \"Heading 1\" style is used.",
             "tex": {
                 "help": "Make sure you used the \\bibliographystyle{abbrv} and \\bibliography{sigproc} (or whatever your .bib file is named instead of sigproc.bib) commands in your paper."
             }

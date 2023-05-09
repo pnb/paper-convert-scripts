@@ -263,13 +263,13 @@ def position_figures_tables(soup: bs4.BeautifulSoup) -> None:
     position in the source.
 
     Args:
-        soup (bs4.BeautifulSoup): Paper soup with h1/h2/etc. headers describing sections
+        soup (bs4.BeautifulSoup): Paper soup with h1/h2/etc. headings describing sections
     """
     for elem in soup.find_all(['table', 'figure'], attrs={'data-subfigure': False,
                                                           'data-position-here': False}):
-        next_header = elem.find_next(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
-        if next_header:
-            next_header.insert_before(elem)
+        next_heading = elem.find_next(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+        if next_heading:
+            next_heading.insert_before(elem)
         else:  # This will almost never happen, and isn't necessarily worth warning about
             print('Info: Could not move table/figure to end of section')
 
