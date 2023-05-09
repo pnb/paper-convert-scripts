@@ -25,7 +25,7 @@ def add_authors(texer: TeXHandler) -> None:
             if beyond_author_name or '@' in elem.get_text() or \
                     'phvr8t-x-x-120' not in elem['class']:
                 beyond_author_name = True  # Evidence we are past the author name part
-                if '@' in elem.get_text() or 'phvr8t-x-x-120' in elem['class']:
+                if '@' in elem.get_text():
                     elem['class'] = 'E-Mail'
                 else:
                     elem['class'] = 'Affiliations'
