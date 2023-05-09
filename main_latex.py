@@ -86,8 +86,8 @@ with open(os.path.join(extracted_dir, 'tmp-make4ht.html')) as infile:
     soup = BeautifulSoup(infile, 'html.parser')
 
 texer = tex.TeXHandler(texstr, soup)
-print('Parsing headers')
-texer.add_headers()
+print('Parsing headings')
+tex.add_headings(texer)
 print('Parsing authors')
 tex.add_authors(texer)
 shared_utils.wrap_author_divs(texer.soup)
