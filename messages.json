@@ -139,7 +139,7 @@
             "message": "Broken internal cross-reference",
             "help": "Look for \"Error!\" in your document and fix the broken internal cross-reference. You may need to open the print dialog in Word (then simply close it without printing) to force internal cross-references to refresh.",
             "tex": {
-                "help": "Search for \"??\" in the converted document to see where the error occurs. The most common cause is equations, which need to use <code>\\eqref</code> from the <code>amsmath</code> package so that they can be handled separately from regular <code>\\ref</code> references to tables, figures, and sections."
+                "help": "Search for \"??\" in the converted document to see where the error occurs. The most common cause is equations, which need to use <code>\\eqref</code> from the <code>amsmath</code> package so that they can be handled separately from regular <code>\\ref</code> references to tables, figures, and sections. Additionally, labels are case-sensitive (which some LaTeX compilers ignore), which is something to check."
             }
         },
         "wingdings": {
