@@ -74,7 +74,10 @@ def format_author_superscripts(texer: TeXHandler, tabular: bs4.Tag) -> None:
                     isinstance(sup.previous_sibling, bs4.Comment) and
                     sup.find_previous_sibling('span')):
             sup.find_previous_sibling('span').append(sup)
-            sup.insert_after(texer.soup.new_string(' '))
+            # Insert some space after the superscript unless it is followed by punctuation
+            if not isinstance(sup.parent.next_sibling, bs4.Tag) or \
+                    (sup.parent.next_sibling.get_text() + ' ')[0] not in ',.;':
+                sup.insert_after(texer.soup.new_string(' '))
         elif sup.find_next_sibling('span'):  # Prepend instead
             sup.find_next_sibling('span').insert(0, sup)
         else:
