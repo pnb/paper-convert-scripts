@@ -26,6 +26,11 @@ class TeXHandler:
         for hr in soup.find_all('hr'):
             hr.decompose()
 
+        # Remove <br>s in links (sometimes \\ by authors due to LaTeX URL word-wrapping troubles)
+        for a in soup.find_all('a', attrs={'href': re.compile(r'https?://.*')}):
+            for br in a.find_all('br'):
+                br.decompose()
+
         # Remove random PICT thing it adds; later should delete all empty <p>
         pict_img = soup.find('img', attrs={'alt': 'PICT'})
         if pict_img and '0x.' in pict_img['src']:
@@ -36,7 +41,7 @@ class TeXHandler:
                     top_parent = cur_elem
                 cur_elem = cur_elem.parent
             top_parent.decompose()
-        
+
         self._copy_def_commands()
 
     def tex_line_num(self, soup_elem: bs4.Tag) -> int:
