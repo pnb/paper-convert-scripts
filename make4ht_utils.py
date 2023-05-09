@@ -76,7 +76,11 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
     match = re.search(r'\\end\{algorithmic\}[ \t]*\n[ \t]*[a-zA-Z]{1,20}', tex_str, re.MULTILINE)
     if match:
         warn('no_newline_after_algorithmic', match.group(0))
-    tex_str = tex_str.replace('\\Bar{', '\\bar{').replace('\\Tilde{', '\\tilde{')
+
+    tex_str = tex_str.replace(R'\Bar{', R'\bar{') \
+        .replace(R'\Tilde{', R'\tilde{') \
+        .replace(R'\vcentcolon', ':')
+
     siunitx_tabulars = re.findall(r'\\begin\{tabular.?\}\s*\{[^\[]*S\[.*\}', tex_str)
     if siunitx_tabulars:
         print('Found `siunitx` "S" column in tabular environment; please note that this can cause '
