@@ -88,6 +88,11 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
         for tabular in siunitx_tabulars:
             print('###', tabular, '\n')
 
+    # Mark up {description} environments that sometimes (always?) get lost
+    tex_str = tex_str.replace(R'\begin{description}',
+                              R'\HCode{<p class="description-env">}\begin{description}') \
+        .replace(R'\end{description}', R'\end{description}\HCode{</p>}')
+
     # Look for image filenames with uppercase and/or mismatching case letters, which causes issues
     # across different OSs and issues with make4ht if the filename extension is uppercase
     img_fnames = set([re.sub(r'^\./', '', x)  # Remove any ./ cur dir prefix
