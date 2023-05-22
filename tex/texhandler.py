@@ -64,8 +64,8 @@ class TeXHandler:
 
     def find_image_line_num(self, starting_line_num: int, fname: str) -> int:
         """Find a LaTeX line number after a given line number that includes a specific image file
-        (ignoring the extension which may differ due to conversion). Useful for cases where Make4ht
-        does not provide the latest line number.
+        (ignoring the subdirectory and extension which may differ due to conversion). Useful for
+        cases where Make4ht does not provide the latest line number.
 
         Args:
             starting_line_num (int): Starting point, usually from `tex_line_num()`
@@ -74,12 +74,12 @@ class TeXHandler:
         Returns:
             int: Line number, or starting line number if the image was not found
         """
-        prefix = fname.lower()
-        if '.' in prefix:
-            prefix = prefix[:prefix.rfind('.')]
+        prefix = re.sub(r'.*/', '', fname.lower())
+        prefix = re.sub(r'\.[^.]+$', '', prefix)
+        fname_regex = re.compile(r'[^{}]*\b' + prefix + r'[.}]')
         for i in range(starting_line_num - 1, len(self.tex_lines)):
             curline = self.tex_lines[i].lower()
-            if R'\includegraphics' in curline and '{' + prefix in curline:
+            if R'\includegraphics' in curline and re.findall(fname_regex, curline):
                 return i + 1
         return starting_line_num
 
@@ -125,7 +125,9 @@ class TeXHandler:
         Returns:
             str: Text that was added as the alt text
         """
-        env_start, env_end = self.get_tex_environment(self.tex_line_num(img_elem))
+        line_num_start = self.tex_line_num(img_elem)
+        img_line_num = self.find_image_line_num(line_num_start, img_elem['src'])
+        env_start, env_end = self.get_tex_environment(img_line_num)
         tex_section = '\n'.join(self.tex_lines[env_start:env_end + 1])
         alts = get_command_content(tex_section, 'Description')
         img_i = img_elem.parent.find_all('img').index(img_elem)
