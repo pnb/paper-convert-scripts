@@ -280,6 +280,7 @@ class TeXHandler:
         class_elem_map = {
             'aeb10-': 'strong',
             'aeti9-': 'em',
+            'aeti8-': 'em',
             'aeti7-': 'em',
             'phvbo8t-': 'em',  # Title oblique
             'aett9-': 'code',
