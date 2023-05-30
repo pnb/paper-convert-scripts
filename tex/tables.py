@@ -54,6 +54,7 @@ def format_tables(texer: TeXHandler) -> None:
         for onetable in container.find_all('table'):
             if not onetable.find_parent('table'):  # Not a nested table
                 format_one_table(texer, onetable)
+    add_tablenotes(texer)
 
 
 def format_one_table(texer: TeXHandler, table: bs4.Tag) -> None:
@@ -127,3 +128,25 @@ def format_one_table(texer: TeXHandler, table: bs4.Tag) -> None:
             prev_cell = elem.find_previous_sibling(['th', 'td'])
             if prev_cell:
                 prev_cell.append(elem)
+
+
+def add_tablenotes(texer: TeXHandler) -> None:
+    # If tablenotes exist, integrate them semantically into the table as <tfoot>
+    for tablenotes in texer.soup.find_all('div', attrs={'class': 'tablenotes'}):
+        tablenotes.name = 'td'
+        tablenotes['colspan'] = 1000
+        row_wrap = texer.soup.new_tag('tr')
+        tfoot_wrap = texer.soup.new_tag('tfoot')
+        tablenotes.wrap(row_wrap)
+        row_wrap.wrap(tfoot_wrap)
+
+        table = tablenotes.find_previous('table')
+        thead = table.find('thead')
+        if thead:
+            thead.insert_after(tfoot_wrap)
+        else:
+            tbody = table.find('tbody')
+            if tbody:
+                tbody.insert_before(tfoot_wrap)
+            else:
+                table.find('tr').insert_before(tfoot_wrap)
