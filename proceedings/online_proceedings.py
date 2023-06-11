@@ -156,7 +156,7 @@ for dir in os.listdir(args.html_papers_dir):
             'content': html.escape(pages[0])
         })
         meta_lastpage = soup.new_tag('meta', attrs={
-            'name': 'citation_firstpage',
+            'name': 'citation_lastpage',
             'content': html.escape(pages[1])
         })
         first_meta_tag.insert_before(meta_firstpage)
