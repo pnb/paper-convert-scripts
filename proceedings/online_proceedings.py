@@ -364,7 +364,7 @@ for cat_regex, cat_title in category_regexes.items():
 if paper_index:
     print('Indexing uncategorized papers')
     uncategorized_ul = index_soup.new_tag('ul', attrs={'class': 'proceedings-list'})
-    if intro_link:
+    if args.intro_md and intro_link:
         intro_link.insert_after(uncategorized_ul)
     else:
         h1_elem.insert_after(uncategorized_ul)
