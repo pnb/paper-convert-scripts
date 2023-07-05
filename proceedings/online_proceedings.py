@@ -283,6 +283,10 @@ if args.intro_doc:
         print(' * Could indicate the title is not correctly detected.')
     intro_soup.find('title').clear()
     intro_soup.find('title').append(intro_soup.new_string(first_heading.get_text(strip=True)))
+    # Remove any image styles (don't want to get *too* much into LaTeX postprocessing...)
+    for img in intro_soup.find_all('img'):
+        if img.has_attr('style'):
+            del img['style']
     with open(os.path.join(args.output_dir, 'intro.html'), 'w', encoding='utf8') as ofile:
         ofile.write(str(intro_soup))
     # Now link to it from the proceedings page
