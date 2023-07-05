@@ -386,4 +386,4 @@ if extra_bib_titles:
     print('\nBibTex entries not matched to a paper:')
     for std_title in extra_bib_titles:
         bib_id = next(iter(bib_data[std_title].entries))
-        print(' *', bib_data[std_title].entries[bib_id].fields['title'])
+        print(' *', bib_id + ':', bib_data[std_title].entries[bib_id].fields['title'])
