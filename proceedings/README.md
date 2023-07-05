@@ -22,7 +22,8 @@ Run `python online_proceedings.py -h` for additional help and description of arg
   * The regular expression will be matched to BibTex keys from the .bib files
   * Any papers not matched will be in an unnamed section at the top of the proceedings index
   * Within category (or uncategorized), papers will be ordered based on page number
-* Front matter Markdown, linked at the top of the proceedings index and outputted to a separate `intro.html` file
+* Front matter, linked at the top of the proceedings index and outputted to a separate `intro.html` file
+  * Note that both Markdown and LaTeX are supported (technically anything Pandoc can handle as input), but very little sanity checking is done on the output; hence, Markdown is strongly recommended since there is very little chance of strange results
 * Copyright info, which will be appended to the end of each paper after a horizontal rule
 
 ## Example with all options
@@ -32,7 +33,7 @@ Run `python online_proceedings.py -h` for additional help and description of arg
         ~/Downloads/bib-with-doi \   # .bib files
         ~/Downloads/stamped \        # .pdf files
         ~/Downloads/edm_html_proceedings \  # Output destination
-        https://educationaldatamining.org/edm2022/proceedings \
-        --category-regex-file edm2022-categories.txt \
-        --intro-md ~/Downloads/front_matter_final.md \
-        --copyright edm2022-copyright.html
+        https://educationaldatamining.org/edm2023/proceedings \
+        --category-regex-file edm-categories.txt \
+        --intro-doc ~/Downloads/front_matter_final.md \
+        --copyright edm2023-copyright.html

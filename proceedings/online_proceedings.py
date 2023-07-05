@@ -25,8 +25,9 @@ ap.add_argument('--category-regex-file', help='Path to a text file with a list o
                 'names, each with a regular expression on the next line, which will be matched to '
                 'BibTex keys; any uncategorized papers will appear at the top; regular expressions '
                 'will be matched in order, with the first match found being applied')
-ap.add_argument('--intro-md', help='Path to a Markdown file that can be shown as a preface page; '
-                'the title will be drawn from the first heading found in the file')
+ap.add_argument('--intro-doc', help='Path to a Markdown or LaTeX file to show as a preface page; '
+                'the title will be drawn from the first heading found in the file; LaTeX need not '
+                'be a complete document, only a snippet (Markdown is recommended, however)')
 ap.add_argument('--copyright', help='Path to a copyright notice snippet in HTML format')
 args = ap.parse_args()
 
@@ -272,17 +273,21 @@ if args.intro_md:
     print('Creating introduction page')
     intro_html = pypandoc.convert_file(args.intro_md, 'html')
     with open(os.path.join(script_dir, 'intro_template.html'), encoding='utf8') as infile:
-        intro_soup = bs4.BeautifulSoup(infile.read(), 'lxml')
-    intro_soup.find('main').append(bs4.BeautifulSoup(intro_html, 'lxml'))
-    first_header = intro_soup.find(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
-    assert first_header, 'No header found in ' + args.intro_md
+        intro_soup = bs4.BeautifulSoup(infile.read(), 'html.parser')
+    intro_soup.find('main').append(bs4.BeautifulSoup(intro_html, 'html.parser'))
+    first_heading = intro_soup.find(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+    assert first_heading, 'No heading found in ' + args.intro_md
+    if first_heading.sourceline > 10:
+        print('Warning! First heading in preface file is far into the contents of the file.')
+        print(' * Heading:', first_heading.get_text(strip=True))
+        print(' * Could indicate the title is not correctly detected.')
     intro_soup.find('title').clear()
-    intro_soup.find('title').append(intro_soup.new_string(first_header.get_text(strip=True)))
+    intro_soup.find('title').append(intro_soup.new_string(first_heading.get_text(strip=True)))
     with open(os.path.join(args.output_dir, 'intro.html'), 'w', encoding='utf8') as ofile:
         ofile.write(str(intro_soup))
     # Now link to it from the proceedings page
     intro_link = index_soup.new_tag('a', attrs={'href': 'intro.html', 'class': 'intro-link'})
-    intro_link.append(index_soup.new_string(first_header.get_text(strip=True)))
+    intro_link.append(index_soup.new_string(first_heading.get_text(strip=True)))
     main_elem.append(intro_link)
 
 
