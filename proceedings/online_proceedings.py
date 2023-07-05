@@ -269,14 +269,14 @@ h1_elem.clear()
 h1_elem.append(index_soup.new_string(bib_entry.fields['booktitle']))
 
 # Add intro/frontmatter if provided
-if args.intro_md:
+if args.intro_doc:
     print('Creating introduction page')
-    intro_html = pypandoc.convert_file(args.intro_md, 'html')
+    intro_html = pypandoc.convert_file(args.intro_doc, 'html')
     with open(os.path.join(script_dir, 'intro_template.html'), encoding='utf8') as infile:
         intro_soup = bs4.BeautifulSoup(infile.read(), 'html.parser')
     intro_soup.find('main').append(bs4.BeautifulSoup(intro_html, 'html.parser'))
     first_heading = intro_soup.find(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
-    assert first_heading, 'No heading found in ' + args.intro_md
+    assert first_heading, 'No heading found in ' + args.intro_doc
     if first_heading.sourceline > 10:
         print('Warning! First heading in preface file is far into the contents of the file.')
         print(' * Heading:', first_heading.get_text(strip=True))
@@ -369,7 +369,7 @@ for cat_regex, cat_title in category_regexes.items():
 if paper_index:
     print('Indexing uncategorized papers')
     uncategorized_ul = index_soup.new_tag('ul', attrs={'class': 'proceedings-list'})
-    if args.intro_md and intro_link:
+    if args.intro_doc and intro_link:
         intro_link.insert_after(uncategorized_ul)
     else:
         h1_elem.insert_after(uncategorized_ul)
