@@ -378,7 +378,7 @@ with open(os.path.join(args.output_dir, 'index.html'), 'w', encoding='utf8') as 
     ofile.write(index_soup.prettify())
 
 # Copy CSS
-shutil.copy(os.path.join(script_dir, 'edm2022-proceedings.css'), args.output_dir)
+shutil.copy(os.path.join(script_dir, 'edm-proceedings.css'), args.output_dir)
 
 # Check for unexpected mismatches
 extra_bib_titles = set(bib_data.keys()).difference(processed_titles)
