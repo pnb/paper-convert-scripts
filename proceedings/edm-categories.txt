@@ -7,11 +7,14 @@ Short Papers
 Posters
 .*EDM-posters.*
 
+Demonstrations
+.*EDM-(workshop|demonstrations).*
+
 Doctoral Consortium
 .*EDM-doctoral-consortium.*
 
+Tutorials
+.*EDM-tutorials.*
+
 Industry Track
 .*EDM-industry-track.*
-
-Workshop/Tutorial/Demonstration Abstracts
-.*EDM-(workshop|tutorials|demonstrations).*
