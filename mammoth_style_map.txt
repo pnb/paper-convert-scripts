@@ -10,3 +10,12 @@ p[style-name='Table Text'] => p.table-text:fresh
 p[style-name='CopyrightBlock'] => div.CopyrightBlock
 p[style-name='caption'] => caption:fresh
 p[style-name='Code'] => pre > code:separator('\n')
+
+p[style-name='MainTitle'] => div.Paper-Title
+p[style-name='Institution'] => div.Affiliations:fresh
+p[style-name='Abstract'] => p.Abstract
+p[style-name='Nth paragraph (not first)'] => p.NotFirst
+p[style-name='Reference section'] => h1
+p[style-name='Reference item'] => p.ReferenceItem:fresh
+r[style-name='Reference author'] => span.ReferenceAuthor
+r[style-name='URL Char'] => span
