@@ -4,19 +4,18 @@ import json
 import re
 
 import bs4
-from lxml import etree
-import subprocess
-from collections import defaultdict
 
-with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')) as infile:
+
+main_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
+with open(os.path.join(main_dir, 'config.json')) as infile:
     CONFIG = json.load(infile)
-    CONFIG['utils_dir'] = os.path.dirname(os.path.realpath(__file__))
-with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'messages.json')) as infile:
+    CONFIG['utils_dir'] = main_dir
+with open(os.path.join(main_dir, 'messages.json')) as infile:
     messages_txt = json.load(infile)
     WARNING_DEFS = messages_txt['warnings']
 
 
-def warn(warning_name: str, extra_info: str='', tex: bool=False) -> None:
+def warn(warning_name: str, extra_info: str = '', tex: bool = False) -> None:
     """Display and record a warning, as defined in messages.json. If `tex` is True, any keys/values
     in the "tex" key of the warning in messages.json will overwrite the default message; see
     warn_tex().
@@ -51,7 +50,7 @@ def warn(warning_name: str, extra_info: str='', tex: bool=False) -> None:
     print('Conversion warning:', message, extra_info)
 
 
-def warn_tex(warning_name: str, extra_info: str='') -> None:
+def warn_tex(warning_name: str, extra_info: str = '') -> None:
     """Run warn() with `tex = True`. This is useful for shorthand, e.g., `import warn_tex as warn`.
     See warn() documentation for full description.
 
@@ -62,26 +61,30 @@ def warn_tex(warning_name: str, extra_info: str='') -> None:
     warn(warning_name, extra_info, True)
 
 
-def get_elem_containing_text(soup: bs4.BeautifulSoup, tagname: str, text: str) -> bs4.Tag:
-    """Find a BeautifulSoup element containing some specific text. For example, one could find the
-    "References" h1 element. Text matching is case insensitive.
+def get_elem_containing_text(soup: bs4.BeautifulSoup, tagname: str, text: str, last: bool = False) -> bs4.Tag:
+    """Find a BeautifulSoup element containing some specific text. For example, one
+    could find the "References" h1 element. Text matching is case insensitive.
 
     Args:
         soup (bs4.BeautifulSoup): Soup or Tag to search within
         tagname (str): Name of tag, e.g., h1, div to look for
         text (str): Text to search for (case insensitive)
+        last (bool, optional): Search in reverse order to find the last occurrence
 
     Returns:
         bs4.Tag: Element containing the specified text, or None if not found
     """
     regex = re.compile(r'.*' + text + r'.*', re.IGNORECASE)
-    for elem in soup.find_all(tagname):
+    candidates = soup.find_all(tagname)
+    if last:
+        candidates = reversed(candidates)
+    for elem in candidates:
         if regex.match(elem.get_text()):
             return elem
     return None
 
 
-def check_styles(soup: bs4.BeautifulSoup, output_dir: str, tex: bool=False) -> None:
+def check_styles(soup: bs4.BeautifulSoup, output_dir: str, tex: bool = False) -> None:
     """Check the `soup` object to see if it has most of the expected elements with the appropriate
     styles, and trigger warnings if not. This is intended as one of the last steps, after
     postprocessing.
@@ -135,70 +138,9 @@ def check_styles(soup: bs4.BeautifulSoup, output_dir: str, tex: bool=False) -> N
     # Check for broken equation number references
     for broken_ref in soup.find_all(string=['??', 'Error! Reference source not found.']):
         warn('broken_internal_ref', 'Text: "' + broken_ref + '"', tex)
-    # Check every numbered reference appears in the text in square brackets
-    dom = etree.HTML(str(soup))
-    ref_lis = dom.xpath(
-        "//h1[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', " +
-        "'abcdefghijklmnopqrstuvwxyz'),'references')]/following-sibling::ol[1]/li | " +
-        "//h1[.//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', " +
-        "'abcdefghijklmnopqrstuvwxyz'),'references')]]/following-sibling::ol[1]/li")
-    # we found no references in the reference section!
-    if ref_lis == []:
-        warn('no_references_found_in_reference_section', tex=tex)
-    else:
-        ref_in_ref = set(range(1, len(ref_lis) + 1))
-        soup_text = soup.get_text(strip=True)
-        ref_in_text_raw = re.findall(
-            r'\[(?:cf\.\s*)?'  # Chomp cf. at the beginning
-            r'((?:[1-9]\d*,?\s*)+)'  # Capture ref number (>0) and any space/comma separation
-            r'(?:(?:p|Sec|Ch)[^\],]+)?\]',  # Chomp section/page(s) at the end
-            soup_text)
-        ref_ranges = re.findall(r'\[([1-9]\d*[-\u2013][1-9]\d*)\]', soup_text)  # e.g., "[1-5]"
-        for ref_range in ref_ranges:
-            low, high = re.split(r'\D', ref_range)
-            if int(low) < int(high):
-                ref_in_text_raw += [str(x) for x in range(int(low), int(high) + 1)]
-        # we found no citations in the text!
-        if ref_in_text_raw == []:
-            warn('no_citations_found_in_text', tex=tex)
-        else:
-            ref_in_text = set([int(i) for i in re.split(r'\D+', ','.join(ref_in_text_raw))
-                               if int(i) <= max(ref_in_ref) + 5])  # Ignore large misses (math)
-            mismatched_ref = ref_in_ref.symmetric_difference(ref_in_text)
-            if len(mismatched_ref) > 0:
-                warn('mismatched_refs', sorted(mismatched_ref), tex=tex)
-
-    # Check references are complete; executes anystyle in shell
-    refs = [' '.join(''.join(li.itertext()).split()) for li in ref_lis]  # lxml makes this ugly
-    fname = os.path.join(output_dir, 'extracted_refs.txt')
-    with open(os.path.join(fname), 'w') as ofile:
-        for ref in refs:
-            ofile.write(ref + '\n')
-    subprocess.call([CONFIG['anystyle_path'], '-f', 'json', '--overwrite', 'parse',
-                    fname, output_dir], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    fname = os.path.join(output_dir, 'extracted_refs.json')
-    with open(os.path.join(fname)) as ofile:
-        ref_dict_list = json.load(ofile)
-    ref_requirements = defaultdict(lambda: ['title', 'date'])
-    ref_requirements['book'] = ['author', 'title', 'date', 'publisher']
-    ref_requirements['report'] = ['author', 'title', 'date', 'publisher']
-    ref_requirements['chapter'] = ['author', 'title', 'date', 'publisher', 'editor',
-                                   'container-title', 'pages', 'location']
-    ref_requirements['paper-conference'] = ['author', 'title', 'date', 'container-title', 'pages']
-    ref_requirements['article-journal'] = ['author', 'title', 'date', 'container-title', 'pages',
-                                           'volume']  # "issue" is false alarming too much
-
-    for i, ref_dict in enumerate(ref_dict_list, start=1):
-        reqs = set(ref_requirements[ref_dict['type']])
-        t1 = set(ref_dict.keys())
-        missing_reqs = reqs.difference(set(ref_dict.keys()))
-        if len(missing_reqs) > 0:
-            ref_type = ref_dict['type'] if ref_dict['type'] else 'other'
-            warn('incomplete_reference', f'Reference {i} was recognized as {ref_type} and might ' +
-                 'be missing the following elements: ' + ', '.join(missing_reqs), tex)
 
 
-def check_alt_text_duplicates(soup: bs4.BeautifulSoup, tex: bool=False) -> None:
+def check_alt_text_duplicates(soup: bs4.BeautifulSoup, tex: bool = False) -> None:
     """Check if all alt texts in the given document are unique, which they should be for both
     semantic and practical reasons (because DOCX conversion uses alt text as an identifier).
 
@@ -214,7 +156,7 @@ def check_alt_text_duplicates(soup: bs4.BeautifulSoup, tex: bool=False) -> None:
             alt_texts.add(img['alt'])
 
 
-def validate_alt_text(img_elem: bs4.Tag, identifying_text: str, tex: bool=False) -> bool:
+def validate_alt_text(img_elem: bs4.Tag, identifying_text: str, tex: bool = False) -> bool:
     """Check if the alt text for this <img> element meets expectations. Triggers warnings if not.
 
     Args:

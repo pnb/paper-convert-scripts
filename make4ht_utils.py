@@ -5,7 +5,7 @@ import shutil
 import uuid
 import hashlib
 
-from shared_utils import warn_tex as warn
+from shared.shared_utils import warn_tex as warn
 
 
 def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:

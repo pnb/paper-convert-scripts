@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import cssutils
 
 import make4ht_utils
-import shared_utils
+import shared
 import tex
 
 
@@ -18,11 +18,13 @@ ap.add_argument('--mathml', default=False, action='store_true',
                 help='Use MathML conversion in make4ht')
 ap.add_argument('--skip-compile', default=False, action='store_true',
                 help='Skip (re)compilation; useful only for quickly debugging postprocessing steps')
+ap.add_argument('--template', help='Name of expected template (e.g., JEDM)',
+                default='EDM')
 args = ap.parse_args()
 
 print('Creating output folder')
 extracted_dir = os.path.join(args.output_dir, 'source')
-shared_utils.warn.output_filename = os.path.join(args.output_dir, 'conversion_warnings.csv')
+shared.warn.output_filename = os.path.join(args.output_dir, 'conversion_warnings.csv')
 try:
     os.mkdir(args.output_dir)
 except FileExistsError:
@@ -63,11 +65,11 @@ if not args.skip_compile:
                               '"' + mathml + 'mathjax,svg,fn-in" --config make4ht_preamble',
                               shell=True, cwd=extracted_dir)
     if retcode:
-        shared_utils.warn('make4ht_warnings', tex=True)
+        shared.warn('make4ht_warnings', tex=True)
 
 # Load HTML
 if not os.path.exists(os.path.join(extracted_dir, 'tmp-make4ht.html')):
-    shared_utils.warn('make4ht_failed', tex=True)
+    shared.warn('make4ht_failed', tex=True)
     if os.path.exists(os.path.join(extracted_dir, 'tmp-make4ht.blg')):
         print('\nBibliography log:')
         error_count = 0
@@ -79,7 +81,7 @@ if not os.path.exists(os.path.join(extracted_dir, 'tmp-make4ht.html')):
                 if line.startswith('I\'m skipping'):
                     error_count += 1
         if error_count:
-            shared_utils.warn('bib_compile_errors', str(error_count) + ' error(s)', tex=True)
+            shared.warn('bib_compile_errors', str(error_count) + ' error(s)', tex=True)
     exit()
 print('Loading converted HTML')
 with open(os.path.join(extracted_dir, 'tmp-make4ht.html')) as infile:
@@ -90,15 +92,15 @@ print('Parsing headings')
 tex.add_headings(texer)
 print('Parsing authors')
 tex.add_authors(texer)
-shared_utils.wrap_author_divs(texer.soup)
+shared.wrap_author_divs(texer.soup)
 print('Merging unnecessary elements')
 texer.merge_elements('span')
 print('Formatting tables')
 tex.format_tables(texer)
-shared_utils.fix_table_gaps(texer.soup)
+shared.fix_table_gaps(texer.soup)
 print('Formatting figures')
 texer.format_figures()
-shared_utils.check_alt_text_duplicates(texer.soup, True)
+shared.check_alt_text_duplicates(texer.soup, True)
 print('Formatting equations')
 texer.format_equations()
 print('Formatting lists')
@@ -124,8 +126,11 @@ print('Removing unused IDs')
 texer.remove_unused_ids()
 
 print('Checking styles')
-shared_utils.check_styles(soup, args.output_dir, True)
+shared.check_styles(soup, args.output_dir, True)
+shared.check_citations_vs_references(soup, args.output_dir,
+                                     shared.CONFIG['anystyle_path'], args.template,
+                                     tex=True)
 
 # Save result
 print('Saving result')
-shared_utils.save_soup(soup.body, os.path.join(args.output_dir, 'index.html'))
+shared.save_soup(soup.body, os.path.join(args.output_dir, 'index.html'))

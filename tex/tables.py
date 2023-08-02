@@ -2,7 +2,7 @@ import re
 
 import bs4
 
-from shared_utils import warn_tex as warn
+from shared.shared_utils import warn_tex as warn
 from . import TeXHandler
 
 

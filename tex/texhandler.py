@@ -2,8 +2,8 @@ import re
 
 import bs4
 
-import shared_utils
-from shared_utils import warn_tex as warn
+import shared.shared_utils as shared_utils
+from shared.shared_utils import warn_tex as warn
 from make4ht_utils import get_command_content
 
 
