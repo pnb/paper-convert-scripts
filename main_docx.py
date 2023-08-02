@@ -57,7 +57,7 @@ docx_conv.check_caption_placement()
 print('Formatting references')
 docx_conv.fix_references()
 print('Checking styles')
-shared.check_styles(docx_conv.soup, args.output_dir)
+shared.check_styles(docx_conv.soup, args.output_dir, args.template, tex=False)
 shared.check_citations_vs_references(docx_conv.soup, args.output_dir,
                                      shared.CONFIG['anystyle_path'], args.template,
                                      tex=False)

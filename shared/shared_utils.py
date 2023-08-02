@@ -84,15 +84,16 @@ def get_elem_containing_text(soup: bs4.BeautifulSoup, tagname: str, text: str, l
     return None
 
 
-def check_styles(soup: bs4.BeautifulSoup, output_dir: str, tex: bool = False) -> None:
-    """Check the `soup` object to see if it has most of the expected elements with the appropriate
-    styles, and trigger warnings if not. This is intended as one of the last steps, after
-    postprocessing.
+def check_styles(soup: bs4.BeautifulSoup, output_dir: str, input_template: str, tex: bool = False) -> None:
+    """Check the `soup` object to see if it has most of the expected elements with the
+    appropriate styles, and trigger warnings if not. This is intended as one of the last
+    steps, after postprocessing.
 
     Args:
         soup (bs4.BeautifulSoup): Processed paper
         output_dir (str): Output folder, needed to store temporary files
-        tex (bool, optional): Generate warnings flagged as LaTeX warnings. Defaults to False.
+        input_template (str): Expected document format name (e.g., JEDM)
+        tex (bool, optional): Generate warnings flagged as LaTeX warnings
     """
     # Check for <img> with figure "caption" with wrong style (mostly a DOCX problem)
     for img in soup.find_all('img'):
@@ -104,12 +105,13 @@ def check_styles(soup: bs4.BeautifulSoup, output_dir: str, tex: bool = False) ->
     # Check metadata-related styles
     if not soup.find('div', attrs={'class': lambda x: x and 'Paper-Title' in x}):
         warn('style_paper_title', tex=tex)
-    if not soup.find('h1', attrs={'class': lambda x: x and 'AbstractHeading' in x}):
-        warn('style_abstract_heading', tex=tex)
-    if not soup.find('h1', attrs={'class': lambda x: x and 'KeywordsHeading' in x}):
-        warn('style_keywords_heading', tex=tex)
-    if not soup.find('div', attrs={'class': lambda x: x and 'Keywords' in x}):
-        warn('style_keywords', tex=tex)
+    if input_template == 'EDM':
+        if not soup.find('h1', attrs={'class': lambda x: x and 'AbstractHeading' in x}):
+            warn('style_abstract_heading', tex=tex)
+        if not soup.find('h1', attrs={'class': lambda x: x and 'KeywordsHeading' in x}):
+            warn('style_keywords_heading', tex=tex)
+        if not soup.find('div', attrs={'class': lambda x: x and 'Keywords' in x}):
+            warn('style_keywords', tex=tex)
     authors = soup.find_all('div', attrs={'class': lambda x: x and 'Author' in x})
     num_affil = len(soup.find_all('div', attrs={'class': lambda x: x and 'Affiliations' in x}))
     emails = soup.find_all('div', attrs={'class': lambda x: x and 'E-Mail' in x})

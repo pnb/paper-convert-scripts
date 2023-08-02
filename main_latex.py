@@ -126,7 +126,7 @@ print('Removing unused IDs')
 texer.remove_unused_ids()
 
 print('Checking styles')
-shared.check_styles(soup, args.output_dir, True)
+shared.check_styles(soup, args.output_dir, args.template, tex=True)
 shared.check_citations_vs_references(soup, args.output_dir,
                                      shared.CONFIG['anystyle_path'], args.template,
                                      tex=True)
