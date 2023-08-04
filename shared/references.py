@@ -50,6 +50,8 @@ def check_citations_vs_references(
                 # Check if each author in the reference appears in the citation
                 author_matches = []
                 for a in ref["author"]:
+                    if "others" in a and a["others"]:
+                        continue  # 25+ authors have "...", which parses as this
                     name = a["family"] if "family" in a else a["given"]
                     matches = re.search(r"\b" + re.escape(name) + r"\b", cite)
                     author_matches.append(1 if matches else 0)
@@ -67,7 +69,7 @@ def check_citations_vs_references(
         for ref_i, ref in enumerate(refs):
             if ref_i not in ref_matched_i:
                 title = str(ref[next(iter(ref))])
-                for prefer_key in ['title', 'container-title']:
+                for prefer_key in ["title", "container-title"]:
                     if prefer_key in ref:
                         title = ref[prefer_key][0]
                 mismatched.append("Reference: " + title)
@@ -139,7 +141,7 @@ def get_references(
     fname = os.path.join(output_dir, "extracted_refs.txt")
     with open(fname, "w", encoding="utf8") as ofile:
         for ref in heading.find_next("ol").find_all("li"):
-            ofile.write(re.sub(r"\s+", " ", ref.get_text(strip=True)) + "\n")
+            ofile.write(re.sub(r"\s+", " ", ref.get_text().strip()) + "\n")
     subprocess.call(
         [anystyle_path, "-f", "json", "--overwrite", "parse", fname, output_dir],
         stdout=subprocess.DEVNULL,
