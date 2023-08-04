@@ -72,6 +72,7 @@ def check_citations_vs_references(
                 for prefer_key in ["title", "container-title"]:
                     if prefer_key in ref:
                         title = ref[prefer_key][0]
+                        break
                 mismatched.append("Reference: " + title)
     else:
         raise NotImplementedError(input_template)
@@ -263,7 +264,9 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
                     # Keep backtracking until we find likely start of author names
                     inline = True
                 else:
-                    cites.extend(re.split(r";\s*", text[i + 1 : ending.end() - 1]))
+                    for cite in re.split(r";\s*", text[i + 1 : ending.end() - 1]):
+                        if re.match(r".*\s[12][0-9][0-9][0-9][a-z]?$", cite):
+                            cites.append(cite)
                     break
             elif inline and text[i] == " " and text[i + 1] != "(":
                 first_tok = text[i + 1 : ending.end() - 1].split()[0]
@@ -271,7 +274,7 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
                 if (
                     first_word == first_word.lower()
                     and first_word not in lc_name_words
-                    and first_word not in "etal"
+                    and first_word not in "etal&"
                 ):
                     ref = text[i + len(first_tok) + 2 : ending.end() - 1]
                     cites.append(ref.replace(" (", ", "))
