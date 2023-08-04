@@ -338,7 +338,8 @@ class MammothParser:
         # If the author info is in a table, undo that
         info_styles = ['Author', 'Affiliations', 'E-Mail']
         wrappers = []
-        for elem in self.soup.find_all('div', attrs={'class': lambda c: c in info_styles}):
+        elems = self.soup.find_all('div', attrs={'class': lambda c: c in info_styles})
+        for elem in elems:
             wrapper = elem.find_parent('table')
             if wrapper:
                 wrapper.insert_before(elem)
@@ -346,6 +347,24 @@ class MammothParser:
         for wrapper in wrappers:
             wrapper.decompose()  # This works even if the wrapper is already decomposed
         # Remove blank authors (e.g., because of Author style misapplied to whitespace)
-        for elem in self.soup.find_all('div', attrs={'class': lambda c: c in info_styles}):
+        # and find emails marked as affiliations (especially normal in JEDM)
+        EMAIL_REGEX = re.compile(r'(\S+@\S+\.\S+)')  # Not RFC 5322 but that is OK
+        for elem in elems:
             if not elem.get_text(strip=True):
                 elem.decompose()
+            elif 'Affiliations' in elem['class']:  # Check if email needs to be parsed
+                for content in elem.contents[:]:
+                    if isinstance(content, bs4.NavigableString):
+                        parts = EMAIL_REGEX.split(content)
+                        if len(parts) > 1:
+                            new_parts = []
+                            for part in parts:
+                                if EMAIL_REGEX.match(part):
+                                    new_parts.append(self.soup.new_tag(
+                                        'div',
+                                        attrs={'class': 'E-Mail'}
+                                    ))
+                                    new_parts[-1].string = part
+                                elif len(part):
+                                    new_parts.append(self.soup.new_string(part))
+                            content.replace_with(*new_parts)
