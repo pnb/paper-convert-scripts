@@ -113,10 +113,23 @@ def check_citations_vs_references(
         missing_reqs = reqs.difference(set(ref_dict.keys()))
         if len(missing_reqs) > 0:
             ref_type = ref_dict["type"] if ref_dict["type"] else "other"
+            short_key = ""
+            if "title" in ref_dict:
+                short_key = ref_dict["title"][0]
+            elif "author" in ref_dict:
+                short_key = ", ".join(
+                    a["family"] for a in ref_dict["author"] if "family" in a
+                )
+            elif "container-title" in ref_dict:
+                short_key = ref_dict["container-title"][0]
+            if len(short_key) > 35:
+                short_key = short_key[:30] + "..."
+            if len(short_key):
+                short_key = " (" + short_key + ")"
             warn(
                 "incomplete_reference",
-                f"Reference {i} was recognized as {ref_type} and might "
-                + "be missing the following elements: "
+                f"Reference {i}{short_key} was recognized as {ref_type} and might "
+                + "be missing the following: "
                 + ", ".join(missing_reqs),
                 tex,
             )
