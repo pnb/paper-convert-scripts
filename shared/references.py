@@ -266,7 +266,7 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
         text,
     )
     # Precompile expression for potential multi-year cites (Authors, 1999, 2000)
-    year_end_re = re.compile(r',\s*([12][0-9][0-9][0-9][a-z]?)(?=($|,))')
+    year_end_re = re.compile(r",\s*([12][0-9][0-9][0-9][a-z]?)(?=($|,))")
     # Look for "YYYY)" or "YYYY]...)", which should be at the end of every citation, I
     # think...
     for ending in re.finditer(r"[12][0-9][0-9][0-9][a-z]?(\)|](?=[^(]*\)))", text):
@@ -282,7 +282,7 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
                 else:
                     for cite in re.split(r";\s*", text[i + 1 : ending.end() - 1]):
                         for y in year_end_re.finditer(cite):
-                            cites.append(year_end_re.sub('', cite) + ', ' + y.group(1))
+                            cites.append(year_end_re.sub("", cite) + ", " + y.group(1))
                     break
             elif inline and text[i] == " " and text[i + 1] not in "([":
                 first_tok = text[i + 1 : ending.end() - 1].split()[0]
@@ -293,7 +293,7 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
                     and first_word not in "etal&"
                 ):
                     ref = text[i + len(first_tok) + 2 : ending.end() - 1]
-                    cites.append(ref.replace(" (", ", ").replace(' [', ', '))
+                    cites.append(ref.replace(" (", ", ").replace(" [", ", "))
                     break
     return cites
 
