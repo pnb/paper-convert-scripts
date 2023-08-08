@@ -265,23 +265,26 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
         "",
         text,
     )
-    # Look for "YYYY)", which should be at the end of every citation, I think...
-    # Then backtrack to figure out where the citing begins, then split multiple
-    # Should account for non-capitalized names (e.g., van Dijk), et al., ;, etc.
-    for ending in re.finditer(r"[12][0-9][0-9][0-9][a-z]?\)", text):
+    # Precompile expression for potential multi-year cites (Authors, 1999, 2000)
+    year_end_re = re.compile(r',\s*([12][0-9][0-9][0-9][a-z]?)(?=($|,))')
+    # Look for "YYYY)" or "YYYY]...)", which should be at the end of every citation, I
+    # think...
+    for ending in re.finditer(r"[12][0-9][0-9][0-9][a-z]?(\)|](?=[^(]*\)))", text):
+        # Then backtrack to figure out where the citing begins, then split multiple
+        # Account for non-capitalized names (e.g., van Dijk), et al., ;, etc.
         inline = False
         for i in range(ending.end() - 1, -1, -1):
-            if text[i] == "(":
+            if text[i] in "([":
                 if text[i + 1] in "0123456789":
                     # Matches (YYYY; YYYYb, pp. A-B, etc.) without author names
                     # Keep backtracking until we find likely start of author names
                     inline = True
                 else:
                     for cite in re.split(r";\s*", text[i + 1 : ending.end() - 1]):
-                        if re.match(r".*\s[12][0-9][0-9][0-9][a-z]?$", cite):
-                            cites.append(cite)
+                        for y in year_end_re.finditer(cite):
+                            cites.append(year_end_re.sub('', cite) + ', ' + y.group(1))
                     break
-            elif inline and text[i] == " " and text[i + 1] != "(":
+            elif inline and text[i] == " " and text[i + 1] not in "([":
                 first_tok = text[i + 1 : ending.end() - 1].split()[0]
                 first_word = first_tok.rstrip(".,;:")
                 if (
@@ -290,7 +293,7 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
                     and first_word not in "etal&"
                 ):
                     ref = text[i + len(first_tok) + 2 : ending.end() - 1]
-                    cites.append(ref.replace(" (", ", "))
+                    cites.append(ref.replace(" (", ", ").replace(' [', ', '))
                     break
     return cites
 
@@ -303,7 +306,7 @@ if __name__ == "__main__":
         <li>Namington, B., Anotherone, C., and Lastington, D. 1999. The article name.
         Journal of Reference Parsing Tests 1, 2, 123-124.
         </li>
-        <li>Editorname, I., Ed. 2007. The title of book one, 1st. ed. The name of the
+        <li>Editorname, I., Ed. 2007. The Title of Book One, 1st. ed. The name of the
         series one, vol. 9. University of Chicago Press, Chicago.
         </li>
         <li>van der Waal, M. 1999. Een wetenschappelijk artikel. Journaal Van
@@ -316,6 +319,13 @@ if __name__ == "__main__":
         <li>Namington, B., Anotherone, C., and Lastington, D. 2001. The article name 3.
         Journal of Reference Parsing Tests 3, 4, 523-524.
         </li>
+        <li>Solo, H. 1999. Kessel Running: A Memoir, 1st. ed. Corellia: Corellian Press.
+        </li>
+        <li>Solo, H. 2000. A Ship's Manual and More. Corellia: Corellian Press.</li>
+        <li>Nestington, L. 1999. A paper to cite in a nested way. Journal of
+        Reference Parsing Tests 4, 5, 623-624.
+        </li>
+        <li>Nestington, L. 2000. Another nested paper. Bird Quarterly 1, 2, 12-20.</li>
     </ol>
     <h1>Appendix</h1>
     <ol><li>List item in appendix</li></ol>
@@ -354,6 +364,9 @@ if __name__ == "__main__":
         <p>Claim from van der Waal (1999).</p>
         <p>Paper from A. Authorname (1999) disambiguation method.</p>
         <p>Edited book by Editorname (2007) does not work without author.</p>
+        <p>Multiple cites from same author(s) (Solo, 1999, 2000)</p>
+        <p>Citing something (in a parenthetical way [Nestington, 1999]).</p>
+        <p>And in inline parentheses (a claim by Nestington [2000]).</p>
         <h1>References</h1>
     """
     example_soup = bs4.BeautifulSoup(example_html + processed_refs_html, "html.parser")
