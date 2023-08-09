@@ -265,6 +265,7 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
         "",
         text,
     )
+    text = re.sub(r"([(\[])(e\.g\.|i\.e\.),?\s?", r"\1", text)  # Remove e.g., i.e.
     # Precompile expression for potential multi-year cites (Authors, 1999, 2000)
     year_end_re = re.compile(r",\s*([12][0-9][0-9][0-9][a-z]?)(?=($|,))")
     # Look for "YYYY)" or "YYYY]...)", which should be at the end of every citation, I
@@ -326,6 +327,7 @@ if __name__ == "__main__":
         Reference Parsing Tests 4, 5, 623-624.
         </li>
         <li>Nestington, L. 2000. Another nested paper. Bird Quarterly 1, 2, 12-20.</li>
+        <li>Gratia, E. 1999. Just one example. Example Articles 1, 2, 1-20.</li>
     </ol>
     <h1>Appendix</h1>
     <ol><li>List item in appendix</li></ol>
@@ -367,6 +369,7 @@ if __name__ == "__main__":
         <p>Multiple cites from same author(s) (Solo, 1999, 2000)</p>
         <p>Citing something (in a parenthetical way [Nestington, 1999]).</p>
         <p>And in inline parentheses (a claim by Nestington [2000]).</p>
+        <p>Cite as example (e.g., Gratia, 1999).</p>
         <h1>References</h1>
     """
     example_soup = bs4.BeautifulSoup(example_html + processed_refs_html, "html.parser")
