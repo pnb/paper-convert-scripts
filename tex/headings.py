@@ -29,7 +29,7 @@ def add_headings(texer: TeXHandler) -> None:
             for br in h.find_all("br"):
                 br.decompose()
     # Title
-    title_first = texer.soup.find("span", attrs={"class": "phvb8t-x-x-180"})
+    title_first = texer.soup.select_one("span.phvb8t-x-x-180, span.phvr7t-x-x-248")
     if title_first and "\\maketitle" in texer.tex_line(title_first):
         title = title_first.parent
         title["class"] = "Paper-Title"
