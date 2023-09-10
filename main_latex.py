@@ -103,7 +103,7 @@ print("Loading converted HTML")
 with open(os.path.join(extracted_dir, "tmp-make4ht.html")) as infile:
     soup = BeautifulSoup(infile, "html.parser")
 
-texer = tex.TeXHandler(texstr, soup)
+texer = tex.TeXHandler(texstr, soup, args.template)
 print("Parsing headings")
 tex.add_headings(texer)
 print("Parsing authors")

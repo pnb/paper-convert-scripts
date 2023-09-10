@@ -8,7 +8,7 @@ from make4ht_utils import get_command_content
 
 
 class TeXHandler:
-    def __init__(self, tex_str: str, soup: bs4.BeautifulSoup) -> None:
+    def __init__(self, tex_str: str, soup: bs4.BeautifulSoup, input_template: str = 'EDM') -> None:
         """Create an instance of a class with a set of functions useful for postprocessing a
         document BeautifulSoup object given its source LaTeX string. Some functions need to be
         called before others.
@@ -19,6 +19,7 @@ class TeXHandler:
         """
         self.tex_lines = tex_str.split('\n')
         self.soup = soup
+        self.input_template = input_template
         self.env_start_regex = re.compile(r'(^|[^\\])\\begin\{(.+)\}')
         self.env_end_regex = re.compile(r'(^|[^\\])\\end\{')
 
