@@ -30,14 +30,27 @@ def add_headings(texer: TeXHandler) -> None:
                 keywords_candidate.find_next_sibling("span").name = "div"
                 break
     # (Sub)section headings
-    heading_fonts = ["ptmb8t-x-x-120", "ptmri8t-x-x-110"]
+    heading_fonts = [
+        "ptmb8t-x-x-120",
+        "ptmri8t-x-x-110",
+        "phvrc7t-x-x-144",
+        "phvrc7t-x-x-120",
+        "phvr7t-x-x-120",
+    ]
     for h_text in texer.soup.find_all("span", attrs={"class": heading_fonts}):
         h = h_text.parent
         if h.name == "p":  # Otherwise already handled (abstract, etc.)
             h["class"] = "not-numbered"
             num_text = h_text.get_text().strip()
-            if "ptmb8t-x-x-120" in h_text["class"]:
-                if num_text.endswith(".") or "." not in num_text:
+            if (
+                "ptmb8t-x-x-120" in h_text["class"]
+                or "phvrc7t-x-x-144" in h_text["class"]
+                or "phvrc7t-x-x-120" in h_text["class"]
+            ):
+                print(num_text)
+                if (num_text.endswith(".") or "." not in num_text) and num_text.count(
+                    "."
+                ) < 2:
                     h.name = "h1"
                     if h.get_text().lower().strip() == "abstract":
                         h["class"] = h["class"] + " AbstractHeading"
@@ -47,7 +60,10 @@ def add_headings(texer: TeXHandler) -> None:
                         h.find_next("p").name = "div"
                 else:
                     h.name = "h2"
-            elif "ptmri8t-x-x-110" in h_text["class"]:
+            elif (
+                "ptmri8t-x-x-110" in h_text["class"]
+                or "phvr7t-x-x-120" in h_text["class"]
+            ):
                 h.name = "h3"
             # Remove any line breaks caused by \\ in the heading in LaTeX
             for br in h.find_all("br"):
