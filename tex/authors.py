@@ -8,6 +8,19 @@ def add_authors(texer: TeXHandler) -> None:
     """Parse author information and format the HTML soup a bit to add semantic
     information regarding author names, email addresses, and affiliations.
     """
+    if texer.input_template == "JEDM":
+        author_containers = []
+        for email_candidate in texer.soup.select("span.phvr7t-x-x-109"):
+            if "@" in email_candidate.get_text():
+                author_containers.append(
+                    email_candidate.find_parent("div", attrs={"class": "tabular"})
+                )
+        if len(author_containers):
+            container = texer.soup.new_tag("div", attrs={"class": "center"})
+            author_containers[0].insert_before(container)
+            for author_container in author_containers:
+                container.append(author_container)
+
     meta_section = texer.soup.find("div", attrs={"class": "center"})
     if not meta_section or not meta_section.find("div", attrs={"class": "tabular"}):
         warn("author_data_missing")
@@ -25,7 +38,10 @@ def add_authors(texer: TeXHandler) -> None:
             if (
                 beyond_author_name
                 or "@" in elem.get_text()
-                or "phvr8t-x-x-120" not in elem["class"]
+                or (
+                    "phvr8t-x-x-120" not in elem["class"]
+                    and "phvr7t-x-x-144" not in elem["class"]
+                )
             ):
                 beyond_author_name = True  # Evidence we are past the author name part
                 if "@" in elem.get_text():

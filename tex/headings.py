@@ -47,7 +47,6 @@ def add_headings(texer: TeXHandler) -> None:
                 or "phvrc7t-x-x-144" in h_text["class"]
                 or "phvrc7t-x-x-120" in h_text["class"]
             ):
-                print(num_text)
                 if (num_text.endswith(".") or "." not in num_text) and num_text.count(
                     "."
                 ) < 2:
