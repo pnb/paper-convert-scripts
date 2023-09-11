@@ -101,7 +101,8 @@ if not os.path.exists(os.path.join(extracted_dir, "tmp-make4ht.html")):
     exit()
 print("Loading converted HTML")
 with open(os.path.join(extracted_dir, "tmp-make4ht.html")) as infile:
-    soup = BeautifulSoup(infile, "html.parser")
+    html_str = tex.fix_et_al(infile.read())
+    soup = BeautifulSoup(html_str, "html.parser")
 
 texer = tex.TeXHandler(texstr, soup, args.template)
 print("Parsing headings")
