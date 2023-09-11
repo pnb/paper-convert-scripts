@@ -1,3 +1,4 @@
+# Can run tests via `python -m shared.references`
 import re
 import os
 import subprocess
@@ -291,7 +292,7 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
                 if (
                     first_word == first_word.lower()
                     and first_word not in lc_name_words
-                    and first_word not in "etal&"
+                    and first_word not in ["et", "al", "&", "and"]
                 ):
                     ref = text[i + len(first_tok) + 2 : ending.end() - 1]
                     cites.append(ref.replace(" (", ", ").replace(" [", ", "))
@@ -305,29 +306,40 @@ if __name__ == "__main__":
             Clifford: a maple 11 package for clifford algebra computations, version 11.
         </li>
         <li>Namington, B., Anotherone, C., and Lastington, D. 1999. The article name.
-        Journal of Reference Parsing Tests 1, 2, 123-124.
+            Journal of Reference Parsing Tests 1, 2, 123-124.
         </li>
         <li>Editorname, I., Ed. 2007. The Title of Book One, 1st. ed. The name of the
-        series one, vol. 9. University of Chicago Press, Chicago.
+            series one, vol. 9. University of Chicago Press, Chicago.
         </li>
         <li>van der Waal, M. 1999. Een wetenschappelijk artikel. Journaal Van
-        Artikelen 11, 12 (June), 1000-1010.
+            Artikelen 11, 12 (June), 1000-1010.
         </li>
         <li>Supporting Author, A. and Another. 1999. The second author has a mononym.
-        Journal of Articles 1, 2, 10-11.</li>
+            Journal of Articles 1, 2, 10-11.</li>
         <li>Namington, B., Anotherone, C., and Lastington, D. 2000. The article name 2.
-        Journal of Reference Parsing Tests 2, 3, 423-424.
+            Journal of Reference Parsing Tests 2, 3, 423-424.
         <li>Namington, B., Anotherone, C., and Lastington, D. 2001. The article name 3.
-        Journal of Reference Parsing Tests 3, 4, 523-524.
+            Journal of Reference Parsing Tests 3, 4, 523-524.
         </li>
         <li>Solo, H. 1999. Kessel Running: A Memoir, 1st. ed. Corellia: Corellian Press.
         </li>
         <li>Solo, H. 2000. A Ship's Manual and More. Corellia: Corellian Press.</li>
         <li>Nestington, L. 1999. A paper to cite in a nested way. Journal of
-        Reference Parsing Tests 4, 5, 623-624.
+            Reference Parsing Tests 4, 5, 623-624.
         </li>
         <li>Nestington, L. 2000. Another nested paper. Bird Quarterly 1, 2, 12-20.</li>
         <li>Gratia, E. 1999. Just one example. Example Articles 1, 2, 1-20.</li>
+        <li><a id="Xjadud2015aggregate"></a>
+            <span class="ptmrc7t-x-x-109">J<span class="small-caps">adud</span>,
+            M.&nbsp;C.  <span class="small-caps">and</span>
+            D<span class="small-caps">orn</span>,  B.  </span>
+            <span class="ptmr7t-x-x-109">2015. Aggregate compilation behavior: Findings
+            and implications from 27,698 users. In </span><span class="ptmri7t-x-x-109">
+            ICER &rsquo;15: Proceedings of the Eleventh Annual International Conference
+            on International Computing Education Research
+            </span><span class="ptmr7t-x-x-109">.
+            Association for Computing Machinery, 131&ndash;139.</span>
+        </li>
     </ol>
     <h1>Appendix</h1>
     <ol><li>List item in appendix</li></ol>
@@ -370,6 +382,7 @@ if __name__ == "__main__":
         <p>Citing something (in a parenthetical way [Nestington, 1999]).</p>
         <p>And in inline parentheses (a claim by Nestington [2000]).</p>
         <p>Cite as example (e.g., Gratia, 1999).</p>
+        <p>Two authors cited inline, like Jadud and Dorn (2015).</p>
         <h1>References</h1>
     """
     example_soup = bs4.BeautifulSoup(example_html + processed_refs_html, "html.parser")
