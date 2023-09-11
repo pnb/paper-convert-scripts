@@ -8,5 +8,7 @@
     "python.linting.pycodestyleArgs": [
         "--ignore=E203,W503",
         "--max-line-length=88"
-    ]
+    ],
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.black-formatter"
 }
