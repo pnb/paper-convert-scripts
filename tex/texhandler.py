@@ -4,7 +4,6 @@ import bs4
 
 import shared.shared_utils as shared_utils
 from shared.shared_utils import warn_tex as warn
-from make4ht_utils import get_command_content
 
 
 class TeXHandler:
@@ -117,128 +116,6 @@ class TeXHandler:
                 if class1 == class2 and style1 == style2:
                     elem.insert(0, prev)
                     prev.unwrap()
-
-    def add_alt_text(self, img_elem: bs4.Tag) -> str:
-        """Find alt text (Description command) in LaTeX for an <img> and add it to the image.
-
-        Args:
-            img_elem (bs4.Tag): <img> element; e.g., soup.find('img')
-
-        Returns:
-            str: Text that was added as the alt text
-        """
-        line_num_start = self.tex_line_num(img_elem)
-        img_line_num = self.find_image_line_num(line_num_start, img_elem['src'])
-        env_start, env_end = self.get_tex_environment(img_line_num)
-        tex_section = '\n'.join(self.tex_lines[env_start:env_end + 1])
-        alts = get_command_content(tex_section, 'Description')
-        img_i = img_elem.parent.find_all('img').index(img_elem)
-        if img_elem.has_attr('alt'):  # Make4ht defaults to "PIC" which is not real alt text
-            del img_elem['alt']
-        if len(alts) > img_i:
-            img_elem['alt'] = alts[img_i]
-        shared_utils.validate_alt_text(img_elem, img_elem['src'], True)
-        return img_elem['alt'] if img_elem.has_attr('alt') else None
-
-    def _fix_figure_text(self, figure: bs4.Tag) -> None:
-        # Sometimes part of the image filename or alt text might get included on the <img> line
-        for img in figure.find_all('img'):
-            el = img.previous_sibling
-            while el and (isinstance(el, bs4.NavigableString) or el.sourceline == img.sourceline):
-                next_el = el.previous_sibling
-                if isinstance(el, bs4.NavigableString) and el.strip():
-                    el.replace_with('')
-                el = next_el
-            el = img.next_sibling
-            while el and (isinstance(el, bs4.NavigableString) or
-                          el.sourceline == img.sourceline and el.name != 'a'):
-                next_el = el.next_sibling
-                if isinstance(el, bs4.NavigableString) and el.strip():
-                    el.replace_with('')
-                el = next_el
-        # Move everything non-<img> into the caption
-        for p in figure.find_all('p'):
-            if p.has_attr('id'):
-                anchor = self.soup.new_tag('a', attrs={'id': p['id']})
-                p.insert_before(anchor)
-            p.unwrap()
-        for div in figure.find_all('div'):
-            div.name = 'span'  # Change these to spans so we know when we're done (no divs left)
-        caption = self.soup.new_tag('figcaption')
-        for elem in reversed(figure.contents):
-            if isinstance(elem, bs4.NavigableString) or (elem.name != 'figure' and
-                                                         elem.name != 'img'):
-                caption.insert(0, elem)
-        figure.append(caption)
-        # Sometimes there is a leftover ":" element for some reason
-        caption_remnant = caption.find('span', attrs={'class': ['caption', 'id']})
-        if caption_remnant and caption_remnant.get_text().strip() == ':':
-            caption_remnant.decompose()
-
-    def format_figures(self) -> None:
-        """Parse alt text from LaTeX and add it to figures, merge subfigures into a parent <figure>
-        element, set image sizes, and do any other minor adjustments needed for figures.
-        """
-        # First convert any <object>s introduced by SVG conversion to <img>
-        width_regex = re.compile(r'width="(\d+)"')
-        for obj in self.soup.find_all('object', attrs={'class': 'graphics'}):
-            comment = obj.find_next(string=lambda x: isinstance(x, bs4.Comment))
-            if comment:
-                w = width_regex.search(comment)
-                if w:
-                    obj['width'] = int(w.group(1))
-            obj.name = 'img'
-            obj['src'] = obj['data']
-            del obj['name']
-        for img in self.soup.find_all('img'):
-            if img['src'].startswith('tmp-make4ht'):  # Generated image
-                if img.has_attr('class') and 'oalign' in img['class']:
-                    img.decompose()  # Artifact of some LaTeX alignment function
-                    continue
-                elif img.has_attr('alt') and 'Algorithm' in img['alt']:
-                    continue  # Skip over images generated of algorithm listings
-            if img.parent.has_attr('class') and 'centerline' in img.parent['class']:
-                img.parent.unwrap()  # Remove extra div added if somebody uses \centerline
-            # Repair double // in img src that happens when using a trailing / with \graphicspath
-            img['src'] = img['src'].replace('//', '/')
-            # Handle alt text and caption
-            self.add_alt_text(img)
-            img_text_line_num = self.tex_line_num(img)
-            img_text_line_num = self.find_image_line_num(img_text_line_num, img['src'])
-            env_start, _ = self.get_tex_environment(img_text_line_num)
-            parent = img.parent
-            subfigure_wrapper = img.find_parent('div', attrs={'class': 'subfigure'})
-            if 'subfigure' in self.tex_lines[env_start] or subfigure_wrapper:
-                if subfigure_wrapper:
-                    for wrapper in subfigure_wrapper.find_all(['table', 'tr', 'td']):
-                        wrapper.unwrap()
-                img['class'] = 'subfigure'
-                parent = img.find_parent(['div', 'figure'])
-                parent.name = 'figure'
-                self._fix_figure_text(parent)  # Handle subfigure caption
-                parent = parent.parent  # Go up to next level to handle containing <figure>
-            while parent.name != 'div' and parent.name != 'figure':
-                parent = parent.parent
-            parent.name = 'figure'
-            if not parent.find('div'):  # No (more) subfigures to worry about
-                if 'subfigure' in self.tex_lines[env_start]:
-                    parent['class'] = 'has-subfigures'
-                self._fix_figure_text(parent)  # Handle figure caption
-
-            # Set image size class
-            if img.has_attr('height'):
-                del img['height']  # Fixes wrong width/height proportions; width is more important
-            if 'scale=' in self.tex_lines[img_text_line_num - 1] and img.has_attr('width'):
-                del img['width']  # Using scale= leads to tiny width, so we just have to skip it
-            width_in = 3  # Assume medium-ish for "figure" environment
-            if img.has_attr('width'):
-                width_in = int(img['width']) / 72
-                del img['width']
-                if 'subfigure' in self.tex_lines[env_start] or subfigure_wrapper:
-                    width_in = width_in * .8  # Assume subfigures should be a bit smaller
-            if 'figure*' in self.tex_lines[env_start] and len(parent.find_all('img')) == 1:
-                width_in = 5  # Assume large for a "figure*" environment with 1 image
-            shared_utils.set_img_class(img, width_in)
 
     def format_equations(self) -> None:
         """Replace <table> wrappers for equations with <span> that can by styled with CSS. Tables
