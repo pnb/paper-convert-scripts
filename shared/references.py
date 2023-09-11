@@ -260,6 +260,7 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
         list[str]: List of citations found
     """
     cites = []
+    text = text.replace("\n", " ")  # Remove newlines that can complicate parsing
     text = re.sub(r"  +", " ", text)  # Collapse multiple spaces (easier parsing)
     text = re.sub(  # Remove page/chapter/section numbers
         r",? ((pp|Ch|Sec)\. \d+(\d*[-\u2010-\u2015, ]+\d+)*|(p|Ch|Sec)\. \d+)\b",
