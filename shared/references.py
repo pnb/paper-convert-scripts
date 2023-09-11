@@ -55,6 +55,9 @@ def check_citations_vs_references(
                         continue  # 25+ authors have "...", which parses as this
                     name = a["family"] if "family" in a else a["given"]
                     matches = re.search(r"\b" + re.escape(name) + r"\b", cite)
+                    if not matches and re.match(r"([A-Z]\.)+", name):
+                        name = name.replace(".", "")  # A.C.M.E. => ACME
+                        matches = re.search(r"\b" + re.escape(name) + r"\b", cite)
                     author_matches.append(1 if matches else 0)
                 # If yes, or it is an "et al." citation and the first matches, it is OK
                 if (
@@ -341,6 +344,12 @@ if __name__ == "__main__":
             </span><span class="ptmr7t-x-x-109">.
             Association for Computing Machinery, 131&ndash;139.</span>
         </li>
+        <li><span class="ptmrc7t-x-x-109">DWYL</span><span class="ptmr7t-x-x-109">.
+            2022. List of English Words. </span>
+            <a href="https://example.com"><span class="pcrr7t-x-x-109">
+            words_alpha.txt</span></a>
+            <span class="ptmr7t-x-x-109">(accessed 14 April, 2022).</span>
+        </li>
     </ol>
     <h1>Appendix</h1>
     <ol><li>List item in appendix</li></ol>
@@ -384,6 +393,7 @@ if __name__ == "__main__":
         <p>And in inline parentheses (a claim by Nestington [2000]).</p>
         <p>Cite as example (e.g., Gratia, 1999).</p>
         <p>Two authors cited inline, like Jadud and Dorn (2015).</p>
+        <p>Abbrevation cite&nbsp;(<a href="#Xwords2022">DWYL, 2022</a>)</p>
         <h1>References</h1>
     """
     example_soup = bs4.BeautifulSoup(example_html + processed_refs_html, "html.parser")
