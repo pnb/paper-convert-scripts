@@ -143,10 +143,8 @@ css = cssutils.parseFile(os.path.join(extracted_dir, "tmp-make4ht.css"))
 for rule in css:
     if rule.type == rule.STYLE_RULE:
         if "#" in rule.selectorText:
-            elem = soup.select_one(rule.selectorText)
-            if elem:
-                cur_style = elem["style"] if elem.has_attr("style") else ""
-                elem["style"] = rule.style.cssText + ";" + cur_style
+            for elem in soup.select(rule.selectorText):
+                elem["style"] = rule.style.cssText + ";" + elem.get("style", "")
 
 print("Removing unused IDs")
 texer.remove_unused_ids()
