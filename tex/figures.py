@@ -64,7 +64,9 @@ def _fix_figure_text(texer: TeXHandler, figure: bs4.Tag) -> None:
     caption = texer.soup.new_tag("figcaption")
     for elem in reversed(figure.contents):
         if isinstance(elem, bs4.NavigableString) or (
-            elem.name != "figure" and elem.name != "img"
+            elem.name != "figure"
+            and elem.name != "img"
+            and (elem.name != "span" or "fbox" not in elem.get("class", []))
         ):
             caption.insert(0, elem)
     figure.append(caption)
@@ -124,7 +126,7 @@ def format_figures(texer: TeXHandler) -> None:
             parent = parent.parent
         parent.name = "figure"
         if not parent.find("div"):  # No (more) subfigures to worry about
-            if "subfigure" in texer.tex_lines[env_start]:
+            if "subfigure" in texer.tex_lines[env_start] or subfigure_wrapper:
                 parent["class"] = "has-subfigures"
             _fix_figure_text(texer, parent)  # Handle figure caption
 
