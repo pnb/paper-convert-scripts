@@ -22,9 +22,13 @@ ap.add_argument(
 )
 ap.add_argument(
     "--skip-compile",
-    default=False,
     action="store_true",
     help="Skip (re)compilation; useful only for quickly debugging postprocessing steps",
+)
+ap.add_argument(
+    "--skip-extract",
+    action="store_true",
+    help="Skip extraction; useful for modifying Tex sources during debugging",
 )
 ap.add_argument(
     "--template", help="Name of expected template (e.g., JEDM)", default="EDM"
@@ -39,7 +43,7 @@ try:
 except FileExistsError:
     print("Output folder already exists; contents may be overwritten")
     # Clean up old files
-    if not args.skip_compile:
+    if not args.skip_compile and not args.skip_extract:
         try:
             shutil.rmtree(extracted_dir)
         except FileNotFoundError:
@@ -48,9 +52,13 @@ except FileExistsError:
 
 # Combine any \input files into 1 (makes postprocessing much easier for line numbers)
 print("Reading LaTeX source")
-texstr = make4ht_utils.get_raw_tex_contents(args.source_file_path, extracted_dir)
-with open(os.path.join(extracted_dir, "tmp-make4ht.tex"), "w") as ofile:
-    ofile.write(texstr)
+if args.skip_extract:
+    with open(os.path.join(extracted_dir, "tmp-make4ht.tex")) as infile:
+        texstr = infile.read()
+else:
+    texstr = make4ht_utils.get_raw_tex_contents(args.source_file_path, extracted_dir)
+    with open(os.path.join(extracted_dir, "tmp-make4ht.tex"), "w") as ofile:
+        ofile.write(texstr)
 
 bib_backend = make4ht_utils.get_bib_backend(texstr)
 
