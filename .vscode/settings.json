@@ -10,5 +10,8 @@
         "--max-line-length=88"
     ],
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    }
 }
