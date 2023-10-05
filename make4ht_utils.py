@@ -11,7 +11,9 @@ from shared.shared_utils import warn_tex as warn
 def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
     """Return the LaTeX contents of a source zip file as a string. Assumes there is only
     1 .tex file, or that there is a file called main.tex. If the zip file root contains
-    only one item that is a folder, that folder will be treated as the root.
+    only one item that is a folder, that folder will be treated as the root. Makes a few
+    modifications for better HTML conversion, but without modifying line numbers
+    (unless there are included files, which get merged into one).
 
     Args:
         source_zip_path (str): Path to LaTeX .zip file
@@ -103,12 +105,6 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
         for tabular in siunitx_tabulars:
             print("###", tabular, "\n")
 
-    # Mark up {description} environments that sometimes (always?) get lost
-    tex_str = tex_str.replace(
-        R"\begin{description}",
-        R'\HCode{<p class="description-env">}\begin{description}',
-    ).replace(R"\end{description}", R"\end{description}\HCode{</p>}")
-
     # Look for image filenames with uppercase and/or mismatching case letters, which
     # causes issues across different OSs and issues with make4ht if the filename
     # extension is uppercase
@@ -137,6 +133,33 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
                         tex_str = tex_str.replace("{" + img + "}", "{" + newimg + "}")
                     img_fnames.remove(img)
                     break
+
+    # Mark up environments/commands that sometimes/always get lost
+    # \begin{description}
+    tex_str = tex_str.replace(
+        R"\begin{description}",
+        R'\HCode{<p class="description-env">}\begin{description}',
+    ).replace(R"\end{description}", R"\end{description}\HCode{</p>}")
+    # \subfloat[caption]{some image command}
+    next_pos = tex_str.find(R"\subfloat[")
+    while next_pos >= 0:
+        depth = 0
+        for command_end in range(next_pos, len(tex_str)):
+            if tex_str[command_end] == "{":
+                depth += 1
+            elif tex_str[command_end] == "}":
+                depth -= 1
+                if depth == 0:
+                    break
+        tex_str = (
+            tex_str[:next_pos]
+            + R"\HCode{<div class='subfigure'>}"  # Single ' attr seems needed here?
+            + tex_str[next_pos : command_end + 1]
+            + R"\HCode{</div>}"
+            + tex_str[command_end + 1 :]
+        )
+        next_pos = tex_str.find(R"\subfloat[", command_end + 44)
+
     return tex_str
 
 
