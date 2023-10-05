@@ -175,6 +175,7 @@ class TeXHandler:
             "ectt-": "code",
             "ectc-": "code",
             "pcrr7t-x-x-120": "code",
+            "ptmb7t-x-x-120": "strong",
             "aebxti-": ["strong", "em"],
             "aer-7": None,  # Unwrap; not a good/necessary style to keep (tiny text)
         }
