@@ -144,3 +144,32 @@ def format_figures(texer: TeXHandler) -> None:
         if "figure*" in texer.tex_lines[env_start] and len(parent.find_all("img")) == 1:
             width_in = 5  # Assume large for a "figure*" environment with 1 image
         set_img_class(img, width_in)
+
+
+def format_listings(texer: TeXHandler) -> None:
+    for pre in texer.soup.select("pre.lstlisting"):
+        container = pre.parent
+        container["class"] = "listing"
+        container.name = "figure"
+
+        # Move everything after the code into the caption
+        caption = texer.soup.new_tag("figcaption")
+        pre.insert_after(caption)
+        while caption.next_sibling:
+            if isinstance(caption.next_sibling, bs4.NavigableString):
+                label = re.match(r"\s*Listing\s+\d+(.)", str(caption.next_sibling))
+                if label and label.group(1) not in ":.":
+                    newlabel = re.sub(
+                        r"\s*Listing\s+(\d+)",
+                        r"Listing \1: ",
+                        str(caption.next_sibling),
+                    )
+                    caption.next_sibling.replace_with(newlabel)
+            caption.append(caption.next_sibling)
+
+        # Fix the fact that tex4ht adds line breaks inside \textbf{two words}*
+        # This assumes nobody would do a multiline \textbf, which may not be right
+        for elem in pre.select("span.ptmb7t-x-x-120"):
+            for content in elem.contents:
+                if isinstance(content, bs4.NavigableString):
+                    content.replace_with(str(content).replace("\n", ""))
