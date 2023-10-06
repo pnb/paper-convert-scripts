@@ -286,11 +286,15 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
                     # Keep backtracking until we find likely start of author names
                     inline = True
                 else:
-                    for cite in re.split(r";\s*", text[i + 1 : ending.end() - 1]):
+                    # Split based on YYYY or YYYYa with another author name after
+                    for cite in re.split(
+                        r"((?<=\d{4})|(?<=\d{4}[a-z]))[;,]\s*(?=[^\s\d])",
+                        text[i + 1 : ending.end() - 1],
+                    ):
                         for y in year_end_re.finditer(cite):
                             cites.append(year_end_re.sub("", cite) + ", " + y.group(1))
                     break
-            elif inline and text[i] == " " and text[i + 1] not in "([":
+            elif inline and text[i] in [" ", "\xa0"] and text[i + 1] not in "([":
                 first_tok = text[i + 1 : ending.end() - 1].split()[0]
                 first_word = first_tok.rstrip(".,;:")
                 if (
@@ -410,6 +414,9 @@ if __name__ == "__main__":
         <p>Cite as example (e.g., Gratia, 1999).</p>
         <p>Two authors cited inline, like Jadud and Dorn (2015).</p>
         <p>Abbrevation cite&nbsp;(<a href="#Xwords2022">DWYL, 2022</a>)</p>
+        <p>Comma-separated cites (Commaname et al., 1999, Othername et al., 1999)</p>
+        <p>Cites separated by nbsp (Ganapathy et al., 2011, El Asri et al., 2017)</p>
+        <p>Multi-year cites with commas (Commaname et al., 2002, 2003, Solo, 1999)</p>
         <h1>References</h1>
     """
     example_soup = bs4.BeautifulSoup(example_html + processed_refs_html, "html.parser")
