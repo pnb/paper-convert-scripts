@@ -8,4 +8,7 @@ def fix_et_al(html_str: str) -> str:
     Returns:
         str: Modified HTML string
     """
-    return html_str.replace("\xa0almbox .<span class='accentb'>:</span>mbox", " al.")
+    # First replace the version with a space after the last mbox, then without
+    return html_str.replace(
+        "\xa0almbox .<span class='accentb'>:</span>mbox ", " al."
+    ).replace("\xa0almbox .<span class='accentb'>:</span>mbox", " al.")
