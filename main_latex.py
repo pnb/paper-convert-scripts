@@ -146,6 +146,11 @@ for rule in css:
         if "#" in rule.selectorText:
             for elem in soup.select(rule.selectorText):
                 elem["style"] = rule.style.cssText + ";" + elem.get("style", "")
+                if elem.name == "col":
+                    if not elem.parent.find_previous_sibling("colgroup"):
+                        elem["style"] += "border-left:none;"
+                    if not elem.parent.find_next_sibling("colgroup"):
+                        elem["style"] += "border-right:none;"
 
 print("Removing unused IDs")
 texer.remove_unused_ids()
