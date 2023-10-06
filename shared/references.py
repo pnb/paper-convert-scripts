@@ -264,15 +264,16 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
     """
     cites = []
     text = text.replace("\n", " ")  # Remove newlines that can complicate parsing
-    text = re.sub(r"  +", " ", text)  # Collapse multiple spaces (easier parsing)
+    # Collapse multiple spaces (easier parsing) and unusual spaces (e.g., nbsp)
+    text = re.sub(r"\s+", " ", text)
     text = re.sub(  # Remove page/chapter/section numbers
         r",? ((pp|Ch|Sec)\. \d+(\d*[-\u2010-\u2015, ]+\d+)*|(p|Ch|Sec)\. \d+)\b",
         "",
         text,
     )
-    text = re.sub(r"([(\[])(e\.g\.|i\.e\.),?\s?", r"\1", text)  # Remove e.g., i.e.
+    text = re.sub(r"([(\[])(e\.g\.|i\.e\.),? ?", r"\1", text)  # Remove e.g., i.e.
     # Precompile expression for potential multi-year cites (Authors, 1999, 2000)
-    year_end_re = re.compile(r",\s*([12][0-9][0-9][0-9][a-z]?)(?=($|,))")
+    year_end_re = re.compile(r", *([12][0-9][0-9][0-9][a-z]?)(?=($|,))")
     # Look for "YYYY)" or "YYYY]...)", which should be at the end of every citation, I
     # think...
     for ending in re.finditer(r"[12][0-9][0-9][0-9][a-z]?(\)|](?=[^(]*\)))", text):
@@ -288,7 +289,7 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
                 else:
                     # Split based on YYYY or YYYYa with another author name after
                     for cite in re.split(
-                        r"((?<=\d{4})|(?<=\d{4}[a-z]))[;,]\s*(?=[^\s\d])",
+                        r"((?<=\d{4})|(?<=\d{4}[a-z]))[;,] *(?=[^ \d])",
                         text[i + 1 : ending.end() - 1],
                     ):
                         for y in year_end_re.finditer(cite):
