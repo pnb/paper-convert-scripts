@@ -304,6 +304,22 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
     return cites
 
 
+def mark_up_citations(soup: bs4.BeautifulSoup, input_template: str) -> None:
+    """Add useful semantic information to the in-text citations. Currently, this
+    consists only of adding a "citation" CSS class for JEDM Tex citations, but in the
+    future it could include other templates and maybe adding links for citations that
+    don't have them (especially DOCX).
+
+    Args:
+        soup (bs4.BeautifulSoup): Soup to modify
+        input_template (str): Expected document (and thus citation) format
+    """
+    if input_template == "JEDM":
+        for a in soup.find_all("a", attrs={"href": True}):
+            if a["href"].startswith("#X"):
+                a["class"] = a.get("class", []) + ["citation"]
+
+
 if __name__ == "__main__":
     processed_refs_html = """<ol>
         <li><span class="ReferenceAuthor">Ablamowicz, R. and Fauser, B.</span>. 2007.

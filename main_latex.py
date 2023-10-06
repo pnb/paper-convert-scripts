@@ -135,6 +135,7 @@ print("Formatting fonts")
 texer.fix_fonts()
 print("Parsing references")
 texer.fix_references()
+shared.mark_up_citations(texer.soup, args.template)
 
 # Inline any styles made by ID
 print("Inlining styles selected by ID")
