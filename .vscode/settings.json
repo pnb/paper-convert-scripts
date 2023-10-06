@@ -12,6 +12,7 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "ms-python.black-formatter",
     "[html]": {
-        "editor.defaultFormatter": "vscode.html-language-features"
+        "editor.defaultFormatter": "vscode.html-language-features",
+        "editor.formatOnSave": false
     }
 }
