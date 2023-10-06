@@ -126,11 +126,11 @@ def check_styles(
         warn("style_paper_title", tex=tex)
     if not soup.find("h1", attrs={"class": lambda x: x and "KeywordsHeading" in x}):
         warn("style_keywords_heading", tex=tex)
+    if not soup.find("div", attrs={"class": lambda x: x and "Keywords" in x}):
+        warn("style_keywords", tex=tex)
     if input_template == "EDM":
         if not soup.find("h1", attrs={"class": lambda x: x and "AbstractHeading" in x}):
             warn("style_abstract_heading", tex=tex)
-        if not soup.find("div", attrs={"class": lambda x: x and "Keywords" in x}):
-            warn("style_keywords", tex=tex)
     authors = soup.find_all("div", attrs={"class": lambda x: x and "Author" in x})
     num_affil = len(
         soup.find_all("div", attrs={"class": lambda x: x and "Affiliations" in x})
