@@ -24,7 +24,8 @@ def add_headings(texer: TeXHandler) -> None:
         # JEDM keywords
         for keywords_candidate in texer.soup.select("span.ptmb7t-x-x-109"):
             if keywords_candidate.get_text(strip=True) == "Keywords:":
-                keywords_candidate["class"] = "KeywordsHeading"
+                keywords_candidate.name = "h1"
+                keywords_candidate["class"] = ["KeywordsHeading", "not-numbered"]
                 keywords_candidate.string.replace_with("Keywords")
                 keywords_candidate.find_next_sibling("span")["class"] = "Keywords"
                 keywords_candidate.find_next_sibling("span").name = "div"
