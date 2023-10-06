@@ -281,7 +281,19 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
         # Account for non-capitalized names (e.g., van Dijk), et al., ;, etc.
         inline = False
         for i in range(ending.end() - 1, -1, -1):
-            if text[i] in "([":
+            if inline and text[i] in " (" and text[i + 1] not in "([":
+                first_tok = text[i + 1 : ending.end() - 1].split()[0]
+                first_word = first_tok.rstrip(".,;:")
+                if text[i] == "(" or (
+                    first_word == first_word.lower()
+                    and first_word not in lc_name_words
+                    and first_word not in ["et", "al", "&", "and"]
+                ):
+                    offset = 1 if text[i] == "(" else len(first_tok) + 2
+                    ref = text[i + offset : ending.end() - 1]
+                    cites.append(ref.replace(" (", ", ").replace(" [", ", "))
+                    break
+            elif text[i] in "([":
                 if text[i + 1] in "0123456789":
                     # Matches (YYYY; YYYYb, pp. A-B, etc.) without author names
                     # Keep backtracking until we find likely start of author names
@@ -294,17 +306,6 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
                     ):
                         for y in year_end_re.finditer(cite):
                             cites.append(year_end_re.sub("", cite) + ", " + y.group(1))
-                    break
-            elif inline and text[i] in [" ", "\xa0"] and text[i + 1] not in "([":
-                first_tok = text[i + 1 : ending.end() - 1].split()[0]
-                first_word = first_tok.rstrip(".,;:")
-                if (
-                    first_word == first_word.lower()
-                    and first_word not in lc_name_words
-                    and first_word not in ["et", "al", "&", "and"]
-                ):
-                    ref = text[i + len(first_tok) + 2 : ending.end() - 1]
-                    cites.append(ref.replace(" (", ", ").replace(" [", ", "))
                     break
     return cites
 
@@ -396,6 +397,7 @@ if __name__ == "__main__":
         )
 
     example_html = """
+        <p>Parse nested parentheses (e.g. Jadud and Dorn (2015)).</p>
         <p>See, for example, Namington et al. (1999).</p>
         <p>Here is a claim (Supporting Author, Another, 1999).</p>
         <p>More complex (Author A, et al., 1999a; Ablamowicz and Fauser, 2007)</p>
