@@ -10,7 +10,9 @@ def add_authors(texer: TeXHandler) -> None:
     """
     if texer.input_template == "JEDM":
         author_containers = []
-        for email_candidate in texer.soup.select("span.phvr7t-x-x-109"):
+        for email_candidate in texer.soup.select(
+            "span.phvr7t-x-x-109, span.phvr7t-x-x-120"
+        ):
             if "@" in email_candidate.get_text():
                 author_containers.append(
                     email_candidate.find_parent("div", attrs={"class": "tabular"})
