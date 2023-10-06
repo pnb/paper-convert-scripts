@@ -35,6 +35,10 @@ def add_headings(texer: TeXHandler) -> None:
                 keywords_candidate.find_next_sibling("span")["class"] = "Keywords"
                 keywords_candidate.find_next_sibling("span").name = "div"
                 break
+        if found:
+            for p in abstract_candidate.parent.find_next_siblings("p", limit=5):
+                if p.get_text(strip=True).startswith("_" * 87):
+                    p.contents[0] = ""
     # (Sub)section headings
     heading_fonts = [
         "ptmb8t-x-x-120",
