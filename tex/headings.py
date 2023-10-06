@@ -20,6 +20,11 @@ def add_headings(texer: TeXHandler) -> None:
                     elem.extract()
                     found = True
             if found:
+                abstract_heading = texer.soup.new_tag(
+                    "h1", attrs={"class": ["AbstractHeading", "not-numbered"]}
+                )
+                abstract_heading.string = "Abstract"
+                abstract_candidate.insert_before(abstract_heading)
                 break
         # JEDM keywords
         for keywords_candidate in texer.soup.select("span.ptmb7t-x-x-109"):
