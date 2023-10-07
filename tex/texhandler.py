@@ -45,6 +45,19 @@ class TeXHandler:
                 cur_elem = cur_elem.parent
             top_parent.decompose()
 
+        # Remove extra space added after some internal cross-references
+        for a in soup.find_all("a"):
+            # Need to get next 2 siblings and conccat the text, since it could be like
+            # " . whatever" or " <span>.</span>"
+            if re.match(r"^[a-zA-Z0-9.-]+$", a.get_text()):
+                next_text = ""
+                if isinstance(a.next_sibling, bs4.NavigableString):
+                    next_text += a.next_sibling.get_text()
+                    if a.next_sibling.next_sibling:
+                        next_text += a.next_sibling.next_sibling.get_text()
+                    if re.match(r" [.):?!,].*", next_text):
+                        a.next_sibling.replace_with(a.next_sibling[1:])
+
     def tex_line_num(self, soup_elem: bs4.Tag) -> int:
         """Get the line number of LaTeX code corresponding to a BeautifulSoup element
         (1-indexed). This works by using the comments make4ht adds to the soup, which
