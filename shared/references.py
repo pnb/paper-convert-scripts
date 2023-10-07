@@ -204,6 +204,8 @@ def get_citations(
     heading = get_elem_containing_text(soup_copy, "h1", "references", True)
     if heading:
         for elem in heading.find_all_next():
+            if elem.name == "div" and "footnotes" in elem.get("class", []):
+                break  # Stop deleting at footnotes
             elem.clear()  # Delete everything in references to avoid confusion
     text = soup_copy.get_text()
     if input_template == "JEDM":  # APA-ish
