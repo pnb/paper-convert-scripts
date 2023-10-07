@@ -2,7 +2,7 @@ import re
 
 import bs4
 
-from . import TeXHandler
+from . import TeXHandler, tables
 from make4ht_utils import get_command_content
 from shared import validate_alt_text, set_img_class
 
@@ -76,6 +76,18 @@ def _fix_figure_text(texer: TeXHandler, figure: bs4.Tag) -> None:
         caption_remnant.decompose()
 
 
+def _format_tabular_figures(texer: TeXHandler) -> None:
+    """Handle cases with \\begin{figure}\\begin{tabular}..."""
+    for tabular in texer.soup.select("div.figure > div.tabular"):
+        for table in tabular.find_all("table"):
+            tables.format_one_table(texer, table)
+        tabular.parent.name = "figure"
+        tabular.parent["class"] = ["table-as-figure"]
+        caption = tabular.parent.find("span", string=re.compile(r"Figure\s+\d+[:\.].*"))
+        if caption:
+            caption.name = "figcaption"
+
+
 def format_figures(texer: TeXHandler) -> None:
     """Parse alt text from LaTeX and add it to figures, merge subfigures into a parent
     <figure> element, set image sizes, and do any other minor adjustments needed for
@@ -144,6 +156,8 @@ def format_figures(texer: TeXHandler) -> None:
         if "figure*" in texer.tex_lines[env_start] and len(parent.find_all("img")) == 1:
             width_in = 5  # Assume large for a "figure*" environment with 1 image
         set_img_class(img, width_in)
+
+    _format_tabular_figures(texer)
 
 
 def format_listings(texer: TeXHandler) -> None:

@@ -134,6 +134,19 @@ def format_one_table(texer: TeXHandler, table: bs4.Tag) -> None:
             prev_cell = elem.find_previous_sibling(["th", "td"])
             if prev_cell:
                 prev_cell.append(elem)
+    # Check if we're left with one row, which should not be a header
+    final_rows = table.find_all("tr")
+    if len(final_rows) == 1 and final_rows[0].parent.name == "thead":
+        final_rows[0].parent.unwrap()
+        for th in final_rows[0].find_all("th"):
+            th.name = "td"
+    # Remove blank lines at the end of <pre> in tables
+    for pre in table.find_all("pre"):
+        for content in reversed(pre.contents):
+            if not content.get_text(strip=True):
+                content.replace_with("")
+            else:
+                break  # Reached real content
 
 
 def add_tablenotes(texer: TeXHandler) -> None:
