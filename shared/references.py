@@ -120,6 +120,8 @@ def check_citations_vs_references(
         "volume",
     ]  # "issue" is false alarming too much
     for i, ref_dict in enumerate(refs, start=1):
+        if "pages" not in ref_dict and len(ref_dict["date"]) > 1:
+            ref_dict["pages"] = ref_dict["date"][1:]  # Misdetected pages as dates
         reqs = set(ref_requirements[ref_dict["type"]])
         missing_reqs = reqs.difference(set(ref_dict.keys()))
         if len(missing_reqs) > 0:
