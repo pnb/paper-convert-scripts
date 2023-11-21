@@ -44,16 +44,23 @@ def check_citations_vs_references(
         mismatched = []
         for cite_i, cite in enumerate(cites):
             for ref_i, ref in enumerate(refs):
-                if "date" not in ref or ref["date"][0][:4] != cite.split()[-1][:4]:
+                if "date" not in ref:
+                    ref["date"] = ["XXXX"]  # n.d. citations sometimes
+                if ref["date"][0][:4] != cite.split()[-1][:4]:
                     continue  # Year mismatch, ignoring disambiguation a/b/etc.
                 if "author" not in ref:
-                    continue
+                    if "publisher" in ref:  # Maybe misdetected as publisher (e.g., ISU)
+                        ref["author"] = [{"family": ref["publisher"][0]}]
+                    else:
+                        continue
                 # Check if each author in the reference appears in the citation
                 author_matches = []
                 for a in ref["author"]:
                     if "others" in a and a["others"]:
                         continue  # 25+ authors have "...", which parses as this
                     name = a["family"] if "family" in a else a["given"]
+                    if name == "n.d" and "given" in a:
+                        name = a["given"]  # Misdetected n.d. as name
                     matches = re.search(r"\b" + re.escape(name) + r"\b", cite)
                     if not matches and re.match(r"([A-Z]\.)+", name):
                         name = name.replace(".", "")  # A.C.M.E. => ACME
@@ -275,10 +282,12 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
     )
     text = re.sub(r"([(\[])(e\.g\.|i\.e\.),? ?", r"\1", text)  # Remove e.g., i.e.
     # Precompile expression for potential multi-year cites (Authors, 1999, 2000)
-    year_end_re = re.compile(r", *([12][0-9][0-9][0-9][a-z]?)(?=($|,))")
+    year_end_re = re.compile(r",? *([12][0-9][0-9][0-9][a-z]?| nd)(?=($|,))")
     # Look for "YYYY)" or "YYYY]...)", which should be at the end of every citation, I
     # think...
-    for ending in re.finditer(r"[12][0-9][0-9][0-9][a-z]?(\)|](?=[^(]*\)))", text):
+    for ending in re.finditer(
+        r"([12][0-9][0-9][0-9][a-z]?| nd)(\)|](?=[^(]*\)))", text
+    ):
         # Then backtrack to figure out where the citing begins, then split multiple
         # Account for non-capitalized names (e.g., van Dijk), et al., ;, etc.
         inline = False
@@ -307,7 +316,8 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
                         text[i + 1 : ending.end() - 1],
                     ):
                         for y in year_end_re.finditer(cite):
-                            cites.append(year_end_re.sub("", cite) + ", " + y.group(1))
+                            year = "XXXX" if y.group(1) == " nd" else y.group(1)
+                            cites.append(year_end_re.sub("", cite) + ", " + year)
                     break
     return cites
 
@@ -374,6 +384,9 @@ if __name__ == "__main__":
             words_alpha.txt</span></a>
             <span class="ptmr7t-x-x-109">(accessed 14 April, 2022).</span>
         </li>
+        <li>Imaginary State University. n.d. Programs at ISU.
+            https://imagistate.edu/programs/ Accessed: 1998-01-17.
+        </li>
     </ol>
     <h1>Appendix</h1>
     <ol><li>List item in appendix</li></ol>
@@ -399,6 +412,9 @@ if __name__ == "__main__":
         )
 
     example_html = """
+        <p>No date (Imaginary State University, nd)</p>
+        <p>Possibly confusing non-cite ending with nd (here is the end)</p> 
+        <p>No comma after author like with \\citeNP (e.g., Adebeyo 2008)</p>
         <p>Parse nested parentheses (e.g. Jadud and Dorn (2015)).</p>
         <p>See, for example, Namington et al. (1999).</p>
         <p>Here is a claim (Supporting Author, Another, 1999).</p>

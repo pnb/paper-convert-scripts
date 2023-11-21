@@ -249,6 +249,7 @@ class TeXHandler:
                     not isinstance(elem, bs4.NavigableString)
                     and elem.name == "a"
                     and not elem.get_text()
+                    and cur_li.get_text(strip=True)
                 ):
                     cur_li = self.soup.new_tag("li")
                     ref_section.insert(0, cur_li)
