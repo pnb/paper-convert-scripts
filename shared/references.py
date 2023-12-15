@@ -58,7 +58,7 @@ def check_citations_vs_references(
                 for a in ref["author"]:
                     if "others" in a and a["others"]:
                         continue  # 25+ authors have "...", which parses as this
-                    name = a["family"] if "family" in a else a["given"]
+                    name = a.get("family", a.get("given", ""))
                     if name == "n.d" and "given" in a:
                         name = a["given"]  # Misdetected n.d. as name
                     matches = re.search(r"\b" + re.escape(name) + r"\b", cite)
