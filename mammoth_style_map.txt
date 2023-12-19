@@ -14,7 +14,7 @@ p[style-name='Code'] => pre > code:separator('\n')
 p[style-name='MainTitle'] => div.Paper-Title
 p[style-name='Institution'] => div.Affiliations:fresh
 p[style-name='Abstract'] => p.Abstract
-p[style-name='Nth paragraph (not first)'] => p.NotFirst
+p[style-name='Nth paragraph (not first)'] => p.NotFirst:fresh
 p[style-name='Reference section'] => h1
 p[style-name='Reference item'] => p.ReferenceItem:fresh
 p[style-name='Bibliography'] => p.ReferenceItem:fresh
