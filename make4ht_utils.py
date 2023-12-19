@@ -8,7 +8,9 @@ import hashlib
 from shared.shared_utils import warn_tex as warn
 
 
-def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
+def get_raw_tex_contents(
+    source_zip_path: str, extracted_dir: str, main_tex_fname: str = "main.tex"
+) -> str:
     """Return the LaTeX contents of a source zip file as a string. Assumes there is only
     1 .tex file, or that there is a file called main.tex. If the zip file root contains
     only one item that is a folder, that folder will be treated as the root. Makes a few
@@ -18,6 +20,7 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
     Args:
         source_zip_path (str): Path to LaTeX .zip file
         extracted_dir (str): Path to a directory where the zip file should be extracted
+        main_tex_fname (str): Name of main .tex file (default main.tex or auto-detect)
 
     Returns:
         str: LaTeX contents
@@ -63,8 +66,8 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
     ]
     if len(tex_files) == 1:
         tex_fname = tex_files[0]
-    elif "main.tex" in tex_files:
-        tex_fname = "main.tex"
+    elif main_tex_fname in tex_files:
+        tex_fname = main_tex_fname
     elif len(tex_files):
         tex_fname = tex_files[0]
         warn("ambiguous_tex_file", "Using first file: " + tex_fname)

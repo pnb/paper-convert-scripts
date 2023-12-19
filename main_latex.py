@@ -33,6 +33,9 @@ ap.add_argument(
 ap.add_argument(
     "--template", help="Name of expected template (e.g., JEDM)", default="EDM"
 )
+ap.add_argument(
+    "--main-tex", default="main.tex", help="Name of main .tex file (default main.tex)"
+)
 args = ap.parse_args()
 
 print("Creating output folder")
@@ -56,7 +59,9 @@ if args.skip_extract:
     with open(os.path.join(extracted_dir, "tmp-make4ht.tex")) as infile:
         texstr = infile.read()
 else:
-    texstr = make4ht_utils.get_raw_tex_contents(args.source_file_path, extracted_dir)
+    texstr = make4ht_utils.get_raw_tex_contents(
+        args.source_file_path, extracted_dir, args.main_tex
+    )
     with open(os.path.join(extracted_dir, "tmp-make4ht.tex"), "w") as ofile:
         ofile.write(texstr)
 
