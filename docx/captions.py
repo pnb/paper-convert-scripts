@@ -11,7 +11,7 @@ def process_captions(mp: MammothParser) -> None:
     move the caption elements inside the <table> or <figure> element where they should
     be.
     """
-    caption_regex = re.compile(r"\s*(Figure|Fig\.|Table)\s+(.)")
+    caption_regex = re.compile(r"^\s*(Figure|Fig\.|Table)\s+(\d+)?")
     figure_counter = 0
     table_counter = 0
     for elem in mp.soup.find_all("caption"):
@@ -86,12 +86,9 @@ def process_captions(mp: MammothParser) -> None:
                 br.decompose()
             new_fig.append(elem)
         # Number figures and tables if the numbers have gotten dropped
-        if match and not match.group(2).isdigit():
+        if match and not match.group(2):
             txt = elem.find(string=caption_regex)
-            suffix = "." if match.group(2) == "." else ". " + match.group(2)
-            numbered_txt = re.sub(
-                caption_regex, r"\1 " + str(new_num) + suffix, txt, count=1
-            )
+            numbered_txt = re.sub(caption_regex, r"\1 " + str(new_num), txt, count=1)
             txt.replace_with(numbered_txt)
         elif match:
             punc = ":" if mp.input_template == "JEDM" else "."
