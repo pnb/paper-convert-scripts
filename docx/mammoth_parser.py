@@ -431,6 +431,8 @@ class MammothParser:
             if not elem.get_text(strip=True):
                 elem.decompose()
             elif "Affiliations" in elem["class"]:  # Check if email needs to be parsed
+                for a in elem.select("a"):  # Remove any email hrefs
+                    a.unwrap()
                 for content in elem.contents[:]:
                     if isinstance(content, bs4.NavigableString):
                         parts = EMAIL_REGEX.split(content)
@@ -438,12 +440,11 @@ class MammothParser:
                             new_parts = []
                             for part in parts:
                                 if EMAIL_REGEX.match(part):
-                                    new_parts.append(
-                                        self.soup.new_tag(
-                                            "div", attrs={"class": "E-Mail"}
-                                        )
+                                    new_email = self.soup.new_tag(
+                                        "div", attrs={"class": "E-Mail"}
                                     )
-                                    new_parts[-1].string = part
+                                    new_email.string = part
+                                    elem.insert_after(new_email)
                                 elif len(part):
                                     new_parts.append(self.soup.new_string(part))
                             content.replace_with(*new_parts)
