@@ -331,7 +331,7 @@ def save_soup(soup: bs4.BeautifulSoup, output_filename: str) -> None:
         + """</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="../edm2022.css" />
+        <link rel="stylesheet" type="text/css" href="../iedms.css" />
         <script src="../table_sizer.js" defer />
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
         <script>
