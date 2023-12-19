@@ -24,8 +24,12 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
     """
 
     def _load_tex_str(source_tex_filename: str):
-        with open(source_tex_filename, errors="replace") as infile:
-            raw_tex = infile.read()
+        try:
+            with open(source_tex_filename, errors="replace") as infile:
+                raw_tex = infile.read()
+        except FileNotFoundError:  # Maybe file specified without extension
+            with open(source_tex_filename + ".tex", errors="replace") as infile:
+                raw_tex = infile.read()
         # Remove lines starting with %; replace with single % to avoid introducing a <p>
         raw_tex = re.sub(r"([^\\]%).*$", r"\1", raw_tex, flags=re.MULTILINE)
         # Remove \titlenote{}, which make4ht handles poorly so far
@@ -76,8 +80,6 @@ def get_raw_tex_contents(source_zip_path: str, extracted_dir: str) -> str:
         if not match:
             break
         input_fname = match.group(1)
-        if not input_fname.lower().endswith(".tex"):
-            input_fname += ".tex"
         print("Including \\input file:", input_fname)
         extra_tex_str = _load_tex_str(os.path.join(extracted_dir, input_fname))
         tex_str = tex_str[: match.start()] + extra_tex_str + tex_str[match.end() :]
