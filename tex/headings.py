@@ -14,18 +14,15 @@ def add_headings(texer: TeXHandler) -> None:
     if texer.input_template == "JEDM":
         # JEDM line-delimited abstract (not really a heading)
         for abstract_candidate in texer.soup.select("span.ptmr7t-x-x-109"):
-            found = False
-            for elem in abstract_candidate.parent.contents:
-                if elem.get_text(strip=True).startswith("_" * 87):
-                    elem.extract()
-                    found = True
-            if found:
-                abstract_heading = texer.soup.new_tag(
-                    "h1", attrs={"class": ["AbstractHeading", "not-numbered"]}
-                )
-                abstract_heading.string = "Abstract"
-                abstract_candidate.insert_before(abstract_heading)
-                break
+            for line_elem in abstract_candidate.parent.contents:
+                if line_elem.get_text(strip=True).startswith("_" * 87):
+                    abstract_heading = texer.soup.new_tag(
+                        "h1", attrs={"class": ["AbstractHeading", "not-numbered"]}
+                    )
+                    abstract_heading.string = "Abstract"
+                    line_elem.insert_before(abstract_heading)
+                    line_elem.extract()
+                    break
         # JEDM keywords
         for keywords_candidate in texer.soup.select("span.ptmb7t-x-x-109"):
             if keywords_candidate.get_text(strip=True) == "Keywords:":
@@ -34,11 +31,6 @@ def add_headings(texer: TeXHandler) -> None:
                 keywords_candidate.string.replace_with("Keywords")
                 keywords_candidate.find_next_sibling("span")["class"] = "Keywords"
                 keywords_candidate.find_next_sibling("span").name = "div"
-                break
-        if found:
-            for p in abstract_candidate.parent.find_next_siblings("p", limit=5):
-                if p.get_text(strip=True).startswith("_" * 87):
-                    p.contents[0] = ""
     # (Sub)section headings
     heading_fonts = [
         "ptmb8t-x-x-120",
