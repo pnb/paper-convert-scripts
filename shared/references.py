@@ -282,7 +282,9 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
         "",
         text,
     )
-    text = re.sub(r"([(\[])(e\.g\.|i\.e\.),? ?", r"\1", text)  # Remove e.g., i.e.
+    text = re.sub(
+        r"(e\.g\.|i\.e\.|,? ?for example),? ?", "", text
+    )  # Remove e.g., i.e., for example
     # Precompile expression for potential multi-year cites (Authors, 1999, 2000)
     year_end_re = re.compile(r",? *([12][0-9][0-9][0-9][a-z]?| nd)(?=($|,))")
     # Look for "YYYY)" or "YYYY]...)", which should be at the end of every citation, I
