@@ -146,6 +146,10 @@
             "message": "Wingdings should not be used",
             "help": "Wingdings is not a good choice for typographical symbols because it is semantically meaningless. For example, a Wingdings right arrow is really the \"à\" character, which might hinder interpretation by people using screen readers or who do not have Wingdings installed. In most cases there is a <a href=\"https://unicode.org/charts/\">suitable Unicode symbol</a>, which can be pasted as plain text into your document."
         },
+        "url_schema": {
+            "message": "Missing or unexpected URI/URL schema",
+            "help": "If a link is missing the URI schema (e.g., \"https://\") it may not work. For example, a link to \"example.com\" without \"https//\" may link to a non-existent \"file:///example.com\" on some PDF viewers and browsers."
+        },
         "alt_text_missing": {
             "message": "Missing alt text for image",
             "help": "Follow the instructions in the template for adding alt text to images. Every image needs alt text to ensure the paper can be understood by people using screen reader software. Additionally, alt text is used by the HTML conversion program to identify each image, so alt text must be unique for each image; things like image sizes may be wrong otherwise.",

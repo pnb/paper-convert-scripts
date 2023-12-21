@@ -162,6 +162,11 @@ def check_styles(
         string=["??", "Error! Reference source not found."]
     ):
         warn("broken_internal_ref", 'Text: "' + broken_ref + '"', tex)
+    # Check URL schemas
+    for a in soup.find_all("a"):
+        schemas = ["#", "http://", "https://"]
+        if a.has_attr("href") and not any(a["href"].startswith(x) for x in schemas):
+            warn("url_schema", a['href'])
 
 
 def check_alt_text_duplicates(soup: bs4.BeautifulSoup, tex: bool = False) -> None:
