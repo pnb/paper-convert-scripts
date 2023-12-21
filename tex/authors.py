@@ -17,6 +17,12 @@ def add_authors(texer: TeXHandler) -> None:
                 author_containers.append(
                     email_candidate.find_parent("div", attrs={"class": "tabular"})
                 )
+        if not len(author_containers):
+            print("No emails found; falling back to less precise author finding")
+            for name_candidate in texer.soup.select("span.phvr7t-x-x-144"):
+                tabular = name_candidate.find_parent("div", attrs={"class": "tabular"})
+                if tabular not in author_containers:
+                    author_containers.append(tabular)
         if len(author_containers):
             container = texer.soup.new_tag("div", attrs={"class": "center"})
             author_containers[0].insert_before(container)
