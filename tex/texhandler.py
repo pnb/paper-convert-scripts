@@ -91,8 +91,7 @@ class TeXHandler:
             int: Line number, or starting line number if the image was not found
         """
         prefix = re.sub(r".*/", "", fname.lower())
-        prefix = re.sub(r"\.[^.]+$", "", prefix)
-        prefix = prefix.rstrip("-")  # SVG conversion adds this for some reason
+        prefix = re.sub(r"(-\d*)?\.[^.]+$", "", prefix)  # -x.svg and ext removal
         fname_regex = re.compile(r"[^{}]*\b" + prefix + r"[.}]")
         for i in range(starting_line_num - 1, len(self.tex_lines)):
             curline = self.tex_lines[i].lower()
