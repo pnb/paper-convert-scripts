@@ -145,8 +145,11 @@ def format_figures(texer: TeXHandler) -> None:
         # Set image size class
         if img.has_attr("height"):
             del img["height"]  # Fixes width/height proportions; width is more important
-        if "scale=" in texer.tex_lines[img_text_line_num - 1] and img.has_attr("width"):
-            del img["width"]  # Using scale= leads to tiny width, so we have to skip it
+        if img.has_attr("width") and (
+            "scale=" in texer.tex_lines[img_text_line_num - 1]
+            or "\\unitlength" in texer.tex_lines[img_text_line_num - 1]
+        ):
+            del img["width"]  # Some things lead to tiny width, so we have to skip it
         width_in = 3  # Assume medium-ish for "figure" environment
         if img.has_attr("width"):
             width_in = int(img["width"]) / 72
