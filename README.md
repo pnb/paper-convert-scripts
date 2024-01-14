@@ -6,7 +6,18 @@ Required Python packages are specified in `conda_env.yml`. The Python environmen
 
 To install the environment, run:
 
-    conda env create -f conda_env.yml
+    conda env create -f conda_env.yml  # If this gets OOM-killed, see below
+
+On machines with limited RAM such as small cloud servers, the out-of-memory killer may stop the conda environment creation with a "Killed" message. If so, add swap space:
+
+```bash
+sudo fallocate -l 1G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+sudo cp /etc/fstab ~/fstab-backup
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+```
 
 This will create a new conda environment called `paper_convert` with the required packages installed.
 
