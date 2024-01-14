@@ -43,7 +43,7 @@ def add_headings(texer: TeXHandler) -> None:
         h = h_text.parent
         if h.name == "p":  # Otherwise already handled (abstract, etc.)
             h["class"] = "not-numbered"
-            num_text = h_text.get_text().strip()
+            num_text = h_text.get_text().strip().split()[0]
             if (
                 "ptmb8t-x-x-120" in h_text["class"]
                 or "phvrc7t-x-x-144" in h_text["class"]
