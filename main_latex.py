@@ -31,9 +31,6 @@ ap.add_argument(
     help="Skip extraction; useful for modifying Tex sources during debugging",
 )
 ap.add_argument(
-    "--template", help="Name of expected template (e.g., JEDM)", default="EDM"
-)
-ap.add_argument(
     "--main-tex", default="main.tex", help="Name of main .tex file (default main.tex)"
 )
 args = ap.parse_args()
@@ -67,11 +64,19 @@ else:
 
 bib_backend = make4ht_utils.get_bib_backend(texstr)
 
-if args.template == "EDM":
+template_name = "unknown"
+if os.path.exists(os.path.join(extracted_dir, "edm_article.cls")):
+    template_name = "EDM"
     make4ht_utils.check_file_hash(
         os.path.join(extracted_dir, "edm_article.cls"),
         "7efa88c45209f518695575100a433dca2e32f7a02d3d237e9f4c5bd1cb1c3553",
     )
+elif os.path.exists(os.path.join(extracted_dir, "jedm.cls")):
+    template_name = "JEDM"
+else:
+    shared.warn("template_not_detected", tex=True)
+    exit()
+print("Detected template:", template_name)
 
 if not args.skip_compile:
     print("Converting via make4ht")
@@ -117,7 +122,7 @@ with open(os.path.join(extracted_dir, "tmp-make4ht.html")) as infile:
     html_str = tex.fix_et_al(infile.read())
     soup = BeautifulSoup(html_str, "html.parser")
 
-texer = tex.TeXHandler(texstr, soup, args.template)
+texer = tex.TeXHandler(texstr, soup, template_name)
 print("Parsing headings")
 tex.add_headings(texer)
 print("Parsing authors")
@@ -141,7 +146,7 @@ print("Formatting fonts")
 texer.fix_fonts()
 print("Parsing references")
 texer.fix_references()
-shared.mark_up_citations(texer.soup, args.template)
+shared.mark_up_citations(texer.soup, template_name)
 
 # Inline any styles made by ID
 print("Inlining styles selected by ID")
@@ -162,9 +167,9 @@ print("Removing unused IDs")
 texer.remove_unused_ids()
 
 print("Checking styles")
-shared.check_styles(soup, args.output_dir, args.template, tex=True)
+shared.check_styles(soup, args.output_dir, template_name, tex=True)
 shared.check_citations_vs_references(
-    soup, args.output_dir, shared.CONFIG["anystyle_path"], args.template, tex=True
+    soup, args.output_dir, shared.CONFIG["anystyle_path"], template_name, tex=True
 )
 
 # Save result
