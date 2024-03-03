@@ -11,9 +11,6 @@ import shared
 ap = argparse.ArgumentParser(description="Convert .docx to HTML")
 ap.add_argument("source_file_path", help="Path to the source .docx file")
 ap.add_argument("output_dir", help="Path to output folder (will be created if needed)")
-ap.add_argument(
-    "--template", help="Name of expected template (e.g., JEDM)", default="EDM"
-)
 args = ap.parse_args()
 
 print("Creating output folder")
@@ -29,10 +26,19 @@ html = pypandoc.convert_file(
     args.source_file_path, to="html5", format="docx+styles", extra_args=["--mathml"]
 )
 pandoc_soup = BeautifulSoup(html, "html.parser")
+template_name = "unknown"
+if pandoc_soup.find("div", attrs={"data-custom-style": "Paper-Title"}):
+    template_name = "EDM"
+elif pandoc_soup.find("div", attrs={"data-custom-style": "MainTitle"}):
+    template_name = "JEDM"
+else:
+    shared.warn("template_not_detected", tex=True)
+    exit()
+print("Detected template:", template_name)
 
 # Now convert via Mammoth, which handles a couple things better than Pandoc; we will
-# Frankenstein some Pandoc things in later using BeautifulSoup.
-docx_conv = docx.MammothParser(args.source_file_path, args.output_dir, args.template)
+# Frankenstein some Pandoc things in later using BeautifulSoup
+docx_conv = docx.MammothParser(args.source_file_path, args.output_dir, template_name)
 
 print("Formatting authors")
 docx_conv.format_authors()
@@ -60,12 +66,12 @@ print("Formatting references")
 docx_conv.fix_references()
 print("Checking styles")
 docx.fix_jedm_frontmatter(docx_conv)
-shared.check_styles(docx_conv.soup, args.output_dir, args.template, tex=False)
+shared.check_styles(docx_conv.soup, args.output_dir, template_name, tex=False)
 shared.check_citations_vs_references(
     docx_conv.soup,
     args.output_dir,
     shared.CONFIG["anystyle_path"],
-    args.template,
+    template_name,
     tex=False,
 )
 
