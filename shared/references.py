@@ -290,7 +290,7 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
     # Look for "YYYY)" or "YYYY]...)", which should be at the end of every citation, I
     # think...
     for ending in re.finditer(
-        r"(\b[12][0-9][0-9][0-9][a-z]?| nd)(\)|](?=[^(]*\)))", text
+        r"((\s|\(|\[)[12][0-9][0-9][0-9][a-z]?| nd| et al., )(\)|](?=[^(]*\)))", text
     ):
         # Then backtrack to figure out where the citing begins, then split multiple
         # Account for non-capitalized names (e.g., van Dijk), et al., ;, etc.
