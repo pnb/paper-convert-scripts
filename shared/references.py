@@ -53,12 +53,6 @@ def check_citations_vs_references(
                         ref["author"] = [{"family": ref["publisher"][0]}]
                     else:
                         continue
-                if "pages" not in ref and "note" in ref:
-                    maybe_pages = re.search(r"(\d+[-–]\d+)\.$", ref["note"][0])
-                    if maybe_pages:
-                        ref["pages"] = maybe_pages.group(1)
-                if "publisher" not in ref and len(ref.get("container-title", [])) > 1:
-                    ref["publisher"] = ref["container-title"][1]
                 # Check if each author in the reference appears in the citation
                 author_matches = []
                 for a in ref["author"]:
@@ -128,6 +122,12 @@ def check_citations_vs_references(
     for i, ref_dict in enumerate(refs, start=1):
         if "pages" not in ref_dict and len(ref_dict.get("date", [])) > 1:
             ref_dict["pages"] = ref_dict["date"][1:]  # Misdetected pages as dates
+        if "pages" not in ref_dict and "note" in ref_dict:  # Pages as note
+            maybe_pages = re.search(r"(\d+[-–]\d+)\.$", ref_dict["note"][0])
+            if maybe_pages:
+                ref_dict["pages"] = maybe_pages.group(1)
+        if "publisher" not in ref_dict and len(ref_dict.get("container-title", [])) > 1:
+            ref_dict["publisher"] = ref_dict["container-title"][1]  # Publisher as title
         reqs = set(ref_requirements[ref_dict["type"]])
         missing_reqs = reqs.difference(set(ref_dict.keys()))
         if len(missing_reqs) > 0:
