@@ -53,6 +53,10 @@ def check_citations_vs_references(
                         ref["author"] = [{"family": ref["publisher"][0]}]
                     else:
                         continue
+                if "pages" not in ref and "note" in ref:
+                    maybe_pages = re.search(r"(\d+[-–]\d+)\.$", ref["note"][0])
+                    if maybe_pages:
+                        ref["pages"] = maybe_pages.group(1)
                 # Check if each author in the reference appears in the citation
                 author_matches = []
                 for a in ref["author"]:
