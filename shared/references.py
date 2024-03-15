@@ -128,6 +128,11 @@ def check_citations_vs_references(
                 ref_dict["pages"] = maybe_pages.group(1)
         if "publisher" not in ref_dict and len(ref_dict.get("container-title", [])) > 1:
             ref_dict["publisher"] = ref_dict["container-title"][1]  # Publisher as title
+        if "orkshop" in ref_dict.get("container-title", [""])[0]:
+            # Don't check workshops strictly as they often lack publisher info
+            for wskey in ["location", "editor", "publisher"]:
+                if wskey not in ref_dict:
+                    ref_dict[wskey] = "XYZ"
         reqs = set(ref_requirements[ref_dict["type"]])
         missing_reqs = reqs.difference(set(ref_dict.keys()))
         if len(missing_reqs) > 0:
