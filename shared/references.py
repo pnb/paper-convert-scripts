@@ -57,6 +57,8 @@ def check_citations_vs_references(
                     maybe_pages = re.search(r"(\d+[-–]\d+)\.$", ref["note"][0])
                     if maybe_pages:
                         ref["pages"] = maybe_pages.group(1)
+                if "publisher" not in ref and len(ref.get("container-title", [])) > 1:
+                    ref["publisher"] = ref["container-title"][1]
                 # Check if each author in the reference appears in the citation
                 author_matches = []
                 for a in ref["author"]:
