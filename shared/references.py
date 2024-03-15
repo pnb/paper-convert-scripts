@@ -126,8 +126,11 @@ def check_citations_vs_references(
             maybe_pages = re.search(r"(\d+[-–]\d+)\.$", ref_dict["note"][0])
             if maybe_pages:
                 ref_dict["pages"] = maybe_pages.group(1)
-        if "publisher" not in ref_dict and len(ref_dict.get("container-title", [])) > 1:
-            ref_dict["publisher"] = ref_dict["container-title"][1]  # Publisher as title
+        if "publisher" not in ref_dict:
+            if len(ref_dict.get("container-title", [])) > 1:  # Publisher as title
+                ref_dict["publisher"] = ref_dict["container-title"][1]
+            elif ". " in ref_dict.get("container-title", [" "])[0]:
+                ref_dict["publisher"] = ref_dict["container-title"][0].split(". ")[1]
         if "orkshop" in ref_dict.get("container-title", [""])[0]:
             # Don't check workshops strictly as they often lack publisher info
             for wskey in ["location", "editor", "publisher"]:
