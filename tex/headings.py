@@ -24,13 +24,28 @@ def add_headings(texer: TeXHandler) -> None:
                     line_elem.extract()
                     break
         # JEDM keywords
-        for keywords_candidate in texer.soup.select("span.ptmb7t-x-x-109"):
-            if keywords_candidate.get_text(strip=True) == "Keywords:":
+        for keywords_candidate in texer.soup.select(
+            "span.ptmb7t-x-x-109, span.ptmri7t-x-x-109"
+        ):
+            if keywords_candidate.get_text(strip=True).startswith("Keywords"):
                 keywords_candidate.name = "h1"
                 keywords_candidate["class"] = ["KeywordsHeading", "not-numbered"]
                 keywords_candidate.string.replace_with("Keywords")
-                keywords_candidate.find_next_sibling("span")["class"] = "Keywords"
-                keywords_candidate.find_next_sibling("span").name = "div"
+                content = keywords_candidate.find_next_sibling("span")
+                content["class"] = "Keywords"
+                content.name = "div"
+                if content.get_text(strip=True).startswith(":"):
+                    trimmed = content.get_text(strip=True)[1:].strip()
+                    content.string.replace_with(trimmed)
+                hline = content.parent
+                for _ in range(5):  # Remove the line at the end of the abstract
+                    hline = hline.find_next_sibling("p")
+                    if not hline:
+                        break
+                    if hline.get_text(strip=True).startswith("_" * 87):
+                        hline.decompose()
+                        break
+                break
     # (Sub)section headings
     heading_fonts = [
         "ptmb8t-x-x-120",
