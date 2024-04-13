@@ -162,6 +162,11 @@ for rule in css:
                         elem["style"] += "border-left:none;"
                     if not elem.parent.find_next_sibling("colgroup"):
                         elem["style"] += "border-right:none;"
+                if elem.name == "td":
+                    if not elem.find_previous_sibling("td"):
+                        elem["style"] += "border-left:none;"
+                    if not elem.find_next_sibling("td"):
+                        elem["style"] += "border-right:none;"
 
 print("Removing unused IDs")
 texer.remove_unused_ids()
