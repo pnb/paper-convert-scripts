@@ -136,6 +136,10 @@ def format_figures(texer: TeXHandler) -> None:
             parent = parent.parent  # Go up to next level to handle containing <figure>
         while parent.name != "div" and parent.name != "figure":
             parent = parent.parent
+        if not parent.get_text(strip=True):  # Situations with a useless centering div
+            newparent = parent.parent
+            parent.unwrap()
+            parent = newparent
         parent.name = "figure"
         if not parent.find("div"):  # No (more) subfigures to worry about
             if "subfigure" in texer.tex_lines[env_start] or subfigure_wrapper:
