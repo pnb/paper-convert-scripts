@@ -16,7 +16,7 @@ def format_tables(texer: TeXHandler) -> None:
         adjustbox.unwrap()  # Remove any unused size adjustment wrappers
 
     table_tex_regex = re.compile(r"(^|[^\\])\\begin\s*\{table")
-    for caption_start in texer.soup.find_all(string=re.compile(r"Table\s+\d+:")):
+    for caption_start in texer.soup.find_all(string=re.compile(r"Table\s+A?\d+:")):
         # Check previous lines for a table environment
         line_num = texer.tex_line_num(caption_start)
         for i in range(line_num, 0, -1):
