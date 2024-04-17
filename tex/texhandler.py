@@ -131,6 +131,13 @@ class TeXHandler:
                 if class1 == class2 and style1 == style2:
                     elem.insert(0, prev)
                     prev.unwrap()
+                    if (
+                        len(elem.contents) > 1
+                        and isinstance(elem.contents[0], bs4.NavigableString)
+                        and isinstance(elem.contents[1], bs4.NavigableString)
+                    ):
+                        elem.contents[0].replace_with("".join(elem.contents[:2]))
+                        elem.contents[1].extract()
 
     def format_equations(self) -> None:
         """Replace <table> wrappers for equations with <span> that can by styled with
