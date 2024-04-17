@@ -203,11 +203,9 @@ def validate_alt_text(
     if not img_elem.has_attr("alt") or not img_elem["alt"]:
         warn("alt_text_missing", identifying_text, tex)
         return False
-    elif len(img_elem["alt"]) > 150:
+    elif len(img_elem["alt"]) > 500:
         warn("alt_text_long", img_elem["alt"], tex)
-        return (
-            True  # Not good but not a deal breaker, so don't stop processing the image
-        )
+        return  True  # Not a deal breaker, so don't stop processing the image
     return True
 
 
