@@ -23,7 +23,10 @@ def add_alt_text(texer: TeXHandler, img_elem: bs4.Tag) -> str:
     env_start, env_end = texer.get_tex_environment(img_line_num)
     tex_section = "\n".join(texer.tex_lines[env_start : env_end + 1])
     alts = get_command_content(tex_section, "Description")
-    img_i = img_elem.parent.find_all("img").index(img_elem)
+    container = img_elem.parent
+    if container.has_attr("class") and "subfigure" in container["class"]:
+        container = container.parent
+    img_i = container.find_all("img").index(img_elem)
     if img_elem.has_attr("alt"):  # Make4ht defaults to "PIC" which is not real alt text
         del img_elem["alt"]
     if len(alts) > img_i:
