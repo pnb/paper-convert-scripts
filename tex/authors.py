@@ -1,3 +1,5 @@
+import re
+
 import bs4
 
 from shared.shared_utils import warn_tex as warn
@@ -58,6 +60,10 @@ def add_authors(texer: TeXHandler) -> None:
                     elem["class"] = "Affiliations"
             else:
                 elem["class"] = "Author"
+
+            if len(elem.contents) == 1:  # Remove extra whitespace (especially nbsp)
+                if isinstance(elem.contents[0], bs4.NavigableString):
+                    elem.contents[0].replace_with(elem.contents[0].strip())
 
             next_tag = elem.find_next_sibling(["span", "br"])
             if (
