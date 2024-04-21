@@ -260,6 +260,8 @@ def get_square_brackets_citations(text: str) -> list[str]:
         low, high = re.split(r"\D", ref_range)
         if int(low) < int(high) and int(high) - int(low) < 25:  # Not too big of a range
             cites_raw += [str(x) for x in range(int(low), int(high) + 1)]
+    if not cites_raw:
+        return []
     # Further filter to reasonable entries
     all_nums = sorted(set(int(x) for x in re.split(r"\D+", ",".join(cites_raw))))
     for i in range(1, len(all_nums)):
