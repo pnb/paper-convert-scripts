@@ -121,7 +121,9 @@ def format_one_table(texer: TeXHandler, table: bs4.Tag) -> None:
         if not tr.get_text().strip():
             tr.decompose()  # Remove remaining decorative rows (bad for accessibility)
     # Check if there are too many colgroups
-    col_count = max([len(tr.find_all(["th", "td"])) for tr in table.find_all("tr")])
+    col_count = 0
+    if table.find_all("tr"):
+        col_count = max([len(tr.find_all(["th", "td"])) for tr in table.find_all("tr")])
     if col_count:
         colgroups = table.find_all("colgroup")
         if len(colgroups) >= col_count:  # Vertical lines every column (remove them)
