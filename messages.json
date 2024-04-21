@@ -19,10 +19,7 @@
         },
         "template_not_detected": {
             "message": "Could not determine whether this was an EDM or JEDM paper",
-            "help": "Make sure the paper uses the appropriate styles from the template.",
-            "tex": {
-                "help": "Either \"jedm.cls\" or \"edm_article.cls\" is expected in the root of the paper zip file."
-            }
+            "help": "Make sure the paper uses the appropriate styles from the template. For a LaTeX paper either \"jedm.cls\" or \"edm_article.cls\" is expected in the root of the paper zip file. For a Word paper, the title is expected to use the appropriate style from the template (i.e., Paper-Title or MainTitle)."
         },
         "file_hash_edm_article.cls": {
             "message": "edm_article.cls did not match expected SHA256 hash",
