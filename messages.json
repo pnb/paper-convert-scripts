@@ -17,6 +17,10 @@
             "message": "LaTeX compilation warnings; see full output (line numbers will match your source file unless you used \\input{})",
             "help": "In most cases, LaTeX warnings are not a problem. Typically, they occur because the LaTeX HTML compiler (make4ht) does not recognize some package; \"Undefined control sequence\" warnings are especially common in this case. However, conversion will often produce a reasonable output anyway. Hence, you can ignore this warning unless there is another problem, like the document failed to compile or the output looks wrong, in which case the LaTeX warnings may be helpful."
         },
+        "file_not_found": {
+            "message": "Could not find a file to \\input{}",
+            "help": "Check file paths, especially relative file paths. HTML conversion assumes \\input{} paths are relative to the primary LaTeX source file (e.g., main.tex), whereas the LaTeX compiler can be slightly more generous by also allowing paths relative to the working directory. HTML conversion does not have access to the same working directory information, however."
+        },
         "template_not_detected": {
             "message": "Could not determine whether this was an EDM or JEDM paper",
             "help": "Make sure the paper uses the appropriate styles from the template. For a LaTeX paper either \"jedm.cls\" or \"edm_article.cls\" is expected in the root of the paper zip file. For a Word paper, the title is expected to use the appropriate style from the template (i.e., Paper-Title or MainTitle)."

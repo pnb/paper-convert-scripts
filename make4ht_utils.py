@@ -31,8 +31,11 @@ def get_raw_tex_contents(
             with open(source_tex_filename, errors="replace") as infile:
                 raw_tex = infile.read()
         except FileNotFoundError:  # Maybe file specified without extension
-            with open(source_tex_filename + ".tex", errors="replace") as infile:
-                raw_tex = infile.read()
+            try:
+                with open(source_tex_filename + ".tex", errors="replace") as infile:
+                    raw_tex = infile.read()
+            except FileNotFoundError:
+                warn("file_not_found", source_tex_filename + ".tex")
         # Remove lines starting with %; replace with single % to avoid introducing a <p>
         raw_tex = re.sub(r"([^\\]%).*$", r"\1", raw_tex, flags=re.MULTILINE)
         # Remove \titlenote{}, which make4ht handles poorly so far
