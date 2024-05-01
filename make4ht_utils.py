@@ -48,6 +48,8 @@ def get_raw_tex_contents(
             for i, part in enumerate(thanksparts[:-1]):
                 raw_tex += part + R"\footnotemark[" + str(i + 1) + R"]\thanks{"
             raw_tex += thanksparts[-1]
+        # Remove font encoding stuff (JEDM mostly)
+        raw_tex = raw_tex.replace(R"\usepackage[T1]{fontenc}", "%T1 fontenc removed")
         return raw_tex
 
     with zipfile.ZipFile(source_zip_path, "r") as inzip:
