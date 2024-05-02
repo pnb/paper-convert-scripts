@@ -83,7 +83,7 @@ def get_raw_tex_contents(
     # Load tex file and any \input files
     tex_str = _load_tex_str(os.path.join(extracted_dir, tex_fname))
     input_regex = re.compile(r"\\input\s*\{\s*([^\s}]+)\s*\}")
-    for _ in range(25):  # Limit \input to prevent a recursive self-include bomb
+    for _ in range(99):  # Limit \input to prevent a recursive self-include bomb
         match = input_regex.search(tex_str)
         if not match:
             break
