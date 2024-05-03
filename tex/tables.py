@@ -23,7 +23,7 @@ def format_tables(texer: TeXHandler) -> None:
             if table_tex_regex.search(texer.tex_lines[i]):
                 break
         else:
-            continue
+            continue  # No table environment found; skip this caption
         # Find beginning of table container where caption should be inserted
         table_name = caption_start.get_text().strip().split(":")[0]
         while caption_start.parent.name != "div":  # Rewind to beginning of table
@@ -155,6 +155,10 @@ def format_one_table(texer: TeXHandler, table: bs4.Tag) -> None:
                 content.replace_with("")
             else:
                 break  # Reached real content
+    # Check for partial \hhline stuff that turns into rows of _* incorrectly
+    for tr in table.find_all("tr"):
+        if re.match(r"^_+$", tr.get_text(strip=True)):
+            tr.decompose()
 
 
 def add_tablenotes(texer: TeXHandler) -> None:
