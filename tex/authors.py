@@ -134,10 +134,12 @@ def format_author_superscripts(texer: TeXHandler, tabular: bs4.Tag) -> None:
 
 def format_author_footnotes(texer: TeXHandler) -> None:
     """Format the footnotes that result from author affiliation superscripts."""
-    for fnstart in texer.soup.find_all("span", attrs={"class": "tcrm-0900"}):
+    for fnstart in texer.soup.select("span.tcrm-900, span.ptmr8c-x-x-120"):
         if fnstart.parent.name == "p":
             prev_elem = fnstart.parent.previous_sibling
-            while not isinstance(prev_elem, bs4.Tag):
+            while not isinstance(prev_elem, bs4.Tag) or not prev_elem.get_text(
+                strip=True
+            ):
                 prev_elem = prev_elem.previous_sibling
             if prev_elem.find("div", attrs={"class": "Author"}):
                 # fnstart right after the authors
