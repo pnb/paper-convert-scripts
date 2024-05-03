@@ -38,16 +38,24 @@ def get_raw_tex_contents(
                 warn("file_not_found", source_tex_filename + ".tex")
         # Remove lines starting with %; replace with single % to avoid introducing a <p>
         raw_tex = re.sub(r"([^\\]%).*$", r"\1", raw_tex, flags=re.MULTILINE)
+        # Remove block comments
+        raw_tex = re.sub(
+            r"^\\begin\{comment\}(.|\n)*?\\end\{comment\}",
+            "",
+            raw_tex,
+            flags=re.MULTILINE,
+        )
         # Remove \titlenote{}, which make4ht handles poorly so far
         raw_tex = re.sub(
             r"([^\\]|^)\\titlenote\{[^\}]*\}", r"\1", raw_tex, flags=re.MULTILINE
         )
-        thanksparts = raw_tex.split(R"\thanks{")
-        if len(thanksparts) > 1:
-            raw_tex = ""
-            for i, part in enumerate(thanksparts[:-1]):
-                raw_tex += part + R"\footnotemark[" + str(i + 1) + R"]\thanks{"
-            raw_tex += thanksparts[-1]
+        # TODO: Is this hack not needed anymore?
+        # thanksparts = raw_tex.split(R"\thanks{")
+        # if len(thanksparts) > 1:
+        #    raw_tex = ""
+        #    for i, part in enumerate(thanksparts[:-1]):
+        #        raw_tex += part + R"\footnotemark[" + str(i + 1) + R"]\thanks{"
+        #    raw_tex += thanksparts[-1]
         # Remove font encoding stuff (JEDM mostly)
         raw_tex = raw_tex.replace(R"\usepackage[T1]{fontenc}", "%T1 fontenc removed")
         return raw_tex
