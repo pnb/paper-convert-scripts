@@ -11,7 +11,7 @@ def parse_description_lists(texer: TeXHandler) -> None:
         for br in p.find_all("br"):
             # \\ and \hfill in LaTeX, which is often default HTML styling anyway
             br.decompose()
-        for item in p.select(".aeb10-x-x-90,.ptmb7t-x-x-120"):
+        for item in p.select(".aeb10-x-x-90,.ptmb7t-x-x-120,.ptmb8t-x-x-120"):
             item.name = "dt"
             item.insert_after(texer.soup.new_tag("dd"))
         for dd in p.find_all("dd"):
