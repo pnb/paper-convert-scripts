@@ -197,6 +197,7 @@ class TeXHandler:
             "ptmb7t-": "strong",
             "ptmri7t-x-x-120": "em",
             "ptmri7t-x-x-109": "em",
+            "ptmri8t-x-x-120": "em",
             "ptmri7t-": "em",
             "aebxti-": ["strong", "em"],
             "aer-7": None,  # Unwrap; not a good/necessary style to keep (tiny text)
