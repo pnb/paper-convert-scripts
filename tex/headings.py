@@ -1,3 +1,5 @@
+import bs4
+
 from . import TeXHandler
 
 
@@ -94,3 +96,17 @@ def add_headings(texer: TeXHandler) -> None:
             # Remove any line breaks caused by \\ in the heading in LaTeX
             for br in h.find_all("br"):
                 br.decompose()
+    # Subheadings made via \paragraph
+    for phead in texer.soup.select("span.paragraph, span.subparagraph"):
+        parent = phead.parent
+        if parent.name == "p" and len(parent.find_all()) == 1:
+            next_p = parent.next_sibling
+            while next_p and not isinstance(next_p, bs4.Tag):
+                next_p = next_p.next_sibling
+            if next_p:
+                next_p.insert(0, phead)
+                parent.decompose()
+        phead["role"] = "heading"  # Accessibility role
+        phead["aria-level"] = "4" if "paragraph" in phead["class"] else "5"  # A guess
+        if texer.input_template == "JEDM" and "paragraph" in phead["class"]:
+            phead["class"].append("small-caps")
