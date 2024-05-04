@@ -220,6 +220,19 @@ class TeXHandler:
         for caption in self.soup.find_all(["caption", "figcaption"]):
             for elem in caption.find_all("strong"):
                 elem.unwrap()
+        # Incorrectly capitalized small-caps in T1 font encoding
+        for sc in self.soup.select("span.small-caps"):
+            if (
+                sc.parent.name == "span"
+                and sc.parent.has_attr("class")
+                and (
+                    "ptmrc8t-x-x-109" in sc.parent["class"]
+                    or "phvrc8t-x-x-120" in sc.parent["class"]
+                )
+                and all(isinstance(c, bs4.NavigableString) for c in sc.contents)
+            ):
+                for content in sc.contents:
+                    content.replace_with(content.lower())
 
     def fix_references(self) -> None:
         """Format the references section. Requires that fonts have already been fixed to
