@@ -6,14 +6,18 @@ def add_headings(texer: TeXHandler) -> None:
     by make4ht.
     """
     # Title
-    title_first = texer.soup.select_one("span.phvb8t-x-x-180, span.phvr7t-x-x-248")
+    title_first = texer.soup.select_one(
+        "span.phvb8t-x-x-180, span.phvr7t-x-x-248, span.phvr8t-x-x-248"
+    )
     if title_first and "\\maketitle" in texer.tex_line(title_first):
         title = title_first.parent
         title["class"] = "Paper-Title"
         title.name = "div"
     if texer.input_template == "JEDM":
         # JEDM line-delimited abstract (not really a heading)
-        for abstract_candidate in texer.soup.select("span.ptmr7t-x-x-109"):
+        for abstract_candidate in texer.soup.select(
+            "span.ptmr7t-x-x-109, span.ptmr8t-x-x-109"
+        ):
             for line_elem in abstract_candidate.parent.contents:
                 if line_elem.get_text(strip=True).startswith("_" * 87):
                     abstract_heading = texer.soup.new_tag(
@@ -25,7 +29,7 @@ def add_headings(texer: TeXHandler) -> None:
                     break
         # JEDM keywords
         for keywords_candidate in texer.soup.select(
-            "span.ptmb7t-x-x-109, span.ptmri7t-x-x-109"
+            "span.ptmb7t-x-x-109, span.ptmri7t-x-x-109, span.ptmb8t-x-x-109"
         ):
             if keywords_candidate.get_text(strip=True).startswith("Keywords"):
                 keywords_candidate.name = "h1"
@@ -51,8 +55,11 @@ def add_headings(texer: TeXHandler) -> None:
         "ptmb8t-x-x-120",
         "ptmri8t-x-x-110",
         "phvrc7t-x-x-144",
+        "phvrc8t-x-x-144",
         "phvrc7t-x-x-120",
+        "phvrc8t-x-x-120",
         "phvr7t-x-x-120",
+        "phvr8t-x-x-120",
     ]
     for h_text in texer.soup.find_all("span", attrs={"class": heading_fonts}):
         h = h_text.parent
@@ -63,6 +70,8 @@ def add_headings(texer: TeXHandler) -> None:
                 "ptmb8t-x-x-120" in h_text["class"]
                 or "phvrc7t-x-x-144" in h_text["class"]
                 or "phvrc7t-x-x-120" in h_text["class"]
+                or "phvrc8t-x-x-144" in h_text["class"]
+                or "phvrc8t-x-x-120" in h_text["class"]
             ):
                 if (num_text.endswith(".") or "." not in num_text) and num_text.count(
                     "."
@@ -79,6 +88,7 @@ def add_headings(texer: TeXHandler) -> None:
             elif (
                 "ptmri8t-x-x-110" in h_text["class"]
                 or "phvr7t-x-x-120" in h_text["class"]
+                or "phvr8t-x-x-120" in h_text["class"]
             ):
                 h.name = "h3"
             # Remove any line breaks caused by \\ in the heading in LaTeX

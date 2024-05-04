@@ -13,7 +13,7 @@ def add_authors(texer: TeXHandler) -> None:
     if texer.input_template == "JEDM":
         author_containers = []
         for email_candidate in texer.soup.select(
-            "span.phvr7t-x-x-109, span.phvr7t-x-x-120"
+            "span.phvr7t-x-x-109, span.phvr7t-x-x-120, span.phvr8t-x-x-120"
         ):
             if "@" in email_candidate.get_text():
                 author_containers.append(
@@ -21,7 +21,9 @@ def add_authors(texer: TeXHandler) -> None:
                 )
         if not len(author_containers):
             print("No emails found; falling back to less precise author finding")
-            for name_candidate in texer.soup.select("span.phvr7t-x-x-144"):
+            for name_candidate in texer.soup.select(
+                "span.phvr7t-x-x-144, span.phvr8t-x-x-144"
+            ):
                 tabular = name_candidate.find_parent("div", attrs={"class": "tabular"})
                 if tabular not in author_containers:
                     author_containers.append(tabular)
@@ -49,8 +51,12 @@ def add_authors(texer: TeXHandler) -> None:
                 beyond_author_name
                 or "@" in elem.get_text()
                 or (
-                    "phvr8t-x-x-120" not in elem["class"]
+                    (
+                        texer.input_template != "EDM"
+                        or "phvr8t-x-x-120" not in elem["class"]
+                    )
                     and "phvr7t-x-x-144" not in elem["class"]
+                    and "phvr8t-x-x-144" not in elem["class"]
                 )
             ):
                 beyond_author_name = True  # Evidence we are past the author name part
