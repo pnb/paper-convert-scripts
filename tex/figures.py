@@ -21,6 +21,9 @@ def add_alt_text(texer: TeXHandler, img_elem: bs4.Tag) -> str:
     line_num_start = texer.tex_line_num(img_elem)
     img_line_num = texer.find_image_line_num(line_num_start, img_elem["src"])
     env_start, env_end = texer.get_tex_environment(img_line_num)
+    while texer.tex_lines[env_start].strip().startswith(R'\begin{tik'):
+        # \begin{} a TikZ image, not the figure/subfigure/etc. env we actually want
+        env_start, env_end = texer.get_tex_environment(env_start - 1)
     tex_section = "\n".join(texer.tex_lines[env_start : env_end + 1])
     alts = get_command_content(tex_section, "Description")
     container = img_elem.parent
