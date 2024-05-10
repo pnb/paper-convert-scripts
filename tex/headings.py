@@ -57,12 +57,11 @@ def add_headings(texer: TeXHandler) -> None:
         "ptmb8t-x-x-120",
         "ptmri8t-x-x-110",
         "phvrc7t-x-x-144",
-        "phvrc8t-x-x-144",
         "phvrc7t-x-x-120",
-        "phvrc8t-x-x-120",
         "phvr7t-x-x-120",
-        "phvr8t-x-x-120",
     ]
+    if texer.input_template == "JEDM":
+        heading_fonts += ["phvrc8t-x-x-144", "phvrc8t-x-x-120", "phvr8t-x-x-120"]
     for h_text in texer.soup.find_all("span", attrs={"class": heading_fonts}):
         h = h_text.parent
         if h.name == "p":  # Otherwise already handled (abstract, etc.)
