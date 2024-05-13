@@ -43,14 +43,13 @@ def format_tables(texer: TeXHandler) -> None:
             isinstance(caption.next_sibling, bs4.NavigableString)
             or caption.next_sibling.name not in ["div", "table"]
         ):
-            if (  # Check for stray \adjustbox params, rendered for some reason
-                caption.next_sibling.next_sibling
-                and isinstance(caption.next_sibling.next_sibling, bs4.Comment)
-                and re.match(r"\swidth=[\d\.]+", caption.next_sibling)
-            ):
-                caption.next_sibling.extract()
-            else:
-                caption.append(caption.next_sibling)
+            if isinstance(caption.next_sibling, bs4.NavigableString) and re.search(
+                r"(\s|^)width=([\d\.]+|$)", caption.next_sibling
+            ):  # Check for stray \adjustbox params, rendered for some reason
+                caption.next_sibling.replace_with(
+                    re.sub(r"(\s|^)width=([\d\.]+|$)", "", caption.next_sibling)
+                )
+            caption.append(caption.next_sibling)
         table = caption.find_next("table")  # Move into <table> where it belongs
         if not table:
             continue  # Something went pretty wrong, like caption below table
