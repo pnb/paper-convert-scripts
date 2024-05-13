@@ -340,7 +340,7 @@ def save_soup(soup: bs4.BeautifulSoup, output_filename: str) -> None:
         <script>
             MathJax = {
                 loader: {
-                    load: ['[tex]/textmacros']
+                    load: ['[tex]/textmacros', '[tex]/mathtools']
                 },
                 tex: {
                     tags: 'ams',
@@ -353,7 +353,7 @@ def save_soup(soup: bs4.BeautifulSoup, output_filename: str) -> None:
                         mathds: ["{\\\\mathbb \\#1}", 1],
                         mathbbm: ["{\\\\mathbb \\#1}", 1]
                     },
-                    packages: {'[+]': ['textmacros']}
+                    packages: {'[+]': ['textmacros', 'mathtools']}
                 }
             }
         </script>
