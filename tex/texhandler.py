@@ -195,6 +195,7 @@ class TeXHandler:
             "ptmb7t-x-x-120": "strong",
             "ptmb8t-x-x-120": "strong",
             "ptmb7t-": "strong",
+            "ptmb8t-": "strong",
             "ptmri7t-x-x-120": "em",
             "ptmri7t-x-x-109": "em",
             "ptmri8t-x-x-120": "em",
