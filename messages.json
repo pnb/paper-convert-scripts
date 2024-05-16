@@ -166,7 +166,7 @@
             }
         },
         "alt_text_long": {
-            "message": "Alt text may be too long (over 500 characters)",
+            "message": "Alt text may be too long (over 2000 characters)",
             "help": "Alt text should be succinct to provide the best experience to people using screen reader software, since some screen readers may stop reading the text if it is too long."
         },
         "alt_text_duplicate": {
