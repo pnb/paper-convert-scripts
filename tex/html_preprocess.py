@@ -20,3 +20,15 @@ def fix_et_al(html_str: str) -> str:
         html_str,
         flags=re.DOTALL,  # Match \n
     )
+
+
+def lua_font_remap(html_str: str) -> str:
+    """Remap the slightly different fonts LuaLaTeX produces.
+
+    Args:
+        html_str (str): Make4ht output *before* being put into BeautifulSoup
+
+    Returns:
+        str: Modified HTML string
+    """
+    return html_str.replace("8r-x-x-", "8t-x-x-")

@@ -63,6 +63,9 @@ else:
         ofile.write(texstr)
 
 bib_backend = make4ht_utils.get_bib_backend(texstr)
+extra_flags = make4ht_utils.detect_extra_flags_needed(texstr)
+if extra_flags:
+    print("Using extra make4ht flags:" + extra_flags)
 
 template_name = "unknown"
 if os.path.exists(os.path.join(extracted_dir, "edm_article.cls")):
@@ -92,7 +95,7 @@ if not args.skip_compile:
     shutil.copy(os.path.join(scripts_dir, "make4ht_preamble.cfg"), extracted_dir)
     mathml = "mathml," if args.mathml else ""
     retcode = subprocess.call(
-        "make4ht --output-dir .. --format html5+common_domfilters "
+        "make4ht" + extra_flags + " --output-dir .. --format html5+common_domfilters "
         "--build-file make4ht_with_bibtex.mk4 tmp-make4ht.tex "
         '"' + mathml + 'mathjax,svg,fn-in" --config make4ht_preamble',
         shell=True,
@@ -120,6 +123,8 @@ if not os.path.exists(os.path.join(extracted_dir, "tmp-make4ht.html")):
 print("Loading converted HTML")
 with open(os.path.join(extracted_dir, "tmp-make4ht.html")) as infile:
     html_str = tex.fix_et_al(infile.read())
+    if " --lua" in extra_flags:
+        html_str = tex.lua_font_remap(html_str)
     soup = BeautifulSoup(html_str, "html.parser")
 
 texer = tex.TeXHandler(texstr, soup, template_name)

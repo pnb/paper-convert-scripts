@@ -3,6 +3,6 @@ from .tables import format_tables
 from .authors import add_authors
 from .headings import add_headings
 from .lists import parse_description_lists
-from .html_preprocess import fix_et_al
+from .html_preprocess import fix_et_al, lua_font_remap
 from .figures import format_figures, format_listings
 from .macros import add_macros_for_mathjax

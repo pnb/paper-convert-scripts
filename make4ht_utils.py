@@ -232,6 +232,22 @@ def get_bib_backend(tex_str: str) -> str:
     return "bibtex"
 
 
+def detect_extra_flags_needed(tex_str: str) -> str:
+    """Try to detect any extra make4ht compile flags that should be passed in, based on
+    the LaTeX source. Currently only checks if LuaLaTeX might be needed.
+
+    Args:
+        tex_str (str): LaTeX document source code
+
+    Returns:
+        str: Name of backend command to use (e.g., "biber", "bibtex") or None
+    """
+    flags = ""
+    if re.search(r"^\s*\\usepackage\{fontspec\}", tex_str, re.MULTILINE):
+        flags += " --lua"
+    return flags
+
+
 def check_file_hash(file_path: str, sha256_expected: str):
     """Compare the SHA256 hash of a file to an expected hash. Especially useful for
     making sure authors are using the correct version of the article style, and have not
