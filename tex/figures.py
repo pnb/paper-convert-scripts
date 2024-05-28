@@ -125,6 +125,8 @@ def format_figures(texer: TeXHandler) -> None:
                 or img["alt"].strip().startswith("----------------")
             ):
                 continue  # Skip over images generated of algorithm listings
+            if not img.find_parent(['div', 'figure']):
+                continue  # Images outside figure environments (not expecting alt text)
         if img.parent.has_attr("class") and "centerline" in img.parent["class"]:
             img.parent.unwrap()  # Remove extra div added if somebody uses \centerline
         # Repair double // in img src when using a trailing / with \graphicspath
