@@ -125,7 +125,7 @@ def format_figures(texer: TeXHandler) -> None:
                 or img["alt"].strip().startswith("----------------")
             ):
                 continue  # Skip over images generated of algorithm listings
-            if not img.find_parent(['div', 'figure']):
+            if not img.find_parent(["div", "figure"]):
                 continue  # Images outside figure environments (not expecting alt text)
         if img.parent.has_attr("class") and "centerline" in img.parent["class"]:
             img.parent.unwrap()  # Remove extra div added if somebody uses \centerline
@@ -149,7 +149,8 @@ def format_figures(texer: TeXHandler) -> None:
             parent = parent.parent  # Go up to next level to handle containing <figure>
         while parent.name != "div" and parent.name != "figure":
             parent = parent.parent
-        if not parent.get_text(strip=True):  # Situations with a useless centering div
+        if not parent.get_text(strip=True) and parent.parent.name in ["div", "figure"]:
+            # Situations with a useless centering div
             newparent = parent.parent
             parent.unwrap()
             parent = newparent
