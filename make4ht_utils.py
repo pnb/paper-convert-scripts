@@ -35,7 +35,7 @@ def get_raw_tex_contents(
                 with open(source_tex_filename + ".tex", errors="replace") as infile:
                     raw_tex = infile.read()
             except FileNotFoundError:
-                warn("file_not_found", source_tex_filename + ".tex")
+                warn("file_not_found", source_tex_filename)
         # Remove lines starting with %; replace with single % to avoid introducing a <p>
         raw_tex = re.sub(r"([^\\]%).*$", r"\1", raw_tex, flags=re.MULTILINE)
         # Remove block comments
@@ -52,7 +52,7 @@ def get_raw_tex_contents(
         # Treat \subfile as \input, which is gross but we can't implement subfile
         if re.search(r"^\\subfile\{", raw_tex, re.MULTILINE):
             raw_tex = re.sub(r"^\\subfile\{", r"\\input{", raw_tex, flags=re.MULTILINE)
-            warn("tex_subfile_implementation", source_tex_filename + ".tex")
+            warn("tex_subfile_implementation", source_tex_filename)
         # TODO: Is this hack not needed anymore?
         # thanksparts = raw_tex.split(R"\thanks{")
         # if len(thanksparts) > 1:
