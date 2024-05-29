@@ -49,6 +49,10 @@ def get_raw_tex_contents(
         raw_tex = re.sub(
             r"([^\\]|^)\\titlenote\{[^\}]*\}", r"\1", raw_tex, flags=re.MULTILINE
         )
+        # Treat \subfile as \input, which is gross but we can't implement subfile
+        if re.search(r"^\\subfile\{", raw_tex, re.MULTILINE):
+            raw_tex = re.sub(r"^\\subfile\{", r"\\input{", raw_tex, flags=re.MULTILINE)
+            warn("tex_subfile_implementation", source_tex_filename + ".tex")
         # TODO: Is this hack not needed anymore?
         # thanksparts = raw_tex.split(R"\thanks{")
         # if len(thanksparts) > 1:

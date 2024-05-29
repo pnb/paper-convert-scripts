@@ -258,6 +258,10 @@
         "no_newline_after_algorithmic": {
             "message": "Blank line suggested",
             "help": "It is occasionally helpful to add a blank line after the \\end{algorithmic} command. For example, the LaTeX HTML compiler will sometimes render inline math as block equations (each on its own line) if this blank line is missing. If the result looks OK, you may safely ignore this message."
+        },
+        "tex_subfile_implementation": {
+            "message": "\\subfile command not fully supported",
+            "help": "The \\subfile command is treated just like \\input during conversion. If you are using \\subfile like \\input to include a portion of a document, that should work. Otherwise, if the subfile is a complete standalone document, it is unlikely to work."
         }
     }
 }
