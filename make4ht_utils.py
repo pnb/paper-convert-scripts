@@ -229,10 +229,11 @@ def get_bib_backend(tex_str: str) -> str:
         if match.group(2):
             return match.group(2)
         return "biber"
-    if not re.search(r"^\s*\\bibliography\s*\{", tex_str, re.MULTILINE) and re.search(
-        r"^\s*\\bibitem\s*\{", tex_str, re.MULTILINE
+    if not re.search(r"^\s*\\bibliography\s*\{", tex_str, re.MULTILINE) and (
+        re.search(r"^\s*\\bibitem\s*\{", tex_str, re.MULTILINE)
+        or not re.search(r"\\cite.?\{", tex_str)
     ):
-        return None  # Bibliography items hard-coded inito the .tex doc
+        return None  # Bibliography items hard-coded into the .tex (or no cites at all)
     return "bibtex"
 
 
