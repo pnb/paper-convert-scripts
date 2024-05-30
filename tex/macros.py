@@ -15,6 +15,8 @@ def add_macros_for_mathjax(texer: TeXHandler) -> None:
             macros.append(line.strip())
         for macro in re.finditer(r"(^|(?<=\W))\\newcommand[\\{].*$", line):
             macros.append(macro.group(0) + "\n")
+        for macro in re.finditer(r"(^|(?<=\W))\\DeclareMathOperator\*[\\{].*$", line):
+            macros.append(macro.group(0) + "\n")
         if R"\begin{document}" in line:
             break
     if macros:
