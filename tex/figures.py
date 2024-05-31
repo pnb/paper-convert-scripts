@@ -27,10 +27,12 @@ def add_alt_text(texer: TeXHandler, img_elem: bs4.Tag) -> str:
     tex_section = "\n".join(texer.tex_lines[env_start : env_end + 1])
     alts = get_command_content(tex_section, "Description")
     container = img_elem.parent
-    while container.has_attr("class") and (
-        "subfigure" in container["class"] or "fbox" in container["class"]
+    while (
+        container.has_attr("class")
+        and len(alts) > 1  # Not 100% sure if this is right for fbox use cases...
+        and ("subfigure" in container["class"] or "fbox" in container["class"])
     ):
-        container = container.parent
+        container = container.parent  # Handle all subfigures at once if needed
     img_i = container.find_all("img").index(img_elem)
     if img_elem.has_attr("alt"):  # Make4ht defaults to "PIC" which is not real alt text
         del img_elem["alt"]
