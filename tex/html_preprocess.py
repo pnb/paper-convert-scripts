@@ -14,12 +14,20 @@ def fix_et_al(html_str: str) -> str:
         str: Modified HTML string
     """
     # The </span> version occurs during footnote citations
-    return re.sub(
+    html = re.sub(
         r"\xa0almbox \..*?mbox ?(</span><span class='ptmr7t-'>)?",
         " al.",
         html_str,
         flags=re.DOTALL,  # Match \n
     )
+    # Additional JEDM ones with SVGs inserted that are super complicated
+    html = re.sub(
+        r"\xa0al.{,35}?mbox.{,95}?mbox ?</span>\s*<span\s*class=.ptmr7t-.>",
+        " al.",
+        html,
+        flags=re.DOTALL,
+    )
+    return html
 
 
 def lua_font_remap(html_str: str) -> str:
