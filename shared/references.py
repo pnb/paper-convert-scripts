@@ -120,6 +120,7 @@ def check_citations_vs_references(
         "volume",
     ]  # "issue" is false alarming too much
     for i, ref_dict in enumerate(refs, start=1):
+        container_title = ref_dict.get("container-title", [])
         if "pages" not in ref_dict and len(ref_dict.get("date", [])) > 1:
             ref_dict["pages"] = ref_dict["date"][1:]  # Misdetected pages as dates
         if "pages" not in ref_dict and "note" in ref_dict:  # Pages as note
@@ -127,11 +128,11 @@ def check_citations_vs_references(
             if maybe_pages:
                 ref_dict["pages"] = maybe_pages.group(1)
         if "publisher" not in ref_dict:
-            if len(ref_dict.get("container-title", [])) > 1:  # Publisher as title
-                ref_dict["publisher"] = ref_dict["container-title"][1]
-            elif ". " in ref_dict.get("container-title", [" "])[0]:
-                ref_dict["publisher"] = ref_dict["container-title"][0].split(". ")[1]
-        if "orkshop" in ref_dict.get("container-title", [""])[0]:
+            if len(container_title) > 1:  # Publisher as title
+                ref_dict["publisher"] = container_title[1]
+            elif len(container_title) and ". " in container_title[0]:
+                ref_dict["publisher"] = container_title[0].split(". ")[1]
+        if len(container_title) and "orkshop" in container_title[0]:
             # Don't check workshops strictly as they often lack publisher info
             for wskey in ["location", "editor", "publisher"]:
                 if wskey not in ref_dict:
