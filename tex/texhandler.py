@@ -191,6 +191,7 @@ class TeXHandler:
             "aett9-": "code",
             "ectt-": "code",
             "ectc-": "code",
+            "pcrr7t-": "code",
             "pcrr7t-x-x-120": "code",
             "ptmb7t-x-x-120": "strong",
             "ptmb8t-x-x-120": "strong",
