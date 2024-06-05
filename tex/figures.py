@@ -149,7 +149,11 @@ def format_figures(texer: TeXHandler) -> None:
             parent.name = "figure"
             _fix_figure_text(texer, parent)  # Handle subfigure caption
             parent = parent.parent  # Go up to next level to handle containing <figure>
-        while parent.name != "div" and parent.name != "figure":
+        while (
+            parent.name != "div"
+            and parent.name != "figure"
+            and parent.parent.name != "body"  # If this helps it is probably an error
+        ):
             parent = parent.parent
         if not parent.get_text(strip=True) and parent.parent.name in ["div", "figure"]:
             # Situations with a useless centering div
