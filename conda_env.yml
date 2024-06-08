@@ -1,3 +1,4 @@
+# conda env create --file conda_env.yml
 name: paper_convert
 channels:
   - defaults
