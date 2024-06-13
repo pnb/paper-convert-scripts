@@ -4,7 +4,7 @@ import bs4
 
 from . import TeXHandler, tables
 from make4ht_utils import get_command_content
-from shared import validate_alt_text, set_img_class
+from shared import validate_alt_text, set_img_class, warn
 
 
 def add_alt_text(texer: TeXHandler, img_elem: bs4.Tag) -> str:
@@ -133,6 +133,9 @@ def format_figures(texer: TeXHandler) -> None:
             img.parent.unwrap()  # Remove extra div added if somebody uses \centerline
         # Repair double // in img src when using a trailing / with \graphicspath
         img["src"] = img["src"].replace("//", "/")
+        # Check for JEDM filename issue
+        if texer.input_template == "JEDM" and "+" in img["src"]:
+            warn("jedm_figure_filename", img["src"], tex=True)
         # Handle alt text and caption
         add_alt_text(texer, img)
         img_text_line_num = texer.tex_line_num(img)

@@ -176,6 +176,10 @@
                 "help": "Alt text should be unique per image, so that someone using screen reader software can understand the unique contents of each image. Even if the images are duplicates, the alt text should be unique to explain which image is a duplicate and why."
             }
         },
+        "jedm_figure_filename": {
+            "message": "Character \"+\" in image filename can cause issues for JEDM",
+            "help": "The JEDM journal system will sometimes return 404 for images with \"+\" in the filename for some reason."
+        },
         "tex_file_missing": {
             "message": "No .tex files found in root of .zip file; cannot process",
             "help": "The most likely cause of this problem is if your LaTeX source file is in a folder inside the .zip file. To fix this, create a .zip file by selecting all the files in your project and compressing them, rather than compressing the containing folder."
