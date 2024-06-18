@@ -53,6 +53,17 @@ def get_raw_tex_contents(
         if re.search(r"^\\subfile\{", raw_tex, re.MULTILINE):
             raw_tex = re.sub(r"^\\subfile\{", r"\\input{", raw_tex, flags=re.MULTILINE)
             warn("tex_subfile_implementation", source_tex_filename)
+        # Remove underscores in eqref because they break make4ht
+        underscore_labels = set()
+        for eqref_label in re.findall(r"\\eqref\{([^}]*_[^}]*)\}", raw_tex):
+            underscore_labels.add(eqref_label)
+        for label in underscore_labels:
+            new_label = label.replace("_", "UNDERSCORE")
+            raw_tex = (
+                raw_tex.replace(R"\eqref{" + label + "}", R"\eqref{" + new_label + "}")
+                .replace(R"\ref{" + label + "}", R"\ref{" + new_label + "}")
+                .replace(R"\label{" + label + "}", R"\label{" + new_label + "}")
+            )
         # TODO: Is this hack not needed anymore?
         # thanksparts = raw_tex.split(R"\thanks{")
         # if len(thanksparts) > 1:
