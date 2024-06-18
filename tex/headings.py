@@ -20,6 +20,12 @@ def add_headings(texer: TeXHandler) -> None:
         for abstract_candidate in texer.soup.select(
             "span.ptmr7t-x-x-109, span.ptmr8t-x-x-109"
         ):
+            if (
+                abstract_candidate.parent.name == "p"
+                and abstract_candidate.parent.has_attr("class")
+                and "indent" in abstract_candidate.parent["class"]
+            ):
+                abstract_candidate = abstract_candidate.parent  # Wrapped in <p>
             for line_elem in abstract_candidate.parent.contents:
                 if line_elem.get_text(strip=True).startswith("_" * 87):
                     abstract_heading = texer.soup.new_tag(
@@ -29,6 +35,8 @@ def add_headings(texer: TeXHandler) -> None:
                     line_elem.insert_before(abstract_heading)
                     line_elem.extract()
                     break
+            if texer.soup.select("h1.AbstractHeading"):
+                break  # Finished finding abstract
         # JEDM keywords
         for keywords_candidate in texer.soup.select(
             "span.ptmb7t-x-x-109, span.ptmri7t-x-x-109, span.ptmb8t-x-x-109"
