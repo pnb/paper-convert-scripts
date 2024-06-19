@@ -125,6 +125,8 @@ def get_raw_tex_contents(
             .replace(R"\ref{" + label + "}", R"\ref{" + new_label + "}")
             .replace(R"\label{" + label + "}", R"\label{" + new_label + "}")
         )
+    # Force space after \eqref if it has one, which otherwise gets deleted
+    tex_str = re.sub(r"(\\eqref\{[^}]+}) ", lambda x: x.group(1) + "~", tex_str)
 
     siunitx_tabulars = re.findall(r"\\begin\{tabular.?\}\s*\{[^\[]*S\[.*\}", tex_str)
     if siunitx_tabulars:
