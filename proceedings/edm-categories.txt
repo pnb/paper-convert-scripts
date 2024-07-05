@@ -17,4 +17,4 @@ Tutorials
 .*EDM-tutorials.*
 
 Industry Track
-.*EDM-industry-track.*
+.*EDM-industry.*
