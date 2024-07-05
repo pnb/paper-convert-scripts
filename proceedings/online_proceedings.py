@@ -48,12 +48,24 @@ ap.add_argument(
     "be a complete document, only a snippet (Markdown is recommended, however)",
 )
 ap.add_argument("--copyright", help="Path to a copyright notice snippet in HTML format")
+ap.add_argument(
+    "--cull-html",
+    help="Delete any HTML paper folders not matched to .bib files",
+    action="store_true",
+)
 args = ap.parse_args()
 
 try:
     os.mkdir(args.output_dir)
 except FileExistsError:
     pass
+
+if args.cull_html:
+    print("It is wise to run once without --cull-html to see what will be deleted")
+    confirm = input("Are you *sure* you want to delete unmatched HTML folders? [y/N] ")
+    if confirm != "y":
+        print("Exiting.")
+        exit()
 
 
 def hash_title(orig_title: str) -> str:
@@ -115,11 +127,11 @@ for bibfile in os.listdir(args.bib_dir):
 print("Processing papers")
 paper_index = {}  # Map first page number => hashed title, for creating index page
 processed_titles = set()  # Track which ones we've taken care of for checking at the end
-for dir in os.listdir(args.html_papers_dir):
-    dir = os.path.join(args.html_papers_dir, dir)
-    if os.path.isdir(dir):  # Is a paper directory, presumably
-        print(dir)
-        with open(os.path.join(dir, "index.html"), encoding="utf8") as infile:
+for pdir in os.listdir(args.html_papers_dir):
+    pdir = os.path.join(args.html_papers_dir, pdir)
+    if os.path.isdir(pdir):  # Is a paper directory, presumably
+        print(pdir)
+        with open(os.path.join(pdir, "index.html"), encoding="utf8") as infile:
             soup = bs4.BeautifulSoup(infile.read(), "lxml")
         first_meta_tag = soup.find("meta")  # To insert things around here
 
@@ -127,9 +139,10 @@ for dir in os.listdir(args.html_papers_dir):
         title_elem = soup.find("title")
         std_title = hash_title(title_elem.get_text())
         if std_title not in bib_data:
-            print(
-                "Error! BibTex/HTML mismatch for HTML:", title_elem.get_text(strip=True)
-            )
+            print("BibTex/HTML mismatch for HTML:", title_elem.get_text(strip=True))
+            if args.cull_html:
+                print("Culling directory")
+                shutil.rmtree(pdir)
             continue
         bib_id = next(iter(bib_data[std_title].entries))
         bib_entry = bib_data[std_title].entries[bib_id]
@@ -282,7 +295,7 @@ for dir in os.listdir(args.html_papers_dir):
         for img in soup.find_all("img", attrs={"src": lambda x: len(x)}):
             new_src = img["src"].lower().replace("/", "_")
             shutil.copy(
-                os.path.join(dir, img["src"]),
+                os.path.join(pdir, img["src"]),
                 os.path.join(args.output_dir, bib_id, new_src),
             )
             img["src"] = "./" + new_src
