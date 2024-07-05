@@ -28,12 +28,14 @@ Run `python online_proceedings.py -h` for additional help and description of arg
 
 ## Example with all options
 
-    python online_proceedings.py \
-        ~/Downloads/papers_select \  # HTML paper directories
-        ~/Downloads/bib-with-doi \   # .bib files
-        ~/Downloads/stamped \        # .pdf files
-        ~/Downloads/edm_html_proceedings \  # Output destination
-        https://educationaldatamining.org/edm2023/proceedings \
-        --category-regex-file edm-categories.txt \
-        --intro-doc ~/Downloads/front_matter_final.md \
-        --copyright edm2023-copyright.html
+```bash
+python online_proceedings.py \
+    ~/Downloads/papers_select \  # HTML paper directories
+    ~/Downloads/bib-with-doi \   # .bib files
+    ~/Downloads/stamped \        # .pdf files
+    ~/Downloads/edm_html_proceedings \  # Output destination
+    https://educationaldatamining.org/edm2023/proceedings \
+    --category-regex-file edm-categories.txt \
+    --intro-doc ~/Downloads/front_matter_final.md \
+    --copyright edm2023-copyright.html
+```
