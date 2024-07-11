@@ -350,10 +350,18 @@ if args.intro_doc:
             print("Found non-semantic {\\Large ...} in front matter.")
             fix_headings = input("Try auto-convert to \\subsection? [Y/n] ")
             if fix_headings.lower().strip() in ["y", ""]:
-                fixed_tex = re.sub(
+                tex_str = re.sub(
                     r"\{\s*\\Large\s+(\\bf\s+)?", R"\\subsection{", tex_str
                 )
-                intro_html = pypandoc.convert_text(fixed_tex, "html", "latex")
+        prefix = re.escape(
+            R">{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{"
+        )
+        if re.findall(prefix, tex_str):
+            print("Found unsupported \\raggedright... column width definition.")
+            fix_colwidth = input("Try to auto-replace with `l`? [Y/n] ")
+            if fix_colwidth.lower().strip() in ["y", ""]:
+                tex_str = re.sub(prefix + r"[\d\.]+\}\}", "l", tex_str)
+        intro_html = pypandoc.convert_text(tex_str, "html", "latex")
     if intro_html is None:
         intro_html = pypandoc.convert_file(args.intro_doc, "html")
     with open(
