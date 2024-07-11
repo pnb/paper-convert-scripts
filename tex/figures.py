@@ -193,6 +193,8 @@ def format_figures(texer: TeXHandler) -> None:
 def format_listings(texer: TeXHandler) -> None:
     for pre in texer.soup.select("pre.lstlisting"):
         container = pre.parent
+        if container.name == "td":
+            continue  # Don't convert table cells to <figure>
         container["class"] = "listing"
         container.name = "figure"
 
