@@ -348,10 +348,11 @@ if args.intro_doc:
             tex_str = infile.read()
         if R"{\Large" in tex_str:
             print("Found non-semantic {\\Large ...} in front matter.")
-            fix_headings = input("Try auto-convert to \\subsection? [Y/n] ")
+            fix_headings = input("Try auto-convert to \\[sub]subsection? [Y/n] ")
             if fix_headings.lower().strip() in ["y", ""]:
+                tex_str = re.sub(r"\{\s*\\Large\s+\\bf\s+", R"\\subsection{", tex_str)
                 tex_str = re.sub(
-                    r"\{\s*\\Large\s+(\\bf\s+)?", R"\\subsection{", tex_str
+                    r"\{\s*\\Large\s+\\it\s+", R"\\subsubsection{", tex_str
                 )
         prefix = re.escape(
             R">{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{"
