@@ -139,6 +139,8 @@ def get_raw_tex_contents(
             print("###", tabular, "\n")
     # Change \clearpage to a paragraph break since HTML doesn't have page breaks
     tex_str = re.sub(r"^\s*\\clearpage\s*$", "\n", tex_str, flags=re.MULTILINE)
+    # Ensure newline before end of listing (else last part is excluded for no reason)
+    tex_str = re.sub(r"(.)(\\end\{lstlisting)", r"\1\n\2", tex_str)
 
     # Look for image filenames with uppercase and/or mismatching case letters, which
     # causes issues across different OSs and issues with make4ht if the filename
