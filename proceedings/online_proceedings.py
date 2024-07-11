@@ -342,7 +342,20 @@ h1_elem.append(index_soup.new_string(bib_entry.fields["booktitle"]))
 # Add intro/frontmatter if provided
 if args.intro_doc:
     print("Creating introduction page")
-    intro_html = pypandoc.convert_file(args.intro_doc, "html")
+    intro_html = None
+    if args.intro_doc.lower().endswith(".tex"):
+        with open(args.intro_doc, "r", encoding="utf8") as infile:
+            tex_str = infile.read()
+        if R"{\Large" in tex_str:
+            print("Found non-semantic {\\Large ...} in front matter.")
+            fix_headings = input("Try auto-convert to \\subsection? [Y/n] ")
+            if fix_headings.lower().strip() in ["y", ""]:
+                fixed_tex = re.sub(
+                    r"\{\s*\\Large\s+(\\bf\s+)?", R"\\subsection{", tex_str
+                )
+                intro_html = pypandoc.convert_text(fixed_tex, "html", "latex")
+    if intro_html is None:
+        intro_html = pypandoc.convert_file(args.intro_doc, "html")
     with open(
         os.path.join(script_dir, "intro_template.html"), encoding="utf8"
     ) as infile:
