@@ -242,7 +242,7 @@ class TeXHandler:
         make finding the references section easier.
         """
         ref_heading = shared_utils.get_elem_containing_text(
-            self.soup, "h1", "references"
+            self.soup, "h1", "references", last=True
         )
         if not ref_heading:
             return  # Already going to warn about this in style check

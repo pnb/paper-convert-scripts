@@ -182,8 +182,13 @@ def get_references(
     # Format one per line as expected by Anystyle
     fname = os.path.join(output_dir, "extracted_refs.txt")
     with open(fname, "w", encoding="utf8") as ofile:
-        for ref in heading.find_next("ol").find_all("li"):
-            ofile.write(re.sub(r"\s+", " ", ref.get_text().strip()) + "\n")
+        # Assumes references have already been through TexHandler fix_references()
+        list_start = heading.find_next("ol")
+        if list_start:
+            for ref in list_start.find_all("li"):
+                ofile.write(re.sub(r"\s+", " ", ref.get_text().strip()) + "\n")
+        else:
+            warn("no_references_found_in_reference_section", "Expected ordered list")
     subprocess.call(
         [anystyle_path, "-f", "json", "--overwrite", "parse", fname, output_dir],
         stdout=subprocess.DEVNULL,
