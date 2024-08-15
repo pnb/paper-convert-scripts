@@ -335,7 +335,7 @@ def save_soup(soup: bs4.BeautifulSoup, output_filename: str) -> None:
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="../iedms.css" />
-        <script src="../table_sizer.js" defer />
+        <script src="../table_sizer.js" defer></script>
         <script>
             MathJax = {
                 loader: {
