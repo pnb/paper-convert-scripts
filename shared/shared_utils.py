@@ -344,13 +344,10 @@ def save_soup(soup: bs4.BeautifulSoup, output_filename: str) -> None:
                 tex: {
                     tags: 'ams',
                     macros: {
-                        bm: ["\\\\boldsymbol{#1}", 1],
                         textsc: [
                             '\\\\style{font-variant-caps: small-caps}{\\\\text{#1}}', 1
                         ],
-                        relax: '',
-                        mathds: ["{\\\\mathbb \\#1}", 1],
-                        mathbbm: ["{\\\\mathbb \\#1}", 1]
+                        relax: ''
                     },
                     packages: {'[+]': ['textmacros', 'mathtools']}
                 }
