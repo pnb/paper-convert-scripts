@@ -152,23 +152,26 @@ def get_raw_tex_contents(
             for x in get_command_content(tex_str, "includegraphics")
         ]
     )
-    for dir, _, fnames in os.walk(extracted_dir):
+    for curdir, _, fnames in os.walk(extracted_dir):
         for fname in fnames:
-            path = os.path.join(dir, fname)
-            relative_path = re.sub(
-                r"^" + re.escape(extracted_dir) + r"/?", "", path
-            ).lower()
+            path = os.path.join(curdir, fname)
+            relative_path = re.sub(r"^" + re.escape(extracted_dir) + r"/?", "", path)
             for img in img_fnames:
                 # Check if this is probably the file being referenced; this matching is
                 # imperfect in situations where authors have the same image filename in
                 # two different directories or the same filename with different
                 # capitalizations (terrible ideas)
-                if img.lower() == relative_path or relative_path.endswith(img.lower()):
+                if (
+                    img.lower() == relative_path.lower()
+                    or relative_path.lower().endswith(img.lower())
+                    or img.lower().endswith(relative_path.lower())
+                ):
                     if fname != fname.lower():  # Uppercase in image filename; rename it
-                        os.rename(path, os.path.join(dir, fname.lower()))
-                    newimg = img[: -len(fname)] + fname.lower()
-                    if newimg != img:  # Replace lowercase filename in tex
-                        tex_str = tex_str.replace("{" + img + "}", "{" + newimg + "}")
+                        os.rename(path, os.path.join(curdir, fname.lower()))
+                    newpath = relative_path[: -len(fname)] + fname.lower()
+                    if newpath != img:  # Replace lowercase/non-relative filename in tex
+                        print("Replacing image filename:", img, "→", newpath)
+                        tex_str = tex_str.replace("{" + img + "}", "{" + newpath + "}")
                     img_fnames.remove(img)
                     break
 
