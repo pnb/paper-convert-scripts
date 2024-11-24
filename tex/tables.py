@@ -15,7 +15,7 @@ def format_tables(texer: TeXHandler) -> None:
     for adjustbox in texer.soup.find_all("div", attrs={"class": "adjustbox"}):
         adjustbox.unwrap()  # Remove any unused size adjustment wrappers
 
-    table_tex_regex = re.compile(r"(^|[^\\])\\begin\s*\{table")
+    table_tex_regex = re.compile(r"(^|[^\\])\\begin\s*\{(long)?table")
     for caption_start in texer.soup.find_all(string=re.compile(r"Table\s+A?\d+:")):
         # Check previous lines for a table environment
         line_num = texer.tex_line_num(caption_start)
@@ -26,15 +26,17 @@ def format_tables(texer: TeXHandler) -> None:
             continue  # No table environment found; skip this caption
         # Find beginning of table container where caption should be inserted
         table_name = caption_start.get_text().strip().split(":")[0]
-        while caption_start.parent.name != "div":  # Rewind to beginning of table
-            caption_start = caption_start.parent
+        while caption_start.parent.name not in ["div", "caption"]:
+            caption_start = caption_start.parent  # Rewind to beginning of table
         while caption_start.previous_sibling:
             caption_start = caption_start.previous_sibling  # Usually an anchor
             if isinstance(caption_start, bs4.Tag) and caption_start.find("table"):
                 warn("table_caption_distance", table_name)  # Caption below table
                 break
-        caption = texer.soup.new_tag("caption")
-        caption_start.insert_before(caption)
+        caption = caption_start.parent
+        if caption.name != "caption":  # Will already be <caption> if longtable
+            caption = texer.soup.new_tag("caption")
+            caption_start.insert_before(caption)
         # Sometimes a <figure> wraps the table for no reason; remove it
         for figure in caption_start.parent.find_all("figure", recursive=False):
             figure.unwrap()  # Direct descendants only (recursive=False)
@@ -50,7 +52,13 @@ def format_tables(texer: TeXHandler) -> None:
                     re.sub(r"(\s|^)width=([\d\.]+|$)", "", caption.next_sibling)
                 )
             caption.append(caption.next_sibling)
-        table = caption.find_next("table")  # Move into <table> where it belongs
+        # Move into <table> where it belongs
+        if caption.has_attr("class") and "longtable" in caption["class"]:
+            table = caption.find_parent("table")
+            while caption.parent.name in ["td", "tr"]:
+                caption.parent.unwrap()  # Get longtable caption out of empty row
+        else:
+            table = caption.find_next("table")
         if not table:
             continue  # Something went pretty wrong, like caption below table
         table.insert(0, caption)
