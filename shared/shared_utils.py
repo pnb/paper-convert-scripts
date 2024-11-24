@@ -166,7 +166,12 @@ def check_styles(
     for a in soup.find_all("a"):
         schemas = ["#", "http://", "https://"]
         if a.has_attr("href") and not any(a["href"].startswith(x) for x in schemas):
-            warn("url_schema", a['href'])
+            warn("url_schema", a["href"])
+    # Check typography
+    for quotedir_match in re.finditer(r"(\s”\w|\w“\s)", soup.get_text()):
+        snip_start = max(0, quotedir_match.start() - 20)
+        snip_end = quotedir_match.end() + 20
+        warn("quote_direction", soup.get_text()[snip_start:snip_end].replace("\n", " "))
 
 
 def check_alt_text_duplicates(soup: bs4.BeautifulSoup, tex: bool = False) -> None:
@@ -205,7 +210,7 @@ def validate_alt_text(
         return False
     elif len(img_elem["alt"]) > 2000:
         warn("alt_text_long", img_elem["alt"], tex)
-        return  True  # Not a deal breaker, so don't stop processing the image
+        return True  # Not a deal breaker, so don't stop processing the image
     return True
 
 
