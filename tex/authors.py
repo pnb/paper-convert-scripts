@@ -33,14 +33,15 @@ def add_authors(texer: TeXHandler) -> None:
             for author_container in author_containers:
                 container.append(author_container)
 
+    # Get rid of totally empty tables, which result from moving the author info
+    for empty_table in texer.soup.find_all("div", attrs={"class": "tabular"}):
+        if not empty_table.get_text().strip():
+            empty_table.decompose()
     meta_section = texer.soup.find("div", attrs={"class": "center"})
     if not meta_section or not meta_section.find("div", attrs={"class": "tabular"}):
         warn("author_data_missing")
         return
     for tabular in meta_section.find_all("div", attrs={"class": "tabular"}):
-        if not tabular.get_text().strip():
-            tabular.decompose()
-            continue
         format_author_superscripts(texer, tabular)
         # Combine/format parts of author info
         beyond_author_name = False  # Assume first thing is author name
