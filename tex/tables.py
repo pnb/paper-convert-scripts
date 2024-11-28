@@ -15,7 +15,7 @@ def format_tables(texer: TeXHandler) -> None:
     for adjustbox in texer.soup.find_all("div", attrs={"class": "adjustbox"}):
         adjustbox.unwrap()  # Remove any unused size adjustment wrappers
 
-    table_tex_regex = re.compile(r"(^|[^\\])\\begin\s*\{(long)?table")
+    table_tex_regex = re.compile(r"(^|[^\\])\\begin\s*\{((long)?table|minipage)")
     for caption_start in texer.soup.find_all(string=re.compile(r"Table\s+A?\d+:")):
         # Check previous lines for a table environment
         line_num = texer.tex_line_num(caption_start)

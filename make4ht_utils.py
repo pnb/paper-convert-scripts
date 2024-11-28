@@ -200,6 +200,14 @@ def get_raw_tex_contents(
             + tex_str[command_end + 1 :]
         )
         next_pos = tex_str.find(R"\subfloat[", command_end + 44)
+    # \captionof{table}{Some caption}  % Line number doesn't get included
+    tex_str = re.sub(
+        r"\\captionof\{table\}",
+        lambda m: R"\HCode{<!-- l. "
+        + str(len(tex_str[: m.start()].splitlines()))
+        + R" -->}\captionof{table}",
+        tex_str,
+    )
 
     return tex_str
 
