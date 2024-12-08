@@ -112,7 +112,7 @@ def format_one_table(texer: TeXHandler, table: bs4.Tag) -> None:
         tr for tr in table.find_all("tr") if not tr.find("th") and tr.get_text().strip()
     ]
     hline_tr = table.find_all("tr", attrs={"class": "hline"})
-    if len(data_tr) > len(hline_tr) - 1:  # Not \hline every row after header
+    if len(data_tr) - 1 > len(hline_tr):  # Not \hline every row after header
         for tr in data_tr[1:]:
             if tr.previous_sibling and tr.previous_sibling in hline_tr:
                 tr["class"] = "border-above"
