@@ -74,17 +74,19 @@ def get_elem_containing_text(
 ) -> bs4.Tag:
     """Find a BeautifulSoup element containing some specific text. For example, one
     could find the "References" h1 element. Text matching is case insensitive.
+    Whitespace, numbers, and punctuation at the beginning/end of the element's text will
+    be ignored to make headings easier to match.
 
     Args:
         soup (bs4.BeautifulSoup): Soup or Tag to search within
         tagname (str): Name of tag, e.g., h1, div to look for
-        text (str): Text to search for (case insensitive)
+        text (str): Text to search for (case insensitive); can be a regex
         last (bool, optional): Search in reverse order to find the last occurrence
 
     Returns:
         bs4.Tag: Element containing the specified text, or None if not found
     """
-    regex = re.compile(r".*" + text + r".*", re.IGNORECASE)
+    regex = re.compile(r"[\s.0-9]*" + text + r"[\s.0-9]*", re.IGNORECASE)
     candidates = soup.find_all(tagname)
     if last:
         candidates = reversed(candidates)
