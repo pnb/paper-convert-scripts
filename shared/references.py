@@ -196,6 +196,10 @@ def get_references(
     )
     with open(fname[:-4] + ".json") as infile:
         ref_dict_list = json.load(infile)
+    for ref in ref_dict_list:
+        # Major misfire, maybe caused by middle initial "D." confused as director?
+        if "producer" in ref and "author" in ref:
+            ref["author"] = [*ref["producer"], *ref["author"]]
     return ref_dict_list
 
 
