@@ -16,62 +16,53 @@ def format_tables(texer: TeXHandler) -> None:
         adjustbox.unwrap()  # Remove any unused size adjustment wrappers
 
     table_tex_regex = re.compile(r"(^|[^\\])\\begin\s*\{((long)?table|minipage)")
-    for caption_start in texer.soup.find_all(string=re.compile(r"Table\s+A?\d+:")):
+    for table in texer.soup.find_all("table"):
         # Check previous lines for a table environment
-        line_num = texer.tex_line_num(caption_start)
+        line_num = texer.tex_line_num(table)
         for i in range(line_num, 0, -1):
             if table_tex_regex.search(texer.tex_lines[i]):
                 break
         else:
             continue  # No table environment found; skip this caption
-        # Find beginning of table container where caption should be inserted
-        table_name = caption_start.get_text().strip().split(":")[0]
-        while caption_start.parent.name not in ["div", "caption"]:
-            caption_start = caption_start.parent  # Rewind to beginning of table
-        while caption_start.previous_sibling:
-            caption_start = caption_start.previous_sibling  # Usually an anchor
-            if isinstance(caption_start, bs4.Tag) and caption_start.find("table"):
-                warn("table_caption_distance", table_name)  # Caption below table
-                break
-        caption = caption_start.parent
-        if caption.name != "caption":  # Will already be <caption> if longtable
-            caption = texer.soup.new_tag("caption")
-            caption_start.insert_before(caption)
+        if table.find("caption"):  # Caption already almost correct (probs a longtable)
+            caption_parent = table.find("caption").parent
+            table.insert(0, table.find("caption"))
+            if caption_parent.name == "td":
+                caption_parent.parent.decompose()  # Get rid of empty <tr>
+            format_one_table(texer, table)
+            continue
+        # Iterate backward through the soup to find caption parts
+        cur_caption_candidate = table
+        caption_parts = []
+        while cur_caption_candidate.parent.name != "body":
+            if cur_caption_candidate.previous_sibling:
+                cur_caption_candidate = cur_caption_candidate.previous_sibling
+            else:
+                cur_caption_candidate = cur_caption_candidate.parent
+                continue  # We already got the relevant children from this new parent
+            if isinstance(cur_caption_candidate, bs4.Tag):
+                if cur_caption_candidate.find("table") not in [None, table]:
+                    break  # Found a previous subtable so we should stop
+            caption_parts.append(cur_caption_candidate)
         # Sometimes a <figure> wraps the table for no reason; remove it
-        for figure in caption_start.parent.find_all("figure", recursive=False):
-            figure.unwrap()  # Direct descendants only (recursive=False)
-        # Combine all sub-sections (e.g., bold) into one caption
-        while caption.next_sibling and (
-            isinstance(caption.next_sibling, bs4.NavigableString)
-            or caption.next_sibling.name not in ["div", "table"]
-        ):
-            if isinstance(caption.next_sibling, bs4.NavigableString) and re.search(
-                r"(\s|^)width=([\d\.]+|$)", caption.next_sibling
+        if len(caption_parts):
+            for figure in caption_parts[-1].parent.find_all("figure", recursive=False):
+                figure.unwrap()  # Direct descendants only (recursive=False)
+        # Put all the caption parts together into a <caption>
+        caption = texer.soup.new_tag("caption")
+        for part in reversed(caption_parts):
+            if part.get_text(strip=True) == ":":
+                part.decompose()  # Remove stray ":" sometimes inserted
+                continue
+            if isinstance(part, bs4.NavigableString) and re.search(
+                r"(\s|^)width=([\d\.]+|$)", part
             ):  # Check for stray \adjustbox params, rendered for some reason
-                caption.next_sibling.replace_with(
-                    re.sub(r"(\s|^)width=([\d\.]+|$)", "", caption.next_sibling)
-                )
-            caption.append(caption.next_sibling)
-        # Move into <table> where it belongs
-        if caption.has_attr("class") and "longtable" in caption["class"]:
-            table = caption.find_parent("table")
-            while caption.parent.name in ["td", "tr"]:
-                caption.parent.unwrap()  # Get longtable caption out of empty row
-        else:
-            table = caption.find_next("table")
-        if not table:
-            continue  # Something went pretty wrong, like caption below table
+                part.replace_with(re.sub(r"(\s|^)width=([\d\.]+|$)", "", part))
+            caption.append(part)
         table.insert(0, caption)
-        # There may be multiple tabular environments within one table, so we'll now back
-        # up to the parent and find each <table>
-        container = table
-        while container.parent.name != "body" and not (
-            container.has_attr("class") and "float" in container["class"]
-        ):
-            container = container.parent
-        for onetable in container.find_all("table"):
-            if not onetable.find_parent("table"):  # Not a nested table
-                format_one_table(texer, onetable)
+        if not caption.get_text(strip=True):
+            warn("table_caption_distance", table.get_text(strip=True)[:30] + "...")
+        format_one_table(texer, table)
     add_tablenotes(texer)
 
 
@@ -104,7 +95,8 @@ def format_one_table(texer: TeXHandler, table: bs4.Tag) -> None:
     next_hline = table.find("tr", attrs={"class": "hline"})
     if next_hline and next_hline is not table.find_all("tr")[-1]:
         for header_row in table.find_all("tr"):
-            if header_row is next_hline:
+            all_numbers = re.match(r"[\d.][\d\s.]+$", header_row.get_text(strip=True))
+            if header_row is next_hline or all_numbers:
                 break
             thead.append(header_row)
             for td in header_row.find_all("td"):
@@ -120,7 +112,7 @@ def format_one_table(texer: TeXHandler, table: bs4.Tag) -> None:
         tr for tr in table.find_all("tr") if not tr.find("th") and tr.get_text().strip()
     ]
     hline_tr = table.find_all("tr", attrs={"class": "hline"})
-    if len(data_tr) > len(hline_tr):  # Not \hline every row
+    if len(data_tr) > len(hline_tr) - 1:  # Not \hline every row after header
         for tr in data_tr[1:]:
             if tr.previous_sibling and tr.previous_sibling in hline_tr:
                 tr["class"] = "border-above"
