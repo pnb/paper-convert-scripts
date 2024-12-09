@@ -28,6 +28,11 @@ class TeXHandler:
         for hr in soup.find_all("hr"):
             hr.decompose()
 
+        # Remove huge <p> tags caused by unclosed <p>
+        for p in soup.select("p.indent"):
+            if p.select("p"):
+                p.unwrap()  # This <p> has child <p>'s which it should not
+
         # Remove <br>s in links (sometimes \\ by authors due to LaTeX URL word-wrapping
         # troubles)
         for a in soup.find_all("a", attrs={"href": re.compile(r"https?://.*")}):
