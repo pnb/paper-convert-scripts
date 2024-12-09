@@ -34,8 +34,8 @@ def add_alt_text(texer: TeXHandler, img_elem: bs4.Tag) -> str:
     ):
         container = container.parent  # Handle all subfigures at once if needed
     img_i = container.find_all("img").index(img_elem)
-    if img_elem.has_attr("alt"):  # Make4ht defaults to "PIC" which is not real alt text
-        del img_elem["alt"]
+    if img_elem.has_attr("alt") and img_elem["alt"] == "PIC":
+        del img_elem["alt"]  # Make4ht defaults to "PIC" (except for {algorithms})
     if len(alts) > img_i:
         img_elem["alt"] = alts[img_i].replace(R"\%", "%")
     validate_alt_text(img_elem, img_elem["src"], True)
