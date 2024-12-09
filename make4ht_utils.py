@@ -114,6 +114,7 @@ def get_raw_tex_contents(
         .replace(R"\Tilde{", R"\tilde{")
         .replace(R"\vcentcolon", ":")
         .replace(R"{sidewaystable}", "{table}")
+        .replace(R"{algorithm*}", "{algorithm}")
     )
     # Remove underscores in eqref because they break make4ht
     underscore_labels = set()
