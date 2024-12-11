@@ -176,6 +176,12 @@ def get_raw_tex_contents(
                     img_fnames.remove(img)
                     break
 
+    # If in a solo subdir and the file references the .bib in that subdir, chomp that
+    if len(children) == 1:
+        tex_str = tex_str.replace(
+            R"\bibliography{" + children[0] + "/", R"\bibliography{"
+        )
+
     # Mark up environments/commands that sometimes/always get lost
     # \begin{description}
     tex_str = tex_str.replace(
