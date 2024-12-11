@@ -102,6 +102,8 @@ if not args.skip_compile:
         cwd=extracted_dir,
     )
     if retcode:
+        if template_name == "JEDM" and "{natbib}" in texstr:
+            shared.warn("natbib_jedm", tex=True)
         shared.warn("make4ht_warnings", tex=True)
 
 # Load HTML
