@@ -43,6 +43,16 @@ def format_tables(texer: TeXHandler) -> None:
             if isinstance(cur_caption_candidate, bs4.Tag):
                 if cur_caption_candidate.find("table") not in [None, table]:
                     break  # Found a previous subtable so we should stop
+            # Mark as subcaption part if it seems like it is one
+            if isinstance(cur_caption_candidate, bs4.Tag):
+                for cls in ["minipage", "subfigure"]:
+                    if cur_caption_candidate.find_parent("div", attrs={"class": cls}):
+                        scap_re = re.compile(r"\s*\([a-zA-Z1-9]{1,2}\)")
+                        scap_match = cur_caption_candidate.find(string=scap_re)
+                        if scap_match:
+                            scap_match.parent["class"] = "subcaption"
+                            scap_match.parent.name = "span"
+                        break
             caption_parts.append(cur_caption_candidate)
         # Sometimes a <figure> wraps the table for no reason; remove it
         if len(caption_parts):
