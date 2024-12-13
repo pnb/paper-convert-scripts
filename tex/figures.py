@@ -138,8 +138,12 @@ def format_figures(texer: TeXHandler) -> None:
                 or img["alt"].strip().startswith("----------------")
             ):
                 continue  # Skip over images generated of algorithm listings
-            if not img.find_parent(["div", "figure"]):
-                continue  # Images outside figure environments (not expecting alt text)
+        if (
+            not img.find_parent("div", attrs={"class": "figure"})
+            and not img.find_parent("div", attrs={"class": "subfigure"})
+            and not img.find_parent("div", attrs={"class": "minipage"})
+        ):
+            continue  # Images outside figure environments (not expecting alt text)
         if img.parent.has_attr("class") and "centerline" in img.parent["class"]:
             img.parent.unwrap()  # Remove extra div added if somebody uses \centerline
         # Repair double // in img src when using a trailing / with \graphicspath
@@ -149,9 +153,9 @@ def format_figures(texer: TeXHandler) -> None:
             warn("jedm_figure_filename", img["src"], tex=True)
         # Handle alt text and caption
         add_alt_text(texer, img)
-        img_text_line_num = texer.tex_line_num(img)
-        img_text_line_num = texer.find_image_line_num(img_text_line_num, img["src"])
-        env_start, _ = texer.get_tex_environment(img_text_line_num)
+        img_tex_line_num = texer.tex_line_num(img)
+        img_tex_line_num = texer.find_image_line_num(img_tex_line_num, img["src"])
+        env_start, _ = texer.get_tex_environment(img_tex_line_num)
         parent = img.parent
         subfigure_wrapper = img.find_parent("div", attrs={"class": "subfigure"})
         if "subfigure" in texer.tex_lines[env_start] or subfigure_wrapper:
@@ -184,8 +188,8 @@ def format_figures(texer: TeXHandler) -> None:
         if img.has_attr("height"):
             del img["height"]  # Fixes width/height proportions; width is more important
         if img.has_attr("width") and (
-            "scale=" in texer.tex_lines[img_text_line_num - 1]
-            or "\\unitlength" in texer.tex_lines[img_text_line_num - 1]
+            "scale=" in texer.tex_lines[img_tex_line_num - 1]
+            or "\\unitlength" in texer.tex_lines[img_tex_line_num - 1]
         ):
             del img["width"]  # Some things lead to tiny width, so we have to skip it
         width_in = 3  # Assume medium-ish for "figure" environment
