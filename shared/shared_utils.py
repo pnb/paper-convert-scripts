@@ -179,18 +179,20 @@ def check_styles(
 def check_alt_text_duplicates(soup: bs4.BeautifulSoup, tex: bool = False) -> None:
     """Check if all alt texts in the given document are unique, which they should be for
     both semantic and practical reasons (because DOCX conversion uses alt text as an
-    identifier).
+    identifier). Duplicate alt text is only ignored for the same image filename, which
+    can occur for decorative images or other small repeated images (e.g., emojis).
 
     Args:
         soup (bs4.BeautifulSoup): Soup for document to check
         tex (bool): Whether or not to trigger LaTeX warnings, if there are any warnings
     """
-    alt_texts = set()
+    alt_texts = {}  # Filename -> alt text
     for img in soup.find_all("img"):
         if img.has_attr("alt") and img["alt"]:
-            if img["alt"] in alt_texts:
-                warn("alt_text_duplicate", 'Alt text: "' + img["alt"] + '"', tex)
-            alt_texts.add(img["alt"])
+            if img["alt"] in alt_texts.values():  # Duplicate alt text
+                if alt_texts.get(img["src"]) != img["alt"]:  # And not for same filename
+                    warn("alt_text_duplicate", 'Alt text: "' + img["alt"] + '"', tex)
+            alt_texts[img["src"]] = img["alt"]
 
 
 def validate_alt_text(

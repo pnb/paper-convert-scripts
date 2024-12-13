@@ -38,6 +38,17 @@ def add_alt_text(texer: TeXHandler, img_elem: bs4.Tag) -> str:
         del img_elem["alt"]  # Make4ht defaults to "PIC" (except for {algorithms})
     if len(alts) > img_i:
         img_elem["alt"] = alts[img_i].replace(R"\%", "%")
+
+    # Also check for \Description on the same line outside a figure environment; a bit
+    # of a hack to allow things like defining an image command for repeated images
+    if not img_elem.has_attr("alt"):
+        for texline in texer.tex_lines:
+            if "{" + img_elem["src"] + "}" in texline and R"\Description" in texline:
+                alts = get_command_content(texline, "Description")
+                if len(alts):
+                    img_elem["alt"] = alts[0]
+                    break
+
     validate_alt_text(img_elem, img_elem["src"], True)
     return img_elem["alt"] if img_elem.has_attr("alt") else None
 
