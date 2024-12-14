@@ -109,6 +109,16 @@ def get_raw_tex_contents(
     if match:
         warn("no_newline_after_algorithmic", match.group(0))
 
+    # Natbib cite style without Natbib causes issues
+    if (R"\citep{" in tex_str or R"\citet{" in tex_str) and "natbib" not in tex_str:
+        citet_cmd = (
+            R"\newcommand{\citet}[1]{"
+            R"\HCode{<span class='citet-replace'>}\cite{#1}\HCode{</span>}}"
+        ).replace("\\", "\\\\")
+        tex_str = re.sub(r"(\\documentclass.*)(?=\n|$)", r"\1 " + citet_cmd, tex_str)
+        tex_str = tex_str.replace(R"\citep{", R"\cite{")
+        warn("converted_citep_citet")
+
     tex_str = (
         tex_str.replace(R"\Bar{", R"\bar{")
         .replace(R"\Tilde{", R"\tilde{")
@@ -282,7 +292,7 @@ def detect_extra_flags_needed(tex_str: str) -> str:
         tex_str (str): LaTeX document source code
 
     Returns:
-        str: Name of backend command to use (e.g., "biber", "bibtex") or None
+        str: Any extra make4ht compile flags to pass in (or "" if none)
     """
     flags = ""
     if re.search(r"^\s*\\usepackage\{fontspec\}", tex_str, re.MULTILINE):

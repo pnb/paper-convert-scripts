@@ -356,7 +356,8 @@ def mark_up_citations(soup: bs4.BeautifulSoup, input_template: str) -> None:
     """Add useful semantic information to the in-text citations. Currently, this
     consists only of adding a "citation" CSS class for JEDM Tex citations, but in the
     future it could include other templates and maybe adding links for citations that
-    don't have them (especially DOCX).
+    don't have them (especially DOCX). Also fixes the parentheses in natbib author-year
+    citet citations if they have been modified to circumvent natbib compilation issues.
 
     Args:
         soup (bs4.BeautifulSoup): Soup to modify
@@ -366,6 +367,14 @@ def mark_up_citations(soup: bs4.BeautifulSoup, input_template: str) -> None:
         for a in soup.find_all("a", attrs={"href": True}):
             if a["href"].startswith("#X"):
                 a["class"] = a.get("class", []) + ["citation"]
+        for citet in soup.select("span.citet-replace"):
+            open_paren = citet.find(string="(")
+            close_paren = citet.find(string=")")
+            year = citet.find(string=re.compile(r"[0-9]"))
+            if open_paren and close_paren and year:
+                open_paren.replace_with(re.sub(r",\s+[0-9].*", "", year) + " (")
+                year.replace_with(re.sub(r"^[^0-9]*", "", year, count=1))
+            citet.unwrap()
 
 
 if __name__ == "__main__":

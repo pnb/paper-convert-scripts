@@ -21,6 +21,10 @@
             "message": "\\usepackage{natbib} should not be specified",
             "help": "The JEDM template already implies natbib, and including it a second time may cause issues."
         },
+        "converted_citep_citet": {
+            "message": "\\citep and/or \\citet converted to \\cite",
+            "help": "\\citep and \\citet causes issues without natbib, so \\citep was automatically converted to \\cite and \\citet was redefined to (hopefully) enable correct postprocessing. If the citations and references in the result seem OK, you can ignore this message."
+        },
         "file_not_found": {
             "message": "Could not find a file to \\input{}",
             "help": "Check file paths, especially relative file paths. HTML conversion assumes \\input{} paths are relative to the primary LaTeX source file (e.g., main.tex), whereas the LaTeX compiler can be slightly more generous by also allowing paths relative to the working directory. HTML conversion does not have access to the same working directory information, however."
