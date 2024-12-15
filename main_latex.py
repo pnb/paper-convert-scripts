@@ -1,7 +1,6 @@
 import argparse
 import os
 import shutil
-import subprocess
 
 from bs4 import BeautifulSoup
 import cssutils
@@ -20,6 +19,7 @@ ap.add_argument(
     action="store_true",
     help="Use MathML conversion in make4ht",
 )
+ap.add_argument("--timeout-ms", type=int, help="Enforce make4ht execution time (in ms)")
 ap.add_argument(
     "--skip-compile",
     action="store_true",
@@ -94,10 +94,11 @@ if not args.skip_compile:
             ofile.write(infile.read())
     shutil.copy(os.path.join(scripts_dir, "make4ht_preamble.cfg"), extracted_dir)
     mathml = "mathml," if args.mathml else ""
-    retcode = subprocess.call(
+    retcode = shared.exec_grouping_subprocesses(
         "make4ht" + extra_flags + " --output-dir .. --format html5+common_domfilters "
         "--build-file make4ht_with_bibtex.mk4 tmp-make4ht.tex "
         '"' + mathml + 'mathjax,svg,fn-in" --config make4ht_preamble',
+        timeout=args.timeout_ms / 1000 if args.timeout_ms else None,
         shell=True,
         cwd=extracted_dir,
     )
