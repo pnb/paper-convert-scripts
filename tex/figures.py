@@ -139,7 +139,7 @@ def format_figures(texer: TeXHandler) -> None:
             ):
                 continue  # Skip over images generated of algorithm listings
         if (
-            not img.find_parent("div", attrs={"class": "figure"})
+            not img.find_parent(["div", "figure"], attrs={"class": "figure"})
             and not img.find_parent("div", attrs={"class": "subfigure"})
             and not img.find_parent("div", attrs={"class": "minipage"})
         ):
