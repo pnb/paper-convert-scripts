@@ -188,3 +188,11 @@ shared.check_citations_vs_references(
 # Save result
 print("Saving result")
 shared.save_soup(soup.body, os.path.join(args.output_dir, "index.html"))
+print("Removing unused tmp-* files from result folder")
+soup_str = str(soup)
+count_removed = 0
+for fname in os.listdir(args.output_dir):
+    if fname.startswith("tmp-") and fname not in soup_str:
+        os.remove(os.path.join(args.output_dir, fname))
+        count_removed += 1
+print("Removed", count_removed, "tmp-* file(s)")
