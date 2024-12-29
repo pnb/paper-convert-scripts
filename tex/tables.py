@@ -67,7 +67,14 @@ def format_tables(texer: TeXHandler) -> None:
             if isinstance(part, bs4.NavigableString) and re.search(
                 r"(\s|^)width=([\d\.]+|$)", part
             ):  # Check for stray \adjustbox params, rendered for some reason
-                part.replace_with(re.sub(r"(\s|^)width=([\d\.]+|$)", "", part))
+                new_part = bs4.NavigableString(
+                    re.sub(r"((\smax)?\s|^)width=([\d\.]+|$)", "", part)
+                )
+                part.replace_with(new_part)
+                part = new_part
+                # After this, caption_parts can no longer be trusted because it has the
+                # old `part` and replace_with works in a surprising way:
+                # https://stackoverflow.com/questions/63424180
             caption.append(part)
         table.insert(0, caption)
         if not caption.get_text(strip=True):
