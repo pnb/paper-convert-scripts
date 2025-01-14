@@ -52,6 +52,10 @@ for fname in os.listdir(curdir):
                 print("margins: Page", page_num, "has content in top margin")
             if count_nonblank_pixels(img, 0, 1025, 850, 1100) > 0:
                 print("margins: Page", page_num, "has content in bottom margin")
-
-# Check the copyright block on the first page; we can crop some areas in the block that
-# *should* be totally blank (cropping around instructions text) and check that they are
+            # Check copyright block on first page is blank (working around instructions
+            # text that is present for MSWord version)
+            if page_num == 1 and (
+                count_nonblank_pixels(img, 0, 880, 420, 908) > 0
+                or count_nonblank_pixels(img, 0, 945, 420, 1005) > 0
+            ):
+                print("copyright block: The copyright block has unexpected content")
