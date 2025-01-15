@@ -39,9 +39,9 @@ for fname in os.listdir(curdir):
                     "page size: Page",
                     page_num,
                     "is the wrong size; should be 8.5 × 11 inches, found",
-                    img.size[0],
+                    img.size[0] / 100,
                     "×",
-                    img.size[1],
+                    img.size[1] / 100,
                 )
                 continue  # If page is wrong size, nothing else can be checked well
             if count_nonblank_pixels(img, 0, 0, 65, 1100) > 0:
