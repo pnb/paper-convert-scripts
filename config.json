@@ -1,6 +1,6 @@
 {
-    "inkscape_path": "/Applications/Inkscape.app/Contents/MacOS/inkscape",
-    "libreoffice_path": "/Applications/LibreOffice.app/Contents/MacOS/soffice",
-    "python_path": "/Users/pnb/anaconda3/envs/paper_convert/bin/python",
+    "inkscape_path": "/usr/bin/inkscape",
+    "libreoffice_path": "/usr/bin/soffice",
+    "python_path": "/var/home/nigel/miniconda3/envs/paper_convert/bin/python",
     "anystyle_path" : "/usr/local/bin/anystyle"
 }
