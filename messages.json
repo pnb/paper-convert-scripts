@@ -222,9 +222,9 @@
             }
         },
         "jedm_figure_filename": {
-            "message": "Character \"+\" in image filename can cause issues for JEDM",
+            "message": "Image filename issue for JEDM",
             "severity": "high",
-            "help": "The JEDM journal system will sometimes return 404 for images with \"+\" in the filename for some reason."
+            "help": "The JEDM journal system will sometimes return 404 for images with \"+\" or \" \" (space) in the filename for some reason. These files should be renamed."
         },
         "tex_file_missing": {
             "message": "No .tex files found in root of .zip file; cannot process",

@@ -149,7 +149,7 @@ def format_figures(texer: TeXHandler) -> None:
         # Repair double // in img src when using a trailing / with \graphicspath
         img["src"] = img["src"].replace("//", "/")
         # Check for JEDM filename issue
-        if texer.input_template == "JEDM" and "+" in img["src"]:
+        if texer.input_template == "JEDM" and ("+" in img["src"] or " " in img["src"]):
             warn("jedm_figure_filename", img["src"], tex=True)
         # Handle alt text and caption
         add_alt_text(texer, img)
