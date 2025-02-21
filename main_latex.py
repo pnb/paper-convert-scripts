@@ -195,4 +195,6 @@ for fname in os.listdir(args.output_dir):
     if fname.startswith("tmp-") and fname not in soup_str:
         os.remove(os.path.join(args.output_dir, fname))
         count_removed += 1
+    elif fname.startswith("tmp-") and fname.endswith(".svg"):
+        tex.fix_svg_quotes(os.path.join(args.output_dir, fname))
 print("Removed", count_removed, "tmp-* file(s)")

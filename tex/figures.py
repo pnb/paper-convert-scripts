@@ -234,3 +234,14 @@ def format_listings(texer: TeXHandler) -> None:
             for content in elem.contents:
                 if isinstance(content, bs4.NavigableString):
                     content.replace_with(str(content).replace("\n", ""))
+
+
+def fix_svg_quotes(svg_fname: str) -> None:
+    """OJS does not like SVGs with single quotes. It sets the Content-Type header to
+    text/xml instead of image/svg+xml, causing them not to display. Therefore, we will
+    replace the single quotes with double quotes."""
+    print("Converting SVG single quotes to double:", svg_fname)
+    with open(svg_fname, "r", encoding="utf8") as infile:
+        svgsoup = bs4.BeautifulSoup(infile.read(), "lxml-xml")
+    with open(svg_fname, "w", encoding="utf8") as ofile:
+        ofile.write(str(svgsoup))
