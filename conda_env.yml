@@ -19,3 +19,4 @@ dependencies:
   - python=3.10.6
   - pip:
     - mammoth==1.7.1
+    - pdfminer.six==20240706

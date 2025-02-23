@@ -1,12 +1,16 @@
 import argparse
 import os
+import re
 
 from PIL import Image
+from pdfminer.high_level import extract_pages
+from pdfminer.layout import LTTextContainer, LTChar, LTTextLineHorizontal
 
 import shared
 
 ap = argparse.ArgumentParser(description="Check a PDF for any known issues")
 ap.add_argument("pdf_path", help="PDF file path")
+ap.add_argument("--max-preref-pages", type=int, help="Max allowed pages before refs")
 args = ap.parse_args()
 
 
@@ -59,3 +63,46 @@ for fname in os.listdir(curdir):
                 or count_nonblank_pixels(img, 0, 945, 420, 1005) > 0
             ):
                 print("copyright block: The copyright block has unexpected content")
+
+# Check text of the PDF to extract title and find headings (e.g., References) to make
+# sure things are in the right order and the paper length is OK
+preref_page_count = 0  # Count of pages before references
+appendix_before_refs = False
+title_chars = []
+title = ""
+for page_i, page_layout in enumerate(extract_pages(args.pdf_path)):
+    chars_in_page = 0
+    cur_heading = []
+    text_containers = [x for x in page_layout if isinstance(x, LTTextContainer)]
+    for element in text_containers:
+        text_lines = [x for x in element if isinstance(x, LTTextLineHorizontal)]
+        for text_line in text_lines:
+            chars = [x for x in text_line if isinstance(x, LTChar)]
+            for character in chars:
+                if not title and character.size > 17:
+                    title_chars.append(character.get_text().replace("\n", " "))
+                elif not title:
+                    title = "".join(title_chars).strip()
+                if character.size > 11.9 and character.size < 12.1:
+                    cur_heading.append(character.get_text())
+                    heading_str = "".join(cur_heading).lower()
+                    if re.match(r"(\d*|[a-z])\.?\s*references", heading_str):
+                        preref_page_count = page_i  # Don't count this page
+                        if chars_in_page > len(cur_heading):  # Unless mid-page
+                            preref_page_count = page_i + 1  # Do count this page
+                    if re.match(r"\d*\.?\s*appendi(x|ces)", heading_str):
+                        if preref_page_count == 0:
+                            appendix_before_refs = True
+                else:
+                    cur_heading.clear()
+                chars_in_page += 1
+print("info: title=" + title)  # Not an error, just a way to get the title for later
+if appendix_before_refs:
+    print("appendix location: Appendices should be after the references, not before")
+if args.max_preref_pages and preref_page_count > args.max_preref_pages:
+    print(
+        "page limit: The paper has content on",
+        preref_page_count,
+        "pages before references, which is more than the maximum of",
+        args.max_preref_pages,
+    )
