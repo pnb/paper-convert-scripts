@@ -1,10 +1,14 @@
 import argparse
 import os
+import tempfile
+import shlex
+import shutil
 import re
 
 from PIL import Image
 from pdfminer.high_level import extract_pages
 from pdfminer.layout import LTTextContainer, LTChar, LTTextLineHorizontal
+import numpy as np
 
 import shared
 
@@ -21,22 +25,23 @@ def count_nonblank_pixels(img: Image, x1: int, y1: int, x2: int, y2: int) -> int
     return sum(1 for pixel in img.getdata() if pixel < 255)
 
 
-curdir = os.path.dirname(args.pdf_path)
+tmpdir = tempfile.mkdtemp()
+shutil.copyfile(args.pdf_path, os.path.join(tmpdir, os.path.basename(args.pdf_path)))
 retcode = shared.exec_grouping_subprocesses(
     "convert -density 100 -background white -alpha remove -alpha off "
-    + os.path.basename(args.pdf_path)
+    + shlex.quote(os.path.basename(args.pdf_path))
     + " page-%d.png",
     shell=True,
-    cwd=curdir,
+    cwd=tmpdir,
 )
 if retcode != 0:
     exit(retcode)
 
 # Count non-blank pixels in margin to see if margins are correctly empty
-for fname in os.listdir(curdir):
+for fname in os.listdir(tmpdir):
     if fname.startswith("page-"):
         page_num = int(fname.split("-")[1].split(".")[0]) + 1
-        with Image.open(os.path.join(curdir, fname)) as img:
+        with Image.open(os.path.join(tmpdir, fname)) as img:
             img = img.convert("L")
             if img.size != (850, 1100):
                 print(
@@ -64,10 +69,11 @@ for fname in os.listdir(curdir):
             ):
                 print("copyright block: The copyright block has unexpected content")
 
-# Check text of the PDF to extract title and find headings (e.g., References) to make
-# sure things are in the right order and the paper length is OK
+# Check text of the PDF to extract things like title, headings (e.g., References), and
+# fonts for additional checks
 preref_page_count = 0  # Count of pages before references
 appendix_before_refs = False
+char_font_sizes = []
 title_chars = []
 title = ""
 for page_i, page_layout in enumerate(extract_pages(args.pdf_path)):
@@ -89,13 +95,15 @@ for page_i, page_layout in enumerate(extract_pages(args.pdf_path)):
                     if re.match(r"(\d*|[a-z])\.?\s*references", heading_str):
                         preref_page_count = page_i  # Don't count this page
                         if chars_in_page > len(cur_heading):  # Unless mid-page
-                            preref_page_count = page_i + 1  # Do count this page
+                            preref_page_count = page_i + 1  # Then do count this page
                     if re.match(r"\d*\.?\s*appendi(x|ces)", heading_str):
                         if preref_page_count == 0:
                             appendix_before_refs = True
                 else:
                     cur_heading.clear()
                 chars_in_page += 1
+                char_font_sizes.append(character.size)
+
 print("info: title=" + title)  # Not an error, just a way to get the title for later
 if appendix_before_refs:
     print("appendix location: Appendices should be after the references, not before")
@@ -106,3 +114,6 @@ if args.max_preref_pages and preref_page_count > args.max_preref_pages:
         "pages before references, which is more than the maximum of",
         args.max_preref_pages,
     )
+mdn_font_size = np.median(char_font_sizes)
+if mdn_font_size < 8.75 or mdn_font_size > 9.25:
+    print("font size: The median font size is", mdn_font_size, "pt (should be 9)")
