@@ -19,4 +19,4 @@ dependencies:
   - python=3.10.6
   - pip:
     - mammoth==1.7.1
-    - pdfminer.six==20240706
+    - pdfminer.six==20231228  # version 20240706 has issue (https://github.com/pdfminer/pdfminer.six/issues/1004) affecting 1 EDM 2024 paper (poster 70)
