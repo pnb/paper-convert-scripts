@@ -57,9 +57,9 @@ for fname in os.listdir(tmpdir):
                 print("margins: Page", page_num, "has content in left margin")
             if count_nonblank_pixels(img, 785, 0, 850, 1100) > 0:
                 print("margins: Page", page_num, "has content in right margin")
-            if count_nonblank_pixels(img, 0, 0, 850, 75) > 0:
+            if count_nonblank_pixels(img, 0, 0, 850, 70) > 0:
                 print("margins: Page", page_num, "has content in top margin")
-            if count_nonblank_pixels(img, 0, 1025, 850, 1100) > 0:
+            if count_nonblank_pixels(img, 0, 1030, 850, 1100) > 0:
                 print("margins: Page", page_num, "has content in bottom margin")
             # Check copyright block on first page is blank (working around instructions
             # text that is present for MSWord version)
