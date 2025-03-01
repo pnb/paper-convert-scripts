@@ -79,7 +79,7 @@
         "style_keywords_heading": {
             "message": "Could not find keywords heading",
             "severity": "high",
-            "help": "Make sure the paper has a \"Keywords\" heading, as shown in the template. Select the text of the \"Keywords\" heading in Word, open the Styles pane, and make sure the \"Keywords Heading\" style is used.",
+            "help": "For EDM, make sure the paper has a \"Keywords\" heading, as shown in the template. Select the text of the \"Keywords\" heading in Word, open the Styles pane, and make sure the \"Keywords Heading\" style is used. For JEDM, make sure the Keywords are within the abstract with the \"Abstract\" style.",
             "tex": {
                 "help": "Make sure the paper has keywords defined with the \\keywords{} command, as shown in the template."
             }
@@ -87,7 +87,7 @@
         "style_keywords": {
             "message": "Could not find keywords",
             "severity": "high",
-            "help": "Select the text of the keywords section in your paper in Word, open the Styles pane, and make sure the \"Keywords\" style is used.",
+            "help": "For EDM, select the text of the keywords section in your paper in Word, open the Styles pane, and make sure the \"Keywords\" style is used. For JEDM, make sure the keywords are within the abstract block (not after) as in the template.",
             "tex": {
                 "help": "Make sure the paper has keywords defined with the \\keywords{} command, as shown in the template."
             }
