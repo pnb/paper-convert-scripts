@@ -11,7 +11,7 @@ def process_captions(mp: MammothParser) -> None:
     move the caption elements inside the <table> or <figure> element where they should
     be.
     """
-    caption_regex = re.compile(r"^\s*(Figure|Fig\.|Table)\s+(A?\.?\d+)?")
+    caption_regex = re.compile(r"^\s*(Figure|Fig\.|Table)\s+(A?\.?\d+[a-z]?)?")
     figure_counter = 0
     table_counter = 0
     for elem in mp.soup.find_all("caption"):
