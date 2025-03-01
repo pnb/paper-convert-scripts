@@ -49,7 +49,9 @@ def check_citations_vs_references(
                 if ref["date"][0][:4] != cite.split()[-1][:4]:
                     continue  # Year mismatch, ignoring disambiguation a/b/etc.
                 if "author" not in ref:
-                    if "publisher" in ref:  # Maybe misdetected as publisher (e.g., ISU)
+                    if "editor" in ref:  # Maybe an edited book (no chapter cited)
+                        ref["author"] = ref["editor"]
+                    elif "publisher" in ref:  # Misdetected as publisher? (e.g., ISU)
                         ref["author"] = [{"family": ref["publisher"][0]}]
                     else:
                         continue
@@ -57,7 +59,7 @@ def check_citations_vs_references(
                 author_matches = []
                 for a in ref["author"]:
                     if "others" in a and a["others"]:
-                        continue  # 25+ authors have "...", which parses as this
+                        continue  # 25+ authors have "...", which parses as "others"
                     name = a.get("family", a.get("given", ""))
                     if name == "n.d" and "given" in a:
                         name = a["given"]  # Misdetected n.d. as name
@@ -426,6 +428,10 @@ if __name__ == "__main__":
         <li>Imaginary State University. n.d. Programs at ISU.
             https://imagistate.edu/programs/ Accessed: 1998-01-17.
         </li>
+        <li>Hunt, R. R., & Worthen, J. B. (Eds.). (2006). Distinctiveness and memory.
+            Oxford University Press.
+            https://doi.org/10.1093/acprof:oso/9780195169669.001.0001
+        </li>
     </ol>
     <h1>Appendix</h1>
     <ol><li>List item in appendix</li></ol>
@@ -477,6 +483,7 @@ if __name__ == "__main__":
         <p>Comma-separated cites (Commaname et al., 1999, Othername et al., 1999)</p>
         <p>Cites separated by nbsp (Ganapathy et al., 2011, El Asri et al., 2017)</p>
         <p>Multi-year cites with commas (Commaname et al., 2002, 2003, Solo, 1999)</p>
+        <p>Citing edited book (Hunt & Worthen, 2006).</p>
         <h1>References</h1>
     """
     example_soup = bs4.BeautifulSoup(example_html + processed_refs_html, "html.parser")
