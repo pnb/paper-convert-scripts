@@ -60,7 +60,9 @@ for fname in os.listdir(tmpdir):
                 or count_nonblank_pixels(img, 790, 0, 850, 1100) > 0
             ):
                 print("margins: Page", page_num, "has content in right margin")
-            if count_nonblank_pixels(img, 0, 0, 850, 70) > 0:
+            if count_nonblank_pixels(img, 0, 0, 850, 60) > 0:
+                # We have to give extra space here because of the \topfraction "feature"
+                # of LaTeX that allows figures into the top margin in certain cases
                 print("margins: Page", page_num, "has content in top margin")
             if count_nonblank_pixels(img, 0, 1030, 850, 1100) > 0:
                 print("margins: Page", page_num, "has content in bottom margin")
