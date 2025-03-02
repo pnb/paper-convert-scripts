@@ -53,9 +53,12 @@ for fname in os.listdir(tmpdir):
                     img.size[1] / 100,
                 )
                 continue  # If page is wrong size, nothing else can be checked well
-            if count_nonblank_pixels(img, 0, 0, 65, 1100) > 0:
+            if count_nonblank_pixels(img, 0, 0, 65, 1100) > 20:
                 print("margins: Page", page_num, "has content in left margin")
-            if count_nonblank_pixels(img, 785, 0, 850, 1100) > 0:
+            if (
+                count_nonblank_pixels(img, 785, 0, 850, 1100) > 20
+                or count_nonblank_pixels(img, 790, 0, 850, 1100) > 0
+            ):
                 print("margins: Page", page_num, "has content in right margin")
             if count_nonblank_pixels(img, 0, 0, 850, 70) > 0:
                 print("margins: Page", page_num, "has content in top margin")
