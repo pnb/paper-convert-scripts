@@ -333,8 +333,15 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
                     and first_word not in ["et", "al", "&", "and"]
                 ):
                     offset = 1 if text[i] == "(" else len(first_tok) + 2
-                    ref = text[i + offset : ending.end() - 1]
-                    cites.append(ref.replace(" (", ", ").replace(" [", ", "))
+                    cite = (
+                        text[i + offset : ending.end() - 1]
+                        .replace(" (", ", ")
+                        .replace(" [", ", ")
+                        .replace(";", ",")
+                    )
+                    for y in year_end_re.finditer(cite):  # In case of (YYYY, YYYY)
+                        year = "XXXX" if y.group(1) == " nd" else y.group(1)
+                        cites.append(year_end_re.sub("", cite) + ", " + year)
                     break
             elif text[i] in "([":
                 if text[i + 1] in "0123456789":
