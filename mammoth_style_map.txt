@@ -21,3 +21,4 @@ p[style-name='Bibliography'] => p.ReferenceItem:fresh
 p[style-name='EndNote Bibliography'] => p.ReferenceItem:fresh
 r[style-name='Reference author'] => span.ReferenceAuthor
 r[style-name='URL Char'] => span
+r[style-name='Emphasis'] => em
