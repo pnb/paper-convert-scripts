@@ -3,3 +3,4 @@ from .captions import *
 from .tables import *
 from .figures import *
 from .headings import *
+from .blockquotes import *
