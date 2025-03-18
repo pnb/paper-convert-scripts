@@ -3,6 +3,7 @@ import os
 import tempfile
 import shlex
 import shutil
+import subprocess
 import re
 
 from PIL import Image
@@ -33,6 +34,8 @@ retcode = shared.exec_grouping_subprocesses(
     + " page-%d.png",
     shell=True,
     cwd=tmpdir,
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL,
 )
 if retcode != 0:
     exit(retcode)
