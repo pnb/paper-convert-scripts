@@ -25,6 +25,8 @@ print("Loading via Pandoc")
 html = pypandoc.convert_file(
     args.source_file_path, to="html5", format="docx+styles", extra_args=["--mathml"]
 )
+with open(os.path.join(args.output_dir, "tmp-pandoc.html"), "w") as ofile:
+    ofile.write(html)  # In case we need to debug later
 pandoc_soup = BeautifulSoup(html, "html.parser")
 template_name = "unknown"
 if pandoc_soup.find("div", attrs={"data-custom-style": "Paper-Title"}):
@@ -57,6 +59,7 @@ docx_conv.format_footnotes()
 print("Copying equations and block quotes from Pandoc")
 docx_conv.add_pandoc_equations(pandoc_soup)
 docx.add_pandoc_blockquotes(pandoc_soup, docx_conv.soup)
+docx.add_pandoc_bullets(pandoc_soup, docx_conv.soup)
 print("Checking for DrawingML charts")
 docx_conv.convert_drawingml(pandoc_soup)
 print("Setting image sizes")

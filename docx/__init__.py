@@ -4,3 +4,4 @@ from .tables import *
 from .figures import *
 from .headings import *
 from .blockquotes import *
+from .bullets import *
