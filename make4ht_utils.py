@@ -177,6 +177,11 @@ def get_raw_tex_contents(
                     img.lower() == relative_path.lower()
                     or relative_path.lower().endswith(img.lower())
                     or img.lower().endswith(relative_path.lower())
+                    or (  # No extension + possible capitalization differences
+                        "." not in img
+                        and relative_path.lower()
+                        in [img.lower() + ext for ext in [".png", ".jpg", ".pdf"]]
+                    )
                 ):
                     if fname != fname.lower():  # Uppercase in image filename; rename it
                         os.rename(path, os.path.join(curdir, fname.lower()))
