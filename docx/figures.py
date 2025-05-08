@@ -7,6 +7,33 @@ from shared.shared_utils import validate_alt_text
 from . import MammothParser
 
 
+def one_to_one_alt_text_map(mp: MammothParser) -> None:
+    """If Mammoth hasn't successfully found alt text for all images, this will try to
+    do a one-to-one mapping of <pic:cNvPr desc="alt text"> to images in the document,
+    which can sometimes work (but only if the author has actually included alt text for
+    all images)."""
+    # Check if alt text was already found for all images
+    imgs = mp.soup.find_all("img")
+    for img in imgs:
+        if not img.has_attr("alt"):
+            break
+    else:
+        return  # No missing alt texts
+    print("Mammoth did not find all alt texts; attempting 1-to-1 mapping")
+    docx_soup = bs4.BeautifulSoup(mp.xml_txt, "lxml-xml")
+    xml_pics = docx_soup.find_all("pic:cNvPr", attrs={"descr": True})
+    if len(imgs) != len(xml_pics):
+        print("1-to-1 mapping not possible")
+        return
+    for img, xml_pic in zip(imgs, xml_pics):
+        if img.has_attr("alt") and img["alt"] != xml_pic["descr"]:
+            print("1-to-1 mapping failed (mismatch between existing alt texts)")
+            return
+        elif not img.has_attr("alt"):
+            img["alt"] = xml_pic["descr"]
+    print("1-to-1 mapping complete")
+
+
 def crop_images(mp: MammothParser) -> None:
     """Crop images, if needed, and check that each one has a valid alt text set."""
     docx_soup = bs4.BeautifulSoup(mp.xml_txt, "lxml-xml")  # To get crop info from

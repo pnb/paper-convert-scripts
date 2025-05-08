@@ -361,6 +361,8 @@ class MammothParser:
             # Find image in docx based on alt text
             if img.has_attr("alt"):
                 drawing = docx_soup.find("wp:docPr", {"descr": img["alt"]})
+                if drawing is None:  # Happens with 1-to-1 alt text mapping
+                    drawing = docx_soup.find("pic:cNvPr", {"descr": img["alt"]})
                 while drawing.name != "drawing":
                     drawing = drawing.parent
                 width = int(drawing.find("wp:extent")["cx"]) / 914400  # To inches

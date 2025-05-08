@@ -49,6 +49,7 @@ print("Processing captions")
 docx.process_captions(docx_conv)
 
 print("Checking figures")
+docx.one_to_one_alt_text_map(docx_conv)
 docx.crop_images(docx_conv)  # Crop figures and check them
 
 print("Checking tables")
