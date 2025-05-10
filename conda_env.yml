@@ -1,22 +1,23 @@
 # conda env create --file conda_env.yml
+# conda env remove --name paper_convert
 name: paper_convert
 channels:
   - defaults
   - conda-forge
 dependencies:
-  - beautifulsoup4=4.11.1
-  - black=23.3.0
+  - beautifulsoup4=4.12.3
+  - black=24.10.0
   - cairo=1.16.0
-  - cssutils=2.6.0
-  - lxml=4.9.1
-  - numpy=1.23.3
-  - pandoc=2.19.2
+  - cssutils=2.11.0
+  - lxml=5.3.0
+  - numpy=2.2.4
+  - pandoc=3.6.4
   - pdf2svg=0.2.3
-  - pillow=9.2.0
-  - pip=22.3.1
+  - pillow=11.0.0
+  - pip=25.1
   - pybtex=0.24.0
-  - pypandoc=1.10
-  - python=3.10.6
+  - pypandoc=1.15
+  - python=3.12
   - pip:
-    - mammoth==1.7.1
+    - mammoth==1.9
     - pdfminer.six==20231228  # version 20240706 has issue (https://github.com/pdfminer/pdfminer.six/issues/1004) affecting 1 EDM 2024 paper (poster 70)
