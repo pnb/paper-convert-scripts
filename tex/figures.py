@@ -1,4 +1,6 @@
 import re
+import os
+import shutil
 
 import bs4
 
@@ -245,3 +247,14 @@ def fix_svg_quotes(svg_fname: str) -> None:
         svgsoup = bs4.BeautifulSoup(infile.read(), "lxml-xml")
     with open(svg_fname, "w", encoding="utf8") as ofile:
         ofile.write(str(svgsoup))
+
+
+def copy_missing_images(texer: TeXHandler, output_dir: str) -> None:
+    """Sometimes if LaTeX compilation goes slightly awry, make4ht won't copy the images
+    into the output directory, so we will patch that if it happens."""
+    for img in texer.soup.find_all("img", attrs={"src": True}):
+        extracted_path = os.path.join(output_dir, "source", img["src"])
+        dest_path = os.path.join(output_dir, img["src"])
+        if not os.path.exists(dest_path) and os.path.exists(extracted_path):
+            print("Copying source image to output dir:", img["src"])
+            shutil.copy(extracted_path, dest_path)
