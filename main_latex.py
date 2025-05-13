@@ -33,6 +33,7 @@ ap.add_argument(
 ap.add_argument(
     "--main-tex", default="main.tex", help="Name of main .tex file (default main.tex)"
 )
+ap.add_argument("--texlive", type=int, help="Use specific TeXLive year (version)")
 args = ap.parse_args()
 
 print("Creating output folder")
@@ -94,6 +95,10 @@ if not args.skip_compile:
             ofile.write(infile.read())
     shutil.copy(os.path.join(scripts_dir, "make4ht_preamble.cfg"), extracted_dir)
     mathml = "mathml," if args.mathml else ""
+    if args.texlive:
+        bin_path = shutil.which("make4ht").replace("2025", str(args.texlive))[:-8]
+        os.environ["PATH"] = bin_path + ":" + os.environ["PATH"]
+        assert os.path.exists(os.path.join(bin_path, "make4ht")), "No such TeXLive"
     retcode = shared.exec_grouping_subprocesses(
         "make4ht" + extra_flags + " --output-dir .. --format html5+common_domfilters "
         "--build-file make4ht_with_bibtex.mk4 tmp-make4ht.tex "
