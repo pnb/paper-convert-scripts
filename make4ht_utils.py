@@ -175,8 +175,8 @@ def get_raw_tex_contents(
                 # capitalizations (terrible ideas)
                 if (
                     img.lower() == relative_path.lower()
-                    or relative_path.lower().endswith(img.lower())
-                    or img.lower().endswith(relative_path.lower())
+                    or ("/" + relative_path.lower()).endswith("/" + img.lower())
+                    or ("/" + img.lower()).endswith("/" + relative_path.lower())
                     or (  # No extension + possible capitalization differences
                         "." not in img
                         and relative_path.lower()
@@ -184,6 +184,7 @@ def get_raw_tex_contents(
                     )
                 ):
                     if fname != fname.lower():  # Uppercase in image filename; rename it
+                        print("Renaming image:", fname, "→", fname.lower())
                         os.rename(path, os.path.join(curdir, fname.lower()))
                     newpath = relative_path[: -len(fname)] + fname.lower()
                     if newpath != img:  # Replace lowercase/non-relative filename in tex
