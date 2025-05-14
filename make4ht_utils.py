@@ -36,8 +36,8 @@ def get_raw_tex_contents(
                     raw_tex = infile.read()
             except FileNotFoundError:
                 warn("file_not_found", source_tex_filename)
-        # Remove lines starting with %; replace with single % to avoid introducing a <p>
-        raw_tex = re.sub(r"([^\\]%).*$", r"\1", raw_tex, flags=re.MULTILINE)
+        # Remove comments; replace with single % to avoid introducing a <p>
+        raw_tex = re.sub(r"(?<![^\\]\\)%.*", "%", raw_tex)
         # Remove block comments
         raw_tex = re.sub(
             r"^\\begin\{comment\}(.|\n)*?\\end\{comment\}",
