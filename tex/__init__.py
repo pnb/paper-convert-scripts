@@ -9,5 +9,6 @@ from .figures import (
     format_listings,
     fix_svg_quotes,
     copy_missing_images,
+    wrap_floating_algorithms,
 )
 from .macros import add_macros_for_mathjax

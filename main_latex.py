@@ -98,6 +98,7 @@ if not args.skip_compile:
     if args.texlive:
         bin_path = shutil.which("make4ht").replace("2025", str(args.texlive))[:-8]
         os.environ["PATH"] = bin_path + ":" + os.environ["PATH"]
+        print("Using TeXLive", args.texlive)
         assert os.path.exists(os.path.join(bin_path, "make4ht")), "No such TeXLive"
     retcode = shared.exec_grouping_subprocesses(
         "make4ht" + extra_flags + " --output-dir .. --format html5+common_domfilters "
@@ -152,6 +153,7 @@ print("Formatting figures")
 tex.format_listings(texer)
 tex.format_figures(texer)
 shared.check_alt_text_duplicates(texer.soup, True)
+tex.wrap_floating_algorithms(texer)
 tex.copy_missing_images(texer, args.output_dir)
 print("Formatting equations")
 texer.format_equations()

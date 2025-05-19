@@ -238,6 +238,21 @@ def format_listings(texer: TeXHandler) -> None:
                     content.replace_with(str(content).replace("\n", ""))
 
 
+def wrap_floating_algorithms(texer: TeXHandler) -> None:
+    """Wrap any algorithms that don't belong to a <figure> in a <div> so they can be
+    styled easily."""
+    for img in texer.soup.find_all("img", attrs={"alt": True}):
+        if (
+            img["alt"].strip().startswith("Algorithm ")
+            and img["src"].startswith("tmp-")
+            and not img.find_parent("figure")
+        ):
+            div = texer.soup.new_tag("div")
+            div["class"] = "algorithm"
+            img.insert_before(div)
+            div.append(img)
+
+
 def fix_svg_quotes(svg_fname: str) -> None:
     """OJS does not like SVGs with single quotes. It sets the Content-Type header to
     text/xml instead of image/svg+xml, causing them not to display. Therefore, we will
@@ -256,5 +271,7 @@ def copy_missing_images(texer: TeXHandler, output_dir: str) -> None:
         extracted_path = os.path.join(output_dir, "source", img["src"])
         dest_path = os.path.join(output_dir, img["src"])
         if not os.path.exists(dest_path) and os.path.exists(extracted_path):
+            if not os.path.exists(os.path.dirname(dest_path)):
+                os.makedirs(os.path.dirname(dest_path))
             print("Copying source image to output dir:", img["src"])
             shutil.copy(extracted_path, dest_path)
