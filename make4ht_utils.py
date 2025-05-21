@@ -189,7 +189,9 @@ def get_raw_tex_contents(
                     newpath = relative_path[: -len(fname)] + fname.lower()
                     if newpath != img:  # Replace lowercase/non-relative filename in tex
                         print("Replacing image filename:", img, "→", newpath)
-                        tex_str = tex_str.replace("{" + img + "}", "{" + newpath + "}")
+                        tex_str = tex_str.replace(
+                            "{" + img + "}", "{" + newpath + "}"
+                        ).replace("{./" + img + "}", "{" + newpath + "}")
                     img_fnames.remove(img)
                     break
 
