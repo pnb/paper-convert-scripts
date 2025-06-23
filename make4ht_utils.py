@@ -119,6 +119,21 @@ def get_raw_tex_contents(
         tex_str = tex_str.replace(R"\citep{", R"\cite{")
         warn("converted_citep_citet")
 
+    # apacite package in JEDM can't be converted, but seems replaceable
+    if R"apacite" in tex_str and r"\shortcite" in tex_str:
+        tex_str = (
+            tex_str.replace(R"\shortcite{", R"\cite{")
+            .replace(R"\shortciteA{", R"\citeN{")  # Not sure why this one works
+            .replace(R"\shortciteNP{", R"\citeNP{")
+        )
+        tex_str = re.sub(
+            r"^\s*\\usepackage\s*(\[.*\])?\s*\{\s*apacite\s*}",
+            "%apacite",
+            tex_str,
+            flags=re.MULTILINE,
+        )
+        warn("converted_apacite")
+
     tex_str = (
         tex_str.replace(R"\Bar{", R"\bar{")
         .replace(R"\Tilde{", R"\tilde{")

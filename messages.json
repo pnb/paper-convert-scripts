@@ -31,6 +31,11 @@
             "severity": "low",
             "help": "\\citep and \\citet causes issues without natbib, so \\citep was automatically converted to \\cite and \\citet was redefined to (hopefully) enable correct postprocessing. If the citations and references in the result seem OK, you can ignore this message."
         },
+        "converted_apacite": {
+            "message": "\\shortcite {apacite} converted to \\cite",
+            "severity": "low",
+            "help": "The apacite package and the \\shortcite commands to not convert well to HTML, and the template does not use them. They have been automatically converted to \\cite commands, which may or may not work perfectly; if not, you may consider avoiding the apacite package and using the citation commands from the template instead."
+        },
         "file_not_found": {
             "message": "Could not find a file to \\input{}",
             "severity": "high",
