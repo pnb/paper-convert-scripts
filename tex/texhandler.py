@@ -267,7 +267,10 @@ class TeXHandler:
         else:  # Bibtex style
             cur_li = self.soup.new_tag("li")
             ref_section.append(cur_li)
-            for elem in reversed(ref_heading.find_next("p").contents):
+            ref_p = ref_heading.find_next("p")
+            while not ref_p.get_text(strip=True) and ref_p.find_next("p"):
+                ref_p = ref_p.find_next("p")  # Sometimes have extra blank <p>
+            for elem in reversed(ref_p.contents):
                 if isinstance(elem, bs4.NavigableString) and new_ref_regex.search(elem):
                     new_str = new_ref_regex.sub("", elem)
                     if new_str.strip():
