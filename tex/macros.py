@@ -23,8 +23,6 @@ def add_macros_for_mathjax(texer: TeXHandler) -> None:
             macros.append(macro.group(0) + "\n")
         for macro in re.finditer(r"(^|(?<=\W))\\DeclareMathOperator\*[\\{].*$", line):
             macros.append(macro.group(0) + "\n")
-        if R"\begin{document}" in line:
-            break
     defcontainer = texer.soup.new_tag("div", attrs={"class": "hidden"})
     defcontainer.append("\\(\n  " + "\n  ".join(macros) + "\n\\)")
     texer.soup.body.insert(0, defcontainer)
