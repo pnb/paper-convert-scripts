@@ -15,6 +15,7 @@ def add_macros_for_mathjax(texer: TeXHandler) -> None:
         R"\def\bm#1{\boldsymbol{#1}}",
         R"\def\mathds#1{\mathbb{#1}}",
         R"\def\mathbbm#1{\mathbb{#1}}",
+        R"\def\bold#1{\boldsymbol{#1}}",
     ]
     for line in texer.tex_lines:
         if line.lstrip().startswith("\\def\\"):
