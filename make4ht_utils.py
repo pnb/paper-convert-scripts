@@ -125,6 +125,7 @@ def get_raw_tex_contents(
             tex_str.replace(R"\shortcite{", R"\cite{")
             .replace(R"\shortciteA{", R"\citeN{")  # Not sure why this one works
             .replace(R"\shortciteNP{", R"\citeNP{")
+            .replace(R"\citeA{", R"\citeN{")  # Not sure if this is apacite-specific
         )
         tex_str = re.sub(
             r"^\s*\\usepackage\s*(\[.*\])?\s*\{\s*apacite\s*}",
