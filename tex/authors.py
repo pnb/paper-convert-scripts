@@ -58,6 +58,7 @@ def add_authors(texer: TeXHandler) -> None:
                     )
                     and "phvr7t-x-x-144" not in elem["class"]
                     and "phvr8t-x-x-144" not in elem["class"]
+                    and "mathjax-inline" not in elem["class"]
                 )
             ):
                 beyond_author_name = True  # Evidence we are past the author name part
