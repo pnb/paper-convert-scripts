@@ -521,3 +521,9 @@ if extra_bib_titles:
     for std_title in extra_bib_titles:
         bib_id = next(iter(bib_data[std_title].entries))
         print(" *", bib_id + ":", bib_data[std_title].entries[bib_id].fields["title"])
+
+print(
+    "\nNote that you will still need to manually copy iedms.css and table_sizer.js "
+    "from the paper-convert-www repository to the output directory. Frontmatter images "
+    "will also need to be copied manually, and alt text added to them."
+)
