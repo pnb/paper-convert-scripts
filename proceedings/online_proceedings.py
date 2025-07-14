@@ -476,15 +476,15 @@ def add_paper_listing(bib_id: str, ul: bs4.Tag) -> None:
 
 
 # First handle any papers matching categories
+cats_found = {c: False for c in category_regexes.keys()}
 for cat_regex, cat_title in category_regexes.items():
     print("Indexing category:", cat_title)
-    cat_found = False
     for first_page_num in sorted(paper_index.keys()):
         std_title = paper_index[first_page_num]
         bib_id = next(iter(bib_data[std_title].entries))
         if re.match(cat_regex, bib_id):
-            if not cat_found:  # Add category to soup for first time
-                cat_found = True
+            if not cats_found[cat_regex]:  # Add category to soup for first time
+                cats_found[cat_regex] = True
                 title_h = index_soup.new_tag("h2")
                 main_elem.append(title_h)
                 title_h.append(index_soup.new_string(cat_title))
@@ -492,6 +492,9 @@ for cat_regex, cat_title in category_regexes.items():
                 main_elem.append(cat_ul)
             listing_elem = add_paper_listing(bib_id, cat_ul)
             del paper_index[first_page_num]  # So it doesn't get added to uncategorized
+for unfound_cat in cats_found:
+    if not cats_found[unfound_cat]:
+        print("No papers matched category:", category_regexes[unfound_cat])
 
 # Add any remaining uncategorized papers
 if paper_index:
