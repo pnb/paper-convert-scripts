@@ -3,6 +3,7 @@ import os
 import re
 import html
 import shutil
+import tempfile
 
 import bs4
 import pybtex.database
@@ -119,7 +120,29 @@ print("Loading .bib files")
 bib_data = {}  # "Standardized" paper title => Pybtex db with one entry
 for bibfile in os.listdir(args.bib_dir):
     if bibfile.endswith(".bib"):
-        db = pybtex.database.parse_file(os.path.join(args.bib_dir, bibfile))
+        # Sometimes files have UTF8 encoding errors, so we will first try to read the
+        # file as UTF8, and if that fails, re-read it ignoring errors and save to a temp
+        # file and read that
+        try:
+            with open(os.path.join(args.bib_dir, bibfile), encoding="utf8") as infile:
+                infile.read()
+            db = pybtex.database.parse_file(os.path.join(args.bib_dir, bibfile))
+        except UnicodeDecodeError:
+            print("UTF-8 error, some characters may be missing:", bibfile)
+            with open(
+                os.path.join(args.bib_dir, bibfile), encoding="utf8", errors="ignore"
+            ) as infile:
+                contents = infile.read()
+            with tempfile.NamedTemporaryFile(
+                "w", encoding="utf8", delete_on_close=False, suffix=".bib"
+            ) as outfile:  # delete_on_close=False will still delete after with()
+                outfile.write(contents)
+                outfile.close()
+                db = pybtex.database.parse_file(outfile.name)
+
+        if len(db.entries) != 1:
+            print(".bib file has >1 entry! That is unexpected. Skipping", bibfile)
+            continue
         # Filename (sans extension) is also key of the sole entry
         entry = db.entries[bibfile[:-4]]
         std_title = hash_title(entry.fields["title"].lower())
