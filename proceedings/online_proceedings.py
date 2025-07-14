@@ -361,6 +361,20 @@ if args.intro_doc:
     if args.intro_doc.lower().endswith(".tex"):
         with open(args.intro_doc, "r", encoding="utf8") as infile:
             tex_str = infile.read()
+        # Check that number of \includegraphics = number of "alt=" for alt-text
+        gfx_count = tex_str.count(R"\includegraphics")
+        alt_count = tex_str.count("alt=")
+        if gfx_count != alt_count:
+            print(
+                "Warning: number of \\includegraphics commands does not equal the "
+                "number of alt= attributes in the front matter (" + str(gfx_count),
+                "vs. " + str(alt_count) + "). This may indicate missing alt-text for "
+                "images. If so, they can be added like:\n"
+                "    \\includegraphics[alt=Some image description]{...",
+            )
+            quit_now = input("Quit now so you can fix and try again? [Y/n] ")
+            if quit_now.lower().strip() in ["y", ""]:
+                exit()
         if R"{\Large" in tex_str:
             print("Found non-semantic {\\Large ...} in front matter.")
             fix_headings = input("Try auto-convert to \\[sub]subsection? [Y/n] ")
@@ -525,5 +539,5 @@ if extra_bib_titles:
 print(
     "\nNote that you will still need to manually copy iedms.css and table_sizer.js "
     "from the paper-convert-www repository to the output directory. Frontmatter images "
-    "will also need to be copied manually, and alt text added to them."
+    "will also need to be copied manually."
 )
