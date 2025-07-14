@@ -1,20 +1,20 @@
 Full Papers
-.*EDM-long-papers.*
+.*EDM.long-papers.*
 
 Short Papers
-.*EDM-short-papers.*
+.*EDM.short-papers.*
 
 Posters
-.*EDM-posters.*
+.*EDM.poster.*
 
 Demonstrations
-.*EDM-(workshop|demonstrations).*
+.*EDM.demonstrations.*
 
 Doctoral Consortium
-.*EDM-doctoral-consortium.*
+.*EDM.doctoral-consortium.*
 
-Tutorials
-.*EDM-tutorials.*
+Workshops and Tutorials
+.*EDM.(workshop|tutorial).*
 
 Industry Track
-.*EDM-industry.*
+.*EDM.industry.*
