@@ -43,11 +43,11 @@ ap.add_argument(
 )
 ap.add_argument(
     "--intro-doc",
-    help="Path to a Markdown or LaTeX file to show as a preface page; "
-    "the title will be drawn from the first heading found in the file; LaTeX need not "
-    "be a complete document, only a snippet (you might insert a \\section title before "
-    '"Preface" and delete everything before, and delete \\end{document}). Markdown is '
-    "recommended, however.",
+    help="Path to a Markdown or LaTeX file to show as a preface page; the title will "
+    "be drawn from the first heading found in the file; LaTeX need not be a complete "
+    "document, only a snippet (you might insert a \\section{Introduction to the "
+    'Proceedings} title before "Preface" and delete everything before, and delete TOC '
+    "and \\end{document}).",
 )
 ap.add_argument("--copyright", help="Path to a copyright notice snippet in HTML format")
 ap.add_argument(
