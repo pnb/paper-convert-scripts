@@ -51,24 +51,12 @@ ap.add_argument(
     "and \\end{document}).",
 )
 ap.add_argument("--copyright", help="Path to a copyright notice snippet in HTML format")
-ap.add_argument(
-    "--cull-html",
-    help="Delete any HTML paper folders not matched to .bib files",
-    action="store_true",
-)
 args = ap.parse_args()
 
 try:
     os.mkdir(args.output_dir)
 except FileExistsError:
     pass
-
-if args.cull_html:
-    print("It is wise to run once without --cull-html to see what will be deleted")
-    confirm = input("Are you *sure* you want to delete unmatched HTML folders? [y/N] ")
-    if confirm != "y":
-        print("Exiting.")
-        exit()
 
 
 def hash_title(orig_title: str) -> str:
@@ -165,9 +153,6 @@ for pdir in os.listdir(args.html_papers_dir):
         std_title = hash_title(title_elem.get_text())
         if std_title not in bib_data:
             print("BibTex/HTML mismatch for HTML:", title_elem.get_text(strip=True))
-            if args.cull_html:
-                print("Culling directory")
-                shutil.rmtree(pdir)
             continue
         bib_id = next(iter(bib_data[std_title].entries))
         bib_entry = bib_data[std_title].entries[bib_id]

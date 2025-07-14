@@ -41,5 +41,3 @@ python online_proceedings.py \
     --intro-doc ~/Downloads/front_matter_final.md \
     --copyright edm2023-copyright.html
 ```
-
-After this, you might want to add the `--cull-html` option to get rid of extra HTML folders (you can start with most recent of all papers). Then find mismatches from .bib and add them back in.
