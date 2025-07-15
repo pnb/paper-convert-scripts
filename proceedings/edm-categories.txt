@@ -4,7 +4,7 @@ Full Papers
 Short Papers
 .*EDM.short-papers.*
 
-Posters
+Posters and Demos
 .*EDM.poster.*
 
 Demonstrations
