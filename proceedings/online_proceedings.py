@@ -6,6 +6,7 @@ import shutil
 import tempfile
 
 import bs4
+import magic
 import pybtex.database
 import pypandoc
 
@@ -106,28 +107,41 @@ if args.category_regex_file:
 
 print("Loading .bib files")
 bib_data = {}  # "Standardized" paper title => Pybtex db with one entry
+converted_encoding = None
+convert_in_place = False
 for bibfile in os.listdir(args.bib_dir):
     if bibfile.endswith(".bib"):
-        # Sometimes files have UTF8 encoding errors, so we will first try to read the
-        # file as UTF8, and if that fails, re-read it ignoring errors and save to a temp
-        # file and read that
-        try:
-            with open(os.path.join(args.bib_dir, bibfile), encoding="utf8") as infile:
-                infile.read()
-            db = pybtex.database.parse_file(os.path.join(args.bib_dir, bibfile))
-        except UnicodeDecodeError:
-            print("UTF-8 error, some characters may be missing:", bibfile)
-            with open(
-                os.path.join(args.bib_dir, bibfile), encoding="utf8", errors="ignore"
-            ) as infile:
-                contents = infile.read()
-            with tempfile.NamedTemporaryFile(
-                "w", encoding="utf8", delete_on_close=False, suffix=".bib"
-            ) as outfile:  # delete_on_close=False will still delete after with()
-                outfile.write(contents)
-                outfile.close()
-                db = pybtex.database.parse_file(outfile.name)
+        # Check encoding and convert if needed to standardize as UTF-8
+        with open(os.path.join(args.bib_dir, bibfile), "rb") as infile:
+            bytecontents = infile.read()
+        info = magic.detect_from_content(bytecontents)
+        if info.encoding != "utf-8":
+            if info.encoding.startswith("unknown"):
+                print("Encoding could not be detected for", bibfile)
+                if converted_encoding:  # Assume same encoding as the previous one?
+                    print("Last converted file had encoding", converted_encoding)
+                    assume = input("Should we assume the same? [Y/n] ")
+                    if assume.lower().strip() not in ["y", ""]:
+                        converted_encoding = None
+                if converted_encoding is None:  # No prior conversion to base it on :(
+                    print("Quitting (only UTF-8 files are supported).")
+                    print("Please manually examine and convert this file and rerun.")
+                    exit()
+            else:
+                converted_encoding = info.encoding
+            if not convert_in_place:  # Ask the first time before converting
+                print("\nNon-UTF-8 encoding detected for", bibfile, "=>", info.encoding)
+                print("Must convert to UTF-8, but you may want to make a backup first.")
+                conv = input("Convert bib files to UTF-8 now (will overwrite!)? [Y/n] ")
+                if conv.lower().strip() not in ["y", ""]:
+                    print("Quitting (only UTF-8 files are supported)")
+                    exit()
+                convert_in_place = True
+            print("Converting from", converted_encoding, "to UTF-8:", bibfile)
+            with open(os.path.join(args.bib_dir, bibfile), "wb") as outfile:
+                outfile.write(bytecontents.decode(converted_encoding).encode("utf-8"))
 
+        db = pybtex.database.parse_file(os.path.join(args.bib_dir, bibfile))
         if len(db.entries) != 1:
             print(".bib file has >1 entry! That is unexpected. Skipping", bibfile)
             continue

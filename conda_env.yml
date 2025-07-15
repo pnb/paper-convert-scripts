@@ -18,6 +18,7 @@ dependencies:
   - pybtex=0.24.0
   - pypandoc=1.15
   - python=3.12
+  - python-magic=0.4.27
   - pip:
     - mammoth==1.9
     - pdfminer.six==20231228  # version 20240706 has issue (https://github.com/pdfminer/pdfminer.six/issues/1004) affecting 1 EDM 2024 paper (poster 70)
