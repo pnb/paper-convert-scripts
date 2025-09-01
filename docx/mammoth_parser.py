@@ -430,11 +430,20 @@ class MammothParser:
         # and find emails marked as affiliations (especially normal in JEDM)
         EMAIL_REGEX = re.compile(r"(\S+@\S+\.\S+)")  # Not RFC 5322 but that is OK
         for elem in elems:
-            if not elem.get_text(strip=True):
-                elem.decompose()
-            elif "Affiliations" in elem["class"]:  # Check if email needs to be parsed
+            if "Affiliations" in elem["class"]:  # Check if email needs to be parsed
                 for a in elem.select("a"):  # Remove any email hrefs
                     a.unwrap()
+                for br in elem.select("br"):  # Remove breaks in emails
+                    if br.previous_sibling and br.previous_sibling.get_text(
+                        strip=True
+                    ).endswith("@") and br.next_sibling:
+                        # Join the prev/next siblings now
+                        br.previous_sibling.replace_with(
+                            br.previous_sibling.get_text(strip=True)
+                            + br.next_sibling.get_text(strip=True)
+                        )
+                        br.next_sibling.extract()  # Like decompose but for strings
+                        br.decompose()
                 for content in elem.contents[:]:
                     if isinstance(content, bs4.NavigableString):
                         parts = EMAIL_REGEX.split(content)
@@ -450,3 +459,5 @@ class MammothParser:
                                 elif len(part):
                                     new_parts.append(self.soup.new_string(part))
                             content.replace_with(*new_parts)
+            if not elem.get_text(strip=True):
+                elem.decompose()
