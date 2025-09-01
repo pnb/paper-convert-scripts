@@ -13,6 +13,10 @@ from .shared_utils import get_elem_containing_text, warn
 # Words that are also lowercase parts of names
 # Even better is to extract from references via get_lowercase_name_words
 LC_NAME_WORDS = "van de der ten la y da das dos e di lo al bin bint abu".split()
+# Words that start sentences followed by a comma, so might look like names but are not
+SENTENCE_START_WORDS = (
+    "However, Similarly, Moreover, Nevertheless, Therefore, Thus".split()
+)
 
 
 def check_citations_vs_references(
@@ -22,12 +26,14 @@ def check_citations_vs_references(
     input_template: str,
     tex: bool,
 ):
-    # Check every numbered reference appears in the text in square brackets
+    # Check every reference is cited in the text (and vice versa)
     refs = get_references(soup, output_dir, anystyle_path)
     if refs == []:
         warn("no_references_found_in_reference_section", tex=tex)
         return
-    cites = get_citations(soup, input_template)
+    cites = get_citations(
+        soup, input_template, sentence_start_words=SENTENCE_START_WORDS
+    )
     if cites == []:
         warn("no_citations_found_in_text", tex=tex)
         return
@@ -37,7 +43,7 @@ def check_citations_vs_references(
         mismatched = ["Citation: " + c for c in set(cites).difference(ref_keys)]
         mismatched += ["Reference: " + r for r in ref_keys.difference(cites)]
     elif input_template == "JEDM":
-        # No 1-to-1 ref <=> cite key mapping due to et al. and disambiguation
+        # No 1-to-1 ref <=> cite key mapping due to "et al." and disambiguation
         # Instead, search for approximate matches for every citation
         cite_matched_i = set()
         ref_matched_i = set()
@@ -93,7 +99,7 @@ def check_citations_vs_references(
         warn("mismatched_refs", sorted(mismatched), tex=tex)
 
     # Check references are complete
-    ref_requirements = defaultdict(lambda: ["title", "date"])
+    ref_requirements = defaultdict(lambda: ["date"])
     ref_requirements["book"] = ["author", "title", "date", "publisher"]
     ref_requirements["report"] = ["author", "title", "date", "publisher"]
     ref_requirements["chapter"] = [
@@ -218,7 +224,10 @@ def get_lowercase_name_words(anystyle_output: list) -> set[str]:
 
 
 def get_citations(
-    soup: bs4.BeautifulSoup, input_template: str, lc_name_words: set[str] = set()
+    soup: bs4.BeautifulSoup,
+    input_template: str,
+    lc_name_words: set[str] = set(),
+    sentence_start_words: set[str] = set(),
 ) -> list[str]:
     """Find in-text citations for the given soup, in the format expected per the input
     template (e.g., EDM).
@@ -228,6 +237,8 @@ def get_citations(
         input_template (str): Expected document (and thus citation) format
         lc_name_words (set[str]): Optional lowercase words to consider part of names
             (e.g., van, bin, y); only relevant for certain styles like JEDM
+        sentence_start_words (set[str]): Optional words that start sentences right
+            before cites (e.g., However) but are not names; only for APA-ish (JEDM)
 
     Raises:
         NotImplementedError: Error on unknown template name
@@ -244,7 +255,7 @@ def get_citations(
             elem.clear()  # Delete everything in references to avoid confusion
     text = soup_copy.get_text()
     if input_template == "JEDM":  # APA-ish
-        return get_apa_citations(text, lc_name_words)
+        return get_apa_citations(text, lc_name_words, sentence_start_words)
     elif input_template == "EDM":
         return get_square_brackets_citations(text)
     else:
@@ -288,7 +299,9 @@ def get_square_brackets_citations(text: str) -> list[str]:
     return cites
 
 
-def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
+def get_apa_citations(
+    text: str, lc_name_words: set[str], sentence_start_words: set[str]
+) -> list[str]:
     """Find in-text citations and return tham as "Author(s), YYYY" strings, including
     et al. if that is what the citation says, and YYYYa/b/etc. if the citation includes
     disambiguating a/b info. Removes page/chapter/section ranges, since these do not
@@ -297,6 +310,8 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
     Args:
         text (str): Plain text to process
         lc_name_words (set[str]): Optional lowercase words to consider part of names
+        sentence_start_words (set[str]): Optional words that often start sentences,
+            which should not be considered parts of names (e.g., "However, CITE...")
 
     Returns:
         list[str]: List of citations found
@@ -327,7 +342,7 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
             if inline and text[i] in " (" and text[i + 1] not in "([":
                 first_tok = text[i + 1 : ending.end() - 1].split()[0]
                 first_word = first_tok.rstrip(".,;:")
-                if text[i] == "(" or (
+                if text[i] == "(" or (  # Evidence we're past the cite start
                     first_word == first_word.lower()
                     and first_word not in lc_name_words
                     and first_word not in ["et", "al", "&", "and"]
@@ -339,6 +354,8 @@ def get_apa_citations(text: str, lc_name_words: set[str]) -> list[str]:
                         .replace(" [", ", ")
                         .replace(";", ",")
                     )
+                    if cite.split()[0] in sentence_start_words and text[i] != "(":
+                        cite = cite[len(first_word) + 1 :].lstrip()
                     for y in year_end_re.finditer(cite):  # In case of (YYYY, YYYY)
                         year = "XXXX" if y.group(1) == " nd" else y.group(1)
                         cites.append(year_end_re.sub("", cite) + ", " + year)
@@ -491,12 +508,15 @@ if __name__ == "__main__":
         <p>Cites separated by nbsp (Ganapathy et al., 2011, El Asri et al., 2017)</p>
         <p>Multi-year cites with commas (Commaname et al., 2002, 2003, Solo, 1999)</p>
         <p>Citing edited book (Hunt & Worthen, 2006).</p>
+        <p>something. Similarly, Kovanovic et al. (2018).</p>
         <h1>References</h1>
     """
     example_soup = bs4.BeautifulSoup(example_html + processed_refs_html, "html.parser")
     with tempfile.TemporaryDirectory() as tmpdir:
         warn.output_filename = os.path.join(tmpdir, "warn.csv")
-        cites = get_citations(example_soup, "JEDM", get_lowercase_name_words(refs))
+        cites = get_citations(
+            example_soup, "JEDM", get_lowercase_name_words(refs), SENTENCE_START_WORDS
+        )
         print("\nJEDM citations:\n", cites, "\n")
         check_citations_vs_references(
             example_soup, tmpdir, "/usr/local/bin/anystyle", "JEDM", False
