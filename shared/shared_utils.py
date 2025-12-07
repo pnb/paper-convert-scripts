@@ -166,7 +166,7 @@ def check_styles(
         warn("broken_internal_ref", 'Text: "' + broken_ref + '"', tex)
     # Check URL schemas
     for a in soup.find_all("a"):
-        schemas = ["#", "http://", "https://"]
+        schemas = ["#", "http://", "https://", "mailto:"]
         if a.has_attr("href") and not any(a["href"].startswith(x) for x in schemas):
             warn("url_schema", a["href"])
     # Check typography
