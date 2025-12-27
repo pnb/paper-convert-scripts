@@ -215,6 +215,9 @@ def validate_alt_text(
     elif len(img_elem["alt"]) > 2000:
         warn("alt_text_long", img_elem["alt"], tex)
         return True  # Not a deal breaker, so don't stop processing the image
+    elif "AI-generated content may be incorrect." in img_elem["alt"]:
+        warn("alt_text_ai_generated", identifying_text, tex)
+        return True
     return True
 
 

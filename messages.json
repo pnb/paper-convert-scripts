@@ -226,6 +226,11 @@
                 "help": "Alt text should be unique per image, so that someone using screen reader software can understand the unique contents of each image. Even if the images are duplicates, the alt text should be unique to explain which image is a duplicate and why."
             }
         },
+        "alt_text_ai_generated": {
+            "message": "Alt text appears to be AI-generated",
+            "severity": "high",
+            "help": "The built-in alt text generator in Word is currently not nearly good enough to provide a reasonable substitute for human-written alt text."
+        },
         "jedm_figure_filename": {
             "message": "Image filename issue for JEDM",
             "severity": "high",
