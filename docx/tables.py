@@ -26,5 +26,15 @@ def check_tables(mp: MammothParser) -> None:
                     + table.get_text(strip=True)[:15]
                     + '..."',
                 )
+            # Check for existence of any <td>
+            if not table.find("td"):
+                warn(
+                    "table_no_data",
+                    "Table index "
+                    + str(i + 1)
+                    + '; table text: "'
+                    + table.get_text(strip=True)[:15]
+                    + '..."',
+                )
         for td in table.find_all("td", attrs={"rowspan": True}):
             td["class"] = "has-rowspan"  # Mark rowspan cells so they can be styled
