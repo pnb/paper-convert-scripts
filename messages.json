@@ -276,6 +276,16 @@
             "severity": "medium",
             "help": "Size and alt text will have to be manually added after conversion. Please notify pnb@illinois.edu and CC pnigelb@gmail.com."
         },
+        "emf_conversion_failed": {
+            "message": "EMF image conversion failed",
+            "severity": "high",
+            "help": "An EMF image was not able to be converted to PNG. This means your paper will probably be missing a figure, which is bad. Some new versions of Word embed EMF images that cannot yet be converted, so these have to be manually handled. Please notify pnb@illinois.edu and CC pnigelb@gmail.com."
+        },
+        "missing_image": {
+            "message": "Missing image file",
+            "severity": "high",
+            "help": "An image file was not found in the converted document. This is likely due to an image conversion failure."
+        },
         "unknown_image_type": {
             "message": "Unexpected image format",
             "severity": "medium",

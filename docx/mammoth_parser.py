@@ -203,9 +203,12 @@ class MammothParser:
                         fname,
                     ],
                     stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
                 )
-                os.unlink(fname)
+                # Check if output png file was actually created
+                if os.path.exists(fname[:-3] + "png"):
+                    os.unlink(fname)
+                else:
+                    warn("emf_conversion_failed", fname)
                 return {"src": num + ".png"}
             warn("unknown_image_type", image.content_type)
 

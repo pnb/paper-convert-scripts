@@ -3,6 +3,7 @@ import os
 import bs4
 import PIL
 
+from shared import warn
 from shared.shared_utils import validate_alt_text
 from . import MammothParser
 
@@ -40,7 +41,11 @@ def crop_images(mp: MammothParser) -> None:
     for img in mp.soup.find_all("img"):
         if img["src"][-4:] in [".jpg", ".png", ".gif"]:  # Load and check image
             fname = os.path.join(mp.output_dir, img["src"])
-            pil_image = PIL.Image.open(fname)
+            try:
+                pil_image = PIL.Image.open(fname)
+            except FileNotFoundError:
+                warn("missing_image", img["src"])
+                continue
             width, height = pil_image.size
             if width / height > 200:
                 print("Replacing wide, thin image (x / y > 200) with horizontal rule")
