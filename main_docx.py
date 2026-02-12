@@ -11,6 +11,9 @@ import shared
 ap = argparse.ArgumentParser(description="Convert .docx to HTML")
 ap.add_argument("source_file_path", help="Path to the source .docx file")
 ap.add_argument("output_dir", help="Path to output folder (will be created if needed)")
+ap.add_argument(
+    "--force-table-hlines", action="store_true", help="Force table lines for each row"
+)
 args = ap.parse_args()
 
 print("Creating output folder")
@@ -54,6 +57,9 @@ docx.crop_images(docx_conv)  # Crop figures and check them
 
 print("Checking tables")
 docx.check_tables(docx_conv)
+if args.force_table_hlines:
+    print("Forcing table horizontal lines")
+    docx.tables.force_table_lines(docx_conv)
 shared.fix_table_gaps(docx_conv.soup)
 print("Formatting any footnotes")
 docx_conv.format_footnotes()

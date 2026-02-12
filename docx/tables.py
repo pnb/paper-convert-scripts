@@ -38,3 +38,13 @@ def check_tables(mp: MammothParser) -> None:
                 )
         for td in table.find_all("td", attrs={"rowspan": True}):
             td["class"] = "has-rowspan"  # Mark rowspan cells so they can be styled
+
+def force_table_lines(mp: MammothParser) -> None:
+    """Add light lines between every row of tables for cases where the lines are needed
+    but can't be detected automatically very well."""
+    for table in mp.soup.find_all("table"):
+        # Add .hlines-every-row class to table
+        if table.get("class"):
+            table["class"].append("hlines-every-row")
+        else:
+            table["class"] = ["hlines-every-row"]
