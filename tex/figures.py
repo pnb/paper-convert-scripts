@@ -209,11 +209,16 @@ def format_figures(texer: TeXHandler) -> None:
 
 def format_listings(texer: TeXHandler) -> None:
     for pre in texer.soup.select("pre.lstlisting"):
-        container = pre.parent
-        if container.name == "td":
-            continue  # Don't convert table cells to <figure>
+        if pre.parent.name == "body":  # Sometimes there's no container
+            container = texer.soup.new_tag("figure")
+            pre.insert_before(container)
+            container.append(pre)
+        else:
+            container = pre.parent
+            if container.name == "td":
+                continue  # Don't convert table cells to <figure>
+            container.name = "figure"
         container["class"] = "listing"
-        container.name = "figure"
 
         # Move everything after the code into the caption
         caption = texer.soup.new_tag("figcaption")
