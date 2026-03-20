@@ -5,7 +5,7 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - beautifulsoup4=4.12.3
+  - beautifulsoup4=4.14.3
   - black=24.10.0
   - cairo=1.16.0
   - cssutils=2.11.0

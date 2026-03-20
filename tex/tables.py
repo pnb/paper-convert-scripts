@@ -16,8 +16,10 @@ def format_tables(texer: TeXHandler) -> None:
         adjustbox.unwrap()  # Remove any unused size adjustment wrappers
 
     table_tex_regex = re.compile(r"(^|[^\\])\\begin\s*\{((long)?table|minipage)")
-    for table in texer.soup.find_all("table"):
+    for table in texer.soup.select("table"):
         # Check previous lines for a table environment
+        if table.name != "table":
+            continue  # Nested table that was removed or turned into something else
         line_num = texer.tex_line_num(table)
         for i in range(line_num, 0, -1):
             if table_tex_regex.search(texer.tex_lines[i]):
@@ -136,7 +138,7 @@ def format_one_table(texer: TeXHandler, table: bs4.Tag) -> None:
         for tr in table.select("tr.border-above"):
             tr["class"] = ""
     for tr in table.find_all("tr"):
-        if not tr.get_text().strip():
+        if not tr.get_text().strip() and not tr.select_one("img"):
             tr.decompose()  # Remove remaining decorative rows (bad for accessibility)
     # Check if there are too many colgroups
     col_count = 0
