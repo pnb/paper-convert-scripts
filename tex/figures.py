@@ -76,6 +76,11 @@ def _fix_figure_text(texer: TeXHandler, figure: bs4.Tag) -> None:
             if isinstance(el, bs4.NavigableString) and el.strip():
                 el.replace_with("")
             el = next_el
+    # Check if this image is inside a table and doesn't seem like a "figure" exactly
+    if figure.find_parent("table") and not figure.find(
+        text=re.compile("^Fig(ure)?\s+")
+    ):
+        return  # Skip; doesn't seem like a figure, just an image in a table
     # Move everything non-<img> into the caption
     for p in figure.find_all("p"):
         if p.has_attr("id"):
