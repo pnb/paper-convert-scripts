@@ -198,6 +198,7 @@ class TeXHandler:
             "ectc-": "code",
             "pcrr7t-": "code",
             "pcrr7t-x-x-120": "code",
+            "pcrr8t": "code",
             "ptmb7t-x-x-120": "strong",
             "ptmb8t-x-x-120": "strong",
             "ptmb7t-": "strong",
