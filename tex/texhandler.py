@@ -254,6 +254,9 @@ class TeXHandler:
         new_ref_regex = re.compile(r"\[\d+\]\s*")
         ref_section = self.soup.new_tag("ol", attrs={"class": "references"})
         biber_section = ref_heading.find_next("dl")
+        next_h1 = ref_heading.find_next("h1")
+        if biber_section and next_h1 and next_h1.find_previous("dl") != biber_section:
+            biber_section = None  # Actually this is just a dl in some appendix
         if biber_section:  # Biber style
             for elem in reversed(biber_section.find_all("dd")):
                 if elem.find("p"):
