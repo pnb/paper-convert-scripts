@@ -86,9 +86,10 @@ def format_tables(texer: TeXHandler) -> None:
 
 
 def format_one_table(texer: TeXHandler, table: bs4.Tag) -> None:
-    # Remove <p>s from table rows
+    # Remove <p>s from table rows if the <p> is merely wrapping the whole row
     for p in table.find_all("p", limit=1000):
-        p.unwrap()
+        if len(p.parent.select("p")) == 1:
+            p.unwrap()
     # Check for colspan/rowspan nested tables
     for subtable in table.find_all("table"):
         parent = subtable.parent
