@@ -91,7 +91,7 @@ def _fix_figure_text(texer: TeXHandler, figure: bs4.Tag) -> None:
                 el.replace_with("")
             el = next_el
     # Check if this image is inside a table and doesn't seem like a "figure" exactly
-    if figure.find_parent("table") and not figure.find(
+    if (figure.name == "table" or figure.find_parent("table")) and not figure.find(
         text=re.compile("^Fig(ure)?\s+")
     ):
         return  # Skip; doesn't seem like a figure, just an image in a table
@@ -184,6 +184,7 @@ def format_figures(texer: TeXHandler) -> None:
             parent = parent.parent  # Go up to next level to handle containing <figure>
         while (
             parent.name != "div"
+            and parent.name != "table"
             and parent.name != "figure"
             and parent.parent.name != "body"  # If this helps it is probably an error
         ):
@@ -193,7 +194,8 @@ def format_figures(texer: TeXHandler) -> None:
             newparent = parent.parent
             parent.unwrap()
             parent = newparent
-        parent.name = "figure"
+        if parent.name == "div":
+            parent.name = "figure"
         if not parent.find("div"):  # No (more) subfigures to worry about
             if "subfigure" in texer.tex_lines[env_start] or subfigure_wrapper:
                 parent["class"] = "has-subfigures"
