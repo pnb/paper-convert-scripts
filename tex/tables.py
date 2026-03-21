@@ -166,10 +166,10 @@ def format_one_table(texer: TeXHandler, table: bs4.Tag) -> None:
     # Check if header has probably been misidentified (only 1 row, or <imgs> in it)
     final_rows = table.find_all("tr")
     if (len(final_rows) == 1 and final_rows[0].parent.name == "thead") or (
-        table.select_one("thead") and table.select_one("thead").select("img")
+        table.select_one("thead img")
     ):
         final_rows[0].parent.unwrap()
-        for th in final_rows[0].find_all("th"):
+        for th in table.select("th"):
             th.name = "td"
     # Remove blank lines at the end of <pre> in tables
     for pre in table.find_all("pre"):
