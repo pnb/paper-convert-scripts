@@ -83,9 +83,14 @@ def get_raw_tex_contents(
         tex_fname = tex_files[0]
     elif main_tex_fname in tex_files:
         tex_fname = main_tex_fname
-    elif len(tex_files):
-        tex_fname = tex_files[0]
-        warn("ambiguous_tex_file", "Using first file: " + tex_fname)
+    elif len(tex_files):  # Have to find a fallback
+        for fbname in ["paper.tex", "article.tex"]:
+            if fbname in tex_files:
+                tex_fname = fbname
+                break
+        else:
+            tex_fname = tex_files[0]
+        warn("ambiguous_tex_file", "Using: " + tex_fname)
     else:
         warn("tex_file_missing")
         exit()

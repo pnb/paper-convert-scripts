@@ -244,7 +244,7 @@
         "ambiguous_tex_file": {
             "message": "Multiple .tex files found and none named \"main.tex\"; unclear which to use",
             "severity": "low",
-            "help": "The converter will use the lexicographically first .tex file in your .zip file if it is unclear which to use. If that is not the correct file, fix this by renaming the primary file to compile to \"main.tex\"."
+            "help": "The converter will try a few common names, then use the lexicographically first .tex file in your .zip file if it is unclear which to use. If that is not the correct file, fix this by renaming the primary file to compile to \"main.tex\"."
         },
         "author_data_missing": {
             "message": "Could not find author metadata section",
