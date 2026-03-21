@@ -21,6 +21,9 @@ def add_alt_text(texer: TeXHandler, img_elem: bs4.Tag) -> str:
         str: Text that was added as the alt text
     """
     line_num_start = texer.tex_line_num(img_elem)
+    if texer.tex_lines[line_num_start].strip().startswith(R"\end{"):
+        # Bit of a hack but it seems that sometimes the line numbers are 1 past the end
+        line_num_start -= 1
     img_line_num = texer.find_image_line_num(line_num_start, img_elem["src"])
     env_start, env_end = texer.get_tex_environment(img_line_num)
     while texer.tex_lines[env_start].strip().startswith(R"\begin{tik"):
@@ -35,9 +38,20 @@ def add_alt_text(texer: TeXHandler, img_elem: bs4.Tag) -> str:
         and ("subfigure" in container["class"] or "fbox" in container["class"])
     ):
         container = container.parent  # Handle all subfigures at once if needed
-    img_i = container.find_all("img").index(img_elem)
+    container_imgs = container.find_all("img")
+    img_i = container_imgs.index(img_elem)
     if img_elem.has_attr("alt") and img_elem["alt"] == "PIC":
         del img_elem["alt"]  # Make4ht defaults to "PIC" (except for {algorithms})
+    if len(alts) > len(container_imgs):
+        # Can happen, e.g., with images in <td>s not really part of figures
+        print("Info: More alt texts than images in figure")
+        if container.name != "figure":  # Try to find parent matching alts
+            parent = container.parent
+            while parent.name != "body" and len(parent.find_all("img")) < len(alts):
+                parent = parent.parent
+            if len(parent.find_all("img")) == len(alts):
+                img_i = parent.find_all("img").index(img_elem)
+                print("Info: Found parent with # images = # alt texts")
     if len(alts) > img_i:
         img_elem["alt"] = alts[img_i].replace(R"\%", "%")
 
@@ -145,12 +159,6 @@ def format_figures(texer: TeXHandler) -> None:
                 or img["alt"].strip().startswith("----------------")
             ):
                 continue  # Skip over images generated of algorithm listings
-        if (
-            not img.find_parent(["div", "figure"], attrs={"class": "figure"})
-            and not img.find_parent("div", attrs={"class": "subfigure"})
-            and not img.find_parent("div", attrs={"class": "minipage"})
-        ):
-            continue  # Images outside figure environments (not expecting alt text)
         if img.parent.has_attr("class") and "centerline" in img.parent["class"]:
             img.parent.unwrap()  # Remove extra div added if somebody uses \centerline
         # Repair double // in img src when using a trailing / with \graphicspath
