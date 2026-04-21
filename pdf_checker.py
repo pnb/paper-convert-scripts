@@ -100,7 +100,13 @@ for page_i, page_layout in enumerate(extract_pages(args.pdf_path)):
                 if character.size > 11.9 and character.size < 12.1:
                     cur_heading.append(character.get_text())
                     heading_str = "".join(cur_heading).lower()
-                    if re.match(r"(\d*|[a-z])\.?\s*references", heading_str):
+                    if (
+                        re.match(
+                            r"(\d*|[a-z])\.?\s*(references|acknowledge?ments?)",
+                            heading_str,
+                        )
+                        and preref_page_count == 0
+                    ):
                         preref_page_count = page_i  # Don't count this page
                         if chars_in_page > len(cur_heading):  # Unless mid-page
                             preref_page_count = page_i + 1  # Then do count this page
