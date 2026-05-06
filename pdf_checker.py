@@ -80,7 +80,6 @@ for fname in os.listdir(tmpdir):
 # Check text of the PDF to extract things like title, headings (e.g., References), and
 # fonts for additional checks
 preref_page_count = 0  # Count of pages before references
-appendix_before_refs = False
 char_font_sizes = []
 title_chars = []
 title = ""
@@ -110,17 +109,12 @@ for page_i, page_layout in enumerate(extract_pages(args.pdf_path)):
                         preref_page_count = page_i  # Don't count this page
                         if chars_in_page > len(cur_heading):  # Unless mid-page
                             preref_page_count = page_i + 1  # Then do count this page
-                    if re.match(r"\d*\.?\s*appendi(x|ces)", heading_str):
-                        if preref_page_count == 0:
-                            appendix_before_refs = True
                 else:
                     cur_heading.clear()
                 chars_in_page += 1
                 char_font_sizes.append(character.size)
 
 print("info: title=" + title)  # Not an error, just a way to get the title for later
-if appendix_before_refs:
-    print("appendix location: Appendices should be after the references, not before")
 if args.max_preref_pages and preref_page_count > args.max_preref_pages:
     print(
         "page limit: The paper has content on",
