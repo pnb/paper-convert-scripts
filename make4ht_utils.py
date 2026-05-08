@@ -84,7 +84,7 @@ def get_raw_tex_contents(
     elif main_tex_fname in tex_files:
         tex_fname = main_tex_fname
     elif len(tex_files):  # Have to find a fallback
-        for fbname in ["paper.tex", "article.tex"]:
+        for fbname in ["EDM_Article_Submission.tex", "paper.tex", "article.tex"]:
             if fbname in tex_files:
                 tex_fname = fbname
                 break
