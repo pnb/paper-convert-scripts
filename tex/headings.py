@@ -103,7 +103,7 @@ def add_headings(texer: TeXHandler) -> None:
                 h.name = "h3"
             # Remove any line breaks caused by \\ in the heading in LaTeX
             for br in h.find_all("br"):
-                br.decompose()
+                br.replace_with(" ")
     # Subheadings made via \paragraph
     for phead in texer.soup.select("span.paragraph, span.subparagraph"):
         parent = phead.parent
