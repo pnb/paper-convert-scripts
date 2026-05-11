@@ -404,6 +404,8 @@ class MammothParser:
                 if isinstance(ref.contents[0], bs4.NavigableString):
                     ref.contents[0].replace_with(num_regex.sub("", ref.contents[0]))
         elif self.input_template == "JEDM":
+            if ol.next_sibling and ol.next_sibling.name == "a":
+                ol.append(ol.next_sibling)  # Sometimes an anchor in JEDM style
             while (
                 ol.next_sibling
                 and ol.next_sibling.name == "p"
