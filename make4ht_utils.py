@@ -126,11 +126,13 @@ def get_raw_tex_contents(
 
     # apacite package in JEDM can't be converted, but seems replaceable
     if R"apacite" in tex_str and r"\shortcite" in tex_str:
-        tex_str = (
-            tex_str.replace(R"\shortcite{", R"\cite{")
-            .replace(R"\shortciteA{", R"\citeN{")  # Not sure why this one works
+        tex_str = (  # Convert to styles in jedm.cls
+            tex_str.replace(R"\cite{", R"\citeN{")  # Author (year)
+            .replace(R"\shortcite{", R"\cite{")
+            .replace(R"\shortciteA{", R"\citeN{")
             .replace(R"\shortciteNP{", R"\citeNP{")
             .replace(R"\citeA{", R"\citeN{")  # Not sure if this is apacite-specific
+            .replace(R"\citep{", R"\cite{")  # (Author, year) is already the default
         )
         tex_str = re.sub(
             r"^\s*\\usepackage\s*(\[.*\])?\s*\{\s*apacite\s*}",
