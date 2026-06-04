@@ -76,9 +76,9 @@ def get_raw_tex_contents(
                     os.path.join(tmp_name, fname), os.path.join(extracted_dir, fname)
                 )
 
-    tex_files = [
-        f for f in os.listdir(extracted_dir) if f.endswith(".tex") and f != "tmp.tex"
-    ]
+    tex_files = sorted(
+        [f for f in os.listdir(extracted_dir) if f.endswith(".tex") and f != "tmp.tex"]
+    )
     if len(tex_files) == 1:
         tex_fname = tex_files[0]
     elif main_tex_fname in tex_files:
