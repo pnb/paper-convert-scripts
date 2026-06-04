@@ -22,8 +22,8 @@ def fix_et_al(html_str: str) -> str:
     )
     # Additional JEDM ones with SVGs inserted that are super complicated
     html = re.sub(
-        r"\xa0al.{,45}?mbox.{,110}?mbox ?</span>\s*<span\s*class=.ptmr7t-[^>]+>",
-        " al.",
+        r"(\xa0|>)al.{,45}?mbox.{,150}?mbox ?</span>(</span>)?\s*<span\s*class=.p[a-z0-9]+-[^>]+>",
+        r"\1al. ",
         html,
         flags=re.DOTALL,
     )
