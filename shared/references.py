@@ -252,6 +252,8 @@ def get_citations(
         for elem in heading.find_all_next():
             if elem.name == "div" and "footnotes" in elem.get("class", []):
                 break  # Stop deleting at footnotes
+            if elem.name == "div" and "appendices" in elem.get("class", []):
+                break  # Appendix should also stop deletion
             elem.clear()  # Delete everything in references to avoid confusion
     text = soup_copy.get_text()
     if input_template == "JEDM":  # APA-ish
