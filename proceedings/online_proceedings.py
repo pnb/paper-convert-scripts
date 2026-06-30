@@ -148,7 +148,10 @@ for bibfile in os.listdir(args.bib_dir):
         # Filename (sans extension) is also key of the sole entry
         entry = db.entries[bibfile[:-4]]
         std_title = hash_title(entry.fields["title"].lower())
-        assert std_title not in bib_data, "Duplicate title issue"
+        if std_title in bib_data:
+            print("Duplicate title:", std_title)
+            print("For:", bibfile, "-- and:", bib_data[std_title])
+            assert std_title not in bib_data, "Duplicate title issue"
         bib_data[std_title] = db
 
 print("Processing papers")
