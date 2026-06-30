@@ -8,6 +8,7 @@ Run `python online_proceedings.py -h` for additional help and description of arg
 
 * The [paper_convert conda environment](../conda_env.yml)
 * A directory with all of the converted HTML papers to be included in the proceedings (and no more), each as an individual directory
+  * This can be obtained via the "Extraction commands" section of the admin interface
 * A directory with a .bib file, one per paper
   * Filenames need not match the HTML paper folders, since they will be matched based on title
   * The directory may contain additional BibTex files, but a one-to-one matching is assumed so these will generate warnings at the end to allow you to check that all expected HTML papers were found
