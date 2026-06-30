@@ -1,5 +1,5 @@
 Full Papers
-.*EDM.long-papers.*
+.*EDM.full-papers.*
 
 Short Papers
 .*EDM.short-papers.*
