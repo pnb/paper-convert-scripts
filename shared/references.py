@@ -255,7 +255,7 @@ def get_citations(
             if elem.name == "div" and "appendices" in elem.get("class", []):
                 break  # Appendix should also stop deletion
             elem.clear()  # Delete everything in references to avoid confusion
-    text = soup_copy.get_text()
+    text = soup_copy.get_text(separator=" | ")
     if input_template == "JEDM":  # APA-ish
         return get_apa_citations(text, lc_name_words, sentence_start_words)
     elif input_template == "EDM":
@@ -511,6 +511,7 @@ if __name__ == "__main__":
         <p>Multi-year cites with commas (Commaname et al., 2002, 2003, Solo, 1999)</p>
         <p>Citing edited book (Hunt & Worthen, 2006).</p>
         <p>something. Similarly, Kovanovic et al. (2018).</p>
+        <p>Possessive cite from Namington et al.'s (1999) paper.</p>
         <h1>References</h1>
     """
     example_soup = bs4.BeautifulSoup(example_html + processed_refs_html, "html.parser")
