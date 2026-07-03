@@ -343,7 +343,7 @@ def get_apa_citations(
         for i in range(ending.end() - 1, -1, -1):
             if inline and text[i] in " (" and text[i + 1] not in "([":
                 first_tok = text[i + 1 : ending.end() - 1].split()[0]
-                first_word = first_tok.rstrip(".,;:")
+                first_word = re.sub(r"[,.;:]*(['’]s)?", "", first_tok)
                 if text[i] == "(" or (  # Evidence we're past the cite start
                     first_word == first_word.lower()
                     and first_word not in lc_name_words
@@ -512,6 +512,7 @@ if __name__ == "__main__":
         <p>Citing edited book (Hunt & Worthen, 2006).</p>
         <p>something. Similarly, Kovanovic et al. (2018).</p>
         <p>Possessive cite from Namington et al.'s (1999) paper.</p>
+        <p>Possessive with curly apostrophe from Namington et al.’s (1999) paper.</p>
         <h1>References</h1>
     """
     example_soup = bs4.BeautifulSoup(example_html + processed_refs_html, "html.parser")
