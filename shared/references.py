@@ -255,7 +255,7 @@ def get_citations(
             if elem.name == "div" and "appendices" in elem.get("class", []):
                 break  # Appendix should also stop deletion
             elem.clear()  # Delete everything in references to avoid confusion
-    text = soup_copy.get_text(separator=" | ")
+    text = soup_copy.get_text()  # get_text(separator=" | ") not consistently working
     if input_template == "JEDM":  # APA-ish
         return get_apa_citations(text, lc_name_words, sentence_start_words)
     elif input_template == "EDM":
