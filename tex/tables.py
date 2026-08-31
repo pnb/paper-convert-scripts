@@ -121,12 +121,14 @@ def format_one_table(texer: TeXHandler, table: bs4.Tag) -> None:
             thead.append(header_row)
             for td in header_row.find_all("td"):
                 td.name = "th"
-    else:  # Assume header is first row
+    else:  # Assume header is first row with some text in it
         header_row = table.find("tr")
-        if header_row:
-            thead.append(header_row)
+        while header_row and not thead.get_text(strip=True):
+            next_header_row = header_row.find_next_sibling("tr")
             for td in header_row.find_all("td"):
                 td.name = "th"
+            thead.append(header_row)
+            header_row = next_header_row
     # Add CSS classes for horizontal borders as long it isn't every row
     data_tr = [
         tr for tr in table.find_all("tr") if not tr.find("th") and tr.get_text().strip()
