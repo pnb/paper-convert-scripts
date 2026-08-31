@@ -109,9 +109,10 @@ def _fix_figure_text(texer: TeXHandler, figure: bs4.Tag) -> None:
             elem.name != "figure"
             and elem.name != "img"
             and (elem.name != "span" or "fbox" not in elem.get("class", []))
+            and not (elem.name == "span" and "note" in elem.get("class", []))
         ):
             caption.insert(0, elem)
-    figure.append(caption)
+    figure.find_all("img")[-1].insert_after(caption)
     # Sometimes there is a leftover ":" element for some reason
     caption_remnant = caption.find("span", attrs={"class": ["caption", "id"]})
     if caption_remnant and caption_remnant.get_text().strip() == ":":
@@ -196,6 +197,10 @@ def format_figures(texer: TeXHandler) -> None:
             parent = newparent
         if parent.name == "div":
             parent.name = "figure"
+        note_div = parent.find("div")  # Sometimes there is a <div> for a Note
+        if note_div and "Note." in note_div.get_text():
+            note_div.name = "span"
+            note_div["class"] = "note"
         if not parent.find("div"):  # No (more) subfigures to worry about
             if "subfigure" in texer.tex_lines[env_start] or subfigure_wrapper:
                 parent["class"] = "has-subfigures"
