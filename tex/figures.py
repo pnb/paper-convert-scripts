@@ -112,7 +112,10 @@ def _fix_figure_text(texer: TeXHandler, figure: bs4.Tag) -> None:
             and not (elem.name == "span" and "note" in elem.get("class", []))
         ):
             caption.insert(0, elem)
-    figure.find_all("img")[-1].insert_after(caption)
+    if figure.find("figure"):  # Has subfigures
+        figure.append(caption)  # Overall caption goes after subfigures
+    else:  # Subfigure caption (or no subfigures) goes after the last image
+        figure.find_all("img")[-1].insert_after(caption)
     # Sometimes there is a leftover ":" element for some reason
     caption_remnant = caption.find("span", attrs={"class": ["caption", "id"]})
     if caption_remnant and caption_remnant.get_text().strip() == ":":
