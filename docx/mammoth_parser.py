@@ -409,8 +409,11 @@ class MammothParser:
             while (
                 ol.next_sibling
                 and ol.next_sibling.name == "p"
-                and ol.next_sibling.has_attr("class")
-                and "ReferenceItem" in ol.next_sibling["class"]
+                and ol.next_sibling.get_text(strip=True)
+                and not (  # Make sure if it has a class it is a ReferenceItem
+                    ol.next_sibling.has_attr("class")
+                    and "ReferenceItem" not in ol.next_sibling["class"]
+                )
             ):
                 ref = ol.next_sibling
                 ref.name = "li"
@@ -439,9 +442,11 @@ class MammothParser:
                 for a in elem.select("a"):  # Remove any email hrefs
                     a.unwrap()
                 for br in elem.select("br"):  # Remove breaks in emails
-                    if br.previous_sibling and br.previous_sibling.get_text(
-                        strip=True
-                    ).endswith("@") and br.next_sibling:
+                    if (
+                        br.previous_sibling
+                        and br.previous_sibling.get_text(strip=True).endswith("@")
+                        and br.next_sibling
+                    ):
                         # Join the prev/next siblings now
                         br.previous_sibling.replace_with(
                             br.previous_sibling.get_text(strip=True)
